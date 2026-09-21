@@ -1,0 +1,175 @@
+@import "tailwindcss";
+
+/*
+ * Paleta y tipografía del documento "Contenido de la landing page"
+ * (referencia visual entregada por el cliente) — no es el Anexo A
+ * final todavía (íconos oficiales del Anexo C siguen pendientes), pero
+ * ya no es un placeholder neutro: estos son los colores/tipografía de
+ * marca a usar. Si llega un Anexo A distinto más adelante, actualizar
+ * acá y en `src/app/layout.tsx` (fuente Poppins autohospedada).
+ */
+:root {
+  --background: #ffffff;
+  --foreground: #0c2340;
+}
+
+@theme {
+  /* Marino — fondos oscuros, titulares, logo */
+  --color-marino-50: #eef1f5;
+  --color-marino-100: #d9e2ec;
+  --color-marino-200: #b3c5d9;
+  --color-marino-300: #8da8c6;
+  --color-marino-400: #5c7fa3;
+  --color-marino-500: #3e5c76;
+  --color-marino-600: #23405c;
+  --color-marino-700: #16304a;
+  --color-marino-800: #10253a;
+  --color-marino-900: #0c2340;
+  --color-marino-950: #071426;
+
+  /* Naranja — botones de acción, acentos, alertas */
+  --color-naranja-50: #fff7ed;
+  --color-naranja-100: #ffedd5;
+  --color-naranja-200: #fed7aa;
+  --color-naranja-300: #fdba74;
+  --color-naranja-400: #fb923c;
+  --color-naranja-500: #f97316;
+  --color-naranja-600: #ea580c;
+  --color-naranja-700: #c2410c;
+  --color-naranja-800: #9a3412;
+  --color-naranja-900: #7c2d12;
+
+  /* Fondos de sección */
+  --color-claro-marca: #d9e2ec;
+  --color-gris-seccion: #f7fafc;
+
+  --font-sans: var(--font-poppins), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+}
+
+@layer utilities {
+  .animate-fade-up {
+    animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-hero-in {
+    animation: hero-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 2.4s ease-in-out infinite;
+  }
+
+  .animate-slide-fade {
+    animation: slide-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Textura tipo "plano de construcción" para romper la planitud de un
+     fondo sólido — siempre visible, es un background-image en CSS puro. */
+  .bg-blueprint {
+    background-image: linear-gradient(to right, rgb(12 35 64 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(12 35 64 / 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .marquee-track {
+    animation: marquee 28s linear infinite;
+  }
+  .marquee-track:hover {
+    animation-play-state: paused;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(26px) scale(0.97);
+    filter: blur(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes slide-fade {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-slow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(234 88 12 / 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgb(234 88 12 / 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-hero-in,
+  .animate-pulse-slow,
+  .animate-slide-fade,
+  .marquee-track {
+    animation: none;
+  }
+}
