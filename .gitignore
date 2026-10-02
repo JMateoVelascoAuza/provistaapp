@@ -16,6 +16,7 @@
 # next.js
 /.next/
 /out/
+*.zip
 
 # production
 /build
@@ -50,3 +51,6 @@ next-env.d.ts
 /public/worker-*.js.map
 /public/fallback-*.js
 /public/fallback-*.js.map
+
+# archivos de entrega generados (index.html / demo.html / Entreobra.html autocontenidos)
+/entrega/

@@ -1,78 +1,94 @@
-import { Mail } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { PrivacyModal } from "@/components/ui/PrivacyModal";
+import { ScrollStagger } from "@/components/ui/ScrollReveal";
+import { WHATSAPP_ENTREOBRA } from "@/lib/datos";
+import { cn } from "@/lib/utils";
 
-// lucide-react ya no incluye logos de marca (Instagram/Facebook/TikTok)
-// por temas de licencia, así que van como SVG simple — son íconos de
-// plataforma estándar, no una decisión de identidad de Provista.
-function IconoInstagram(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
+// Usuario de redes según el manual de marca: @entreobra.
+const REDES: { label: string; href?: string }[] = [
+  { label: "Instagram", href: "https://www.instagram.com/entreobra" },
+  { label: "Facebook", href: "https://www.facebook.com/entreobra" },
+  { label: "TikTok", href: "https://www.tiktok.com/@entreobra" },
+];
 
-function IconoFacebook(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} {...props}>
-      <path d="M15 8.5h2V5.2c-.4-.05-1.5-.2-2.7-.2-2.7 0-4.5 1.6-4.5 4.6v2.4H7v3.6h2.8V21h3.6v-5.4h2.8l.5-3.6h-3.3V9.9c0-1 .3-1.4 1.6-1.4Z" />
-    </svg>
-  );
-}
+// Los dos tratamientos del logo principal del manual: sobre yeso
+// (landing) y sobre carbón (demo).
+const TONOS = {
+  claro: {
+    footer: "border-arena bg-yeso",
+    fondoLogo: "yeso",
+    etiqueta: "text-oliva-oscuro",
+    texto: "text-tierra/80",
+    enlace: "hover:text-carbon",
+    separador: "text-arena",
+    linea: "border-arena",
+    pie: "text-oliva-oscuro",
+  },
+  oscuro: {
+    footer: "border-yeso/6 bg-carbon",
+    fondoLogo: "carbon",
+    etiqueta: "text-oliva",
+    texto: "text-arena/75",
+    enlace: "hover:text-yeso",
+    separador: "text-oliva/60",
+    linea: "border-yeso/6",
+    pie: "text-oliva",
+  },
+} as const;
 
-function IconoTikTok(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
-      <path d="M16.6 5.8a4.3 4.3 0 0 1-3.1-3.1h-2.7v13.2a2.6 2.6 0 1 1-1.8-2.5v-2.8a5.4 5.4 0 1 0 4.5 5.3V9.1a7 7 0 0 0 3.1.7z" />
-    </svg>
-  );
-}
+export function Footer({ tono = "oscuro" }: { tono?: keyof typeof TONOS }) {
+  const t = TONOS[tono];
+  const enlace = cn("transition-colors duration-300", t.enlace);
 
-// TODO: reemplazar WhatsApp/correo/redes con los datos reales del
-// cliente en cuanto los confirme (WhatsApp queda "a definir" según el
-// documento de contenido).
-export function Footer() {
   return (
-    <footer className="bg-gris-seccion py-12">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:grid-cols-3 sm:px-8">
+    <footer className={cn("border-t", t.footer)}>
+      <ScrollStagger stagger={0.1} className="contenedor grid gap-12 py-16 sm:grid-cols-3 md:py-20">
         <div>
-          <Logo />
-          <p className="mt-4 text-sm text-marino-500">Materiales de construcción, ordenados por obra.</p>
-          <p className="mt-1 text-sm text-marino-400">Cochabamba, Bolivia</p>
+          <Logo variante="principal" fondo={t.fondoLogo} animado="scroll" className="text-[20px] md:text-[26px]" />
+          <p className={cn("mt-6 text-[13px]", t.etiqueta)}>Cochabamba, Bolivia</p>
         </div>
 
-        <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-marino-400">Contacto</p>
-          <div className="flex flex-col gap-1.5 text-sm text-marino-500">
-            <span>WhatsApp: +591 ___ _____</span>
-            <a href="mailto:contacto@provistabo.com" className="flex items-center gap-1.5 hover:text-marino-900">
-              <Mail size={14} /> contacto@provistabo.com
+        <div className="sm:justify-self-center">
+          <p className={cn("etiqueta text-[10px]", t.etiqueta)}>Contacto</p>
+          <div className={cn("mt-5 flex flex-col gap-2 text-[13px]", t.texto)}>
+            <a href={`https://wa.me/${WHATSAPP_ENTREOBRA}`} target="_blank" rel="noopener noreferrer" className={enlace}>
+              WhatsApp +591 76971774
+            </a>
+            <a href="mailto:hola@entreobra.com" className={enlace}>
+              hola@entreobra.com
             </a>
           </div>
         </div>
 
-        <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-marino-400">Síguenos</p>
-          <div className="flex items-center gap-3 text-marino-400">
-            <a href="#" aria-label="Instagram" className="transition hover:scale-110 hover:text-marino-900">
-              <IconoInstagram width={18} height={18} />
-            </a>
-            <a href="#" aria-label="Facebook" className="transition hover:scale-110 hover:text-marino-900">
-              <IconoFacebook width={18} height={18} />
-            </a>
-            <a href="#" aria-label="TikTok" className="transition hover:scale-110 hover:text-marino-900">
-              <IconoTikTok width={18} height={18} />
-            </a>
-          </div>
+        <div className="sm:justify-self-end sm:text-right">
+          <p className={cn("etiqueta text-[10px]", t.etiqueta)}>Síguenos</p>
+          <p className={cn("mt-5 text-[13px]", t.texto)}>
+            {REDES.map((red, i) => (
+              <span key={red.label}>
+                {i > 0 && <span className={cn("mx-2", t.separador)}>·</span>}
+                <a href={red.href} target="_blank" rel="noopener noreferrer" className={enlace}>
+                  {red.label}
+                </a>
+              </span>
+            ))}
+          </p>
         </div>
-      </div>
+      </ScrollStagger>
 
-      <div className="mx-auto mt-10 flex max-w-6xl flex-col items-center justify-between gap-2 border-t border-marino-100 px-4 pt-6 text-xs text-marino-400 sm:flex-row sm:px-8">
-        <p>© {new Date().getFullYear()} Provista</p>
-        <PrivacyModal />
+      {/* Sin animación de entrada: al final de la página nunca llega al
+          punto que la dispara, y quedaba invisible y corrida hacia abajo
+          (dejaba ver el fondo del body bajo el footer). */}
+      <div className="contenedor">
+        <div
+          className={cn(
+            "flex flex-col gap-3 border-t py-7 text-xs sm:flex-row sm:items-center sm:justify-between",
+            t.linea,
+            t.pie,
+          )}
+        >
+          <p>© {new Date().getFullYear()} Entreobra</p>
+          <PrivacyModal className={t.enlace} />
+        </div>
       </div>
     </footer>
   );

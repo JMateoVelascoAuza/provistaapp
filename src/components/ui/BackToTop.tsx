@@ -5,16 +5,15 @@ import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 /**
- * No existe hasta que el usuario scrollea lo suficiente — arranca sin
- * renderizarse tanto en servidor como en cliente (mismo estado inicial
- * en los dos lados), así que no hay parpadeo posible.
+ * No existe hasta que el usuario scrollea lo suficiente — arranca oculto
+ * tanto en servidor como en cliente, así que no hay parpadeo posible.
  */
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     function onScroll() {
-      setVisible(window.scrollY > 700);
+      setVisible(window.scrollY > 900);
     }
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -26,13 +25,14 @@ export function BackToTop() {
       type="button"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       aria-label="Volver arriba"
+      tabIndex={visible ? 0 : -1}
       className={cn(
-        "fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center rounded-full bg-marino-900 text-white shadow-lg transition-all duration-300",
-        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0",
-        "hover:scale-110 hover:bg-marino-700",
+        "fixed bottom-5 right-5 z-30 flex h-11 w-11 items-center justify-center border border-yeso/15 bg-carbon/90 text-arena backdrop-blur-sm transition-all duration-500 ease-obra md:bottom-8 md:right-8",
+        visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0",
+        "hover:border-oxido hover:text-yeso",
       )}
     >
-      <ArrowUp size={18} />
+      <ArrowUp size={16} strokeWidth={1.5} />
     </button>
   );
 }

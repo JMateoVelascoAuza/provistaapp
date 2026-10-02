@@ -1,28 +1,128 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
+type Fondo = "carbon" | "yeso";
+
 /**
- * Ícono circular + wordmark en minúscula con línea naranja debajo,
- * según el documento de contenido ("Barra superior"). El ícono en sí
- * (Anexo C) todavía es un placeholder de texto — el resto (tipografía,
- * color, subrayado) ya es el diseño de marca real.
+ * Monograma de corchetes (manual de marca, "Ícono"): los corchetes en
+ * óxido encierran una E de trazo fino — clara sobre carbón, oscura sobre
+ * yeso. `mono` lo pinta todo de un solo color (currentColor) y `grueso`
+ * engrosa el trazo para tamaños chicos, como pide el manual.
  */
-export function Logo({ className, dark = false }: { className?: string; dark?: boolean }) {
+export function Monograma({
+  className,
+  fondo = "carbon",
+  mono = false,
+  grueso = false,
+}: {
+  className?: string;
+  fondo?: Fondo;
+  mono?: boolean;
+  grueso?: boolean;
+}) {
+  const corchete = mono ? "currentColor" : "var(--color-oxido)";
+  const letra = mono ? "currentColor" : fondo === "carbon" ? "var(--color-yeso)" : "var(--color-carbon)";
   return (
-    <span className={cn("flex items-center gap-2", className)}>
-      <span
-        className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-semibold",
-          dark ? "bg-white text-marino-900" : "bg-marino-900 text-white",
-        )}
-      >
-        P
-      </span>
-      <span className="flex flex-col leading-none">
-        <span className={cn("text-lg font-light", dark ? "text-white" : "text-marino-900")}>
-          provista
+    <svg viewBox="0 0 32 32" fill="none" aria-hidden className={cn("monograma h-6 w-6 shrink-0 overflow-visible", className)}>
+      <g stroke={corchete} strokeWidth={grueso ? 2.6 : 1.45} strokeLinecap="square" strokeLinejoin="miter">
+        <path className="corchete-izq" d="M11 5H6.5v22H11" />
+        <path className="corchete-der" d="M21 5h4.5v22H21" />
+      </g>
+      <g className="monograma-e" stroke={letra} strokeWidth={grueso ? 1.8 : 0.95} strokeLinecap="square">
+        <path pathLength={1} d="M18.9 11h-5.6v10h5.6" />
+        <path pathLength={1} d="M13.3 16h4.9" />
+      </g>
+    </svg>
+  );
+}
+
+const NOMBRE = "Entreobra";
+const BAJADA = "Materiales de obra";
+
+type Variante = "principal" | "sin-bajada" | "icono" | "solo-icono";
+type Animacion = "no" | "carga" | "scroll";
+
+/**
+ * Logotipo según el manual de marca: Jost Light en versalitas
+ * espaciadas. `tamano` es el cuerpo del nombre en px (o se hereda del
+ * font-size de `className`, para tamaños responsive); el interletrado y
+ * la bajada salen de las proporciones del manual (interletrado 9 px y
+ * bajada a 7 px sobre el logo de referencia), así se ve igual a
+ * cualquier tamaño.
+ *
+ * Variantes del manual: `principal` (con bajada), `sin-bajada`
+ * (encabezados), `icono` (barra de navegación) y `solo-icono`.
+ *
+ * `animado`: "carga" anima al montar; "scroll" espera a que el logo
+ * entre en pantalla. Los corchetes se abren desde la E, la E se dibuja
+ * y las letras entran una a una. Al pasar el mouse los corchetes se
+ * separan — la plataforma está *entre* la obra y el proveedor.
+ */
+export function Logo({
+  variante = "icono",
+  tamano,
+  fondo = "carbon",
+  animado = "no",
+  className,
+}: {
+  variante?: Variante;
+  tamano?: number;
+  fondo?: Fondo;
+  animado?: Animacion;
+  className?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [visible, setVisible] = useState(animado !== "scroll");
+
+  useEffect(() => {
+    if (animado !== "scroll" || !ref.current) return;
+    const observer = new IntersectionObserver(
+      ([entrada]) => {
+        if (entrada.isIntersecting) {
+          setVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "0px 0px -10% 0px" },
+    );
+    observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [animado]);
+
+  const estado = animado === "no" ? undefined : visible ? "si" : "espera";
+  const colorNombre = fondo === "carbon" ? "text-yeso" : "text-carbon";
+  const conIcono = variante === "icono" || variante === "solo-icono";
+
+  return (
+    <span
+      ref={ref}
+      role="img"
+      aria-label={variante === "principal" ? `${NOMBRE}, ${BAJADA}` : NOMBRE}
+      data-animar={estado}
+      className={cn("logo inline-flex items-center", className)}
+      style={tamano ? { fontSize: tamano } : undefined}
+    >
+      {conIcono && (
+        <Monograma
+          fondo={fondo}
+          grueso={tamano !== undefined && tamano < 13}
+          className={cn("h-[1.55em] w-[1.55em]", variante === "icono" && "mr-[0.6em]")}
+        />
+      )}
+      {variante !== "solo-icono" && (
+        <span className="inline-flex flex-col items-start" aria-hidden>
+          <span className={cn("wordmark leading-none", colorNombre)}>
+            {NOMBRE.split("").map((letra, i) => (
+              <span key={i} className="logo-letra" style={{ "--i": i } as React.CSSProperties}>
+                {letra}
+              </span>
+            ))}
+          </span>
+          {variante === "principal" && <span className="wordmark-bajada logo-bajada mt-[0.75em] leading-none text-oliva">{BAJADA}</span>}
         </span>
-        <span className="mt-1 h-0.5 w-6 rounded-full bg-naranja-600" />
-      </span>
+      )}
     </span>
   );
 }
