@@ -1,131 +1,191 @@
-import { Check, Star } from "lucide-react";
-import { FloatingIcons } from "@/components/ui/FloatingIcons";
-import { CountUp } from "@/components/ui/CountUp";
-import { Parallax } from "@/components/ui/Parallax";
-import { CursorGlow } from "@/components/ui/CursorGlow";
-import { MagneticButton } from "@/components/ui/MagneticButton";
+"use client";
 
-// Nombres y precios de ejemplo — fáciles de reemplazar antes de publicar.
-const PROVEEDORES = [
-  { iniciales: "FSA", nombre: "Ferretería San Antonio", tiempo: "24h", distancia: "2.1 km", rating: 4.6, precio: 2600 },
-  { iniciales: "MCB", nombre: "Materiales Cochabamba", tiempo: "48h", distancia: "3.8 km", rating: 4.4, precio: 2710 },
-  { iniciales: "DBO", nombre: "Distribuidora Bolivia", tiempo: "72h", distancia: "6.4 km", rating: 4.1, precio: 2840 },
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { Foto } from "@/components/ui/Foto";
+import { CountUp } from "@/components/ui/CountUp";
+import { AHORRO } from "@/lib/datos";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { cn } from "@/lib/utils";
+
+gsap.registerPlugin(ScrollTrigger);
+
+const METRICAS = [
+  { valor: 3, prefijo: "", sufijo: " h", label: "Ahorradas por pedido" },
+  { valor: AHORRO, prefijo: "Bs ", sufijo: "", label: "Entre el más caro y el más barato" },
+  { valor: 6, prefijo: "", sufijo: "", label: "Categorías comparadas" },
+  { valor: 0, prefijo: "Bs ", sufijo: "", label: "Costo para tu obra", acento: true },
 ];
 
-const ahorro = Math.max(...PROVEEDORES.map((p) => p.precio)) - Math.min(...PROVEEDORES.map((p) => p.precio));
-
-function formatBs(valor: number) {
-  return `Bs ${valor.toLocaleString("es-BO")}`;
-}
+const LINEAS_TITULO = ["Entre tu obra", "y tu proveedor."];
+const LETRAS = "Entreobra".split("");
 
 export function Hero() {
+  const seccionRef = useRef<HTMLElement>(null);
+  const fondoRef = useRef<HTMLDivElement>(null);
+  const wordmarkRef = useRef<HTMLDivElement>(null);
+  const textoRef = useRef<HTMLDivElement>(null);
+  const reducido = usePrefersReducedMotion();
+
+  // Al salir del hero, la fotografía se desplaza más lento que el
+  // contenido y el wordmark se aleja — profundidad sin cortes secos.
+  // Todo parte del estado renderizado (`gsap.to`): en scroll 0 se ve
+  // exactamente igual que el HTML del servidor.
+  useGSAP(
+    () => {
+      const seccion = seccionRef.current;
+      if (!seccion) return;
+      const letras = gsap.utils.toArray<HTMLElement>("[data-letra]", seccion);
+      const letrasBrillo = gsap.utils.toArray<HTMLElement>("[data-letra-brillo]", seccion);
+      const brillo = seccion.querySelector<HTMLElement>("[data-brillo]");
+
+      if (reducido) {
+        gsap.set(letras, { opacity: 1 });
+        return;
+      }
+
+      // Entrada: las letras suben desde el centro hacia afuera, saliendo
+      // de un desenfoque; después se enciende la capa de brillo.
+      gsap.fromTo(
+        letras,
+        { opacity: 0, yPercent: 70, filter: "blur(14px)" },
+        {
+          opacity: 1,
+          yPercent: 0,
+          filter: "blur(0px)",
+          duration: 1.6,
+          ease: "expo.out",
+          delay: 0.15,
+          stagger: { each: 0.07, from: "center" },
+          clearProps: "filter",
+        },
+      );
+      if (brillo) gsap.to(brillo, { opacity: 1, duration: 1.2, delay: 1.6 });
+
+      // Al salir del hero: la foto va más lenta que el contenido, y las
+      // letras se separan desde el centro mientras se desvanecen.
+      const scrollTrigger = {
+        trigger: seccion,
+        start: "top top",
+        end: "bottom top",
+        scrub: true,
+      };
+      const centro = (LETRAS.length - 1) / 2;
+      gsap.to(fondoRef.current, { yPercent: 18, ease: "none", scrollTrigger });
+      gsap.to(wordmarkRef.current, { yPercent: 50, opacity: 0, ease: "none", scrollTrigger });
+      gsap.to([...letras, ...letrasBrillo], {
+        x: (i) => ((i % LETRAS.length) - centro) * 26,
+        ease: "none",
+        scrollTrigger,
+      });
+      gsap.to(textoRef.current, {
+        y: -40,
+        opacity: 0,
+        ease: "none",
+        scrollTrigger: { ...scrollTrigger, end: "70% top" },
+      });
+    },
+    { scope: seccionRef, dependencies: [reducido] },
+  );
+
   return (
-    <section id="top" className="bg-blueprint relative overflow-hidden bg-linear-to-b from-gris-seccion to-white">
-      <Parallax speed={-0.15} className="pointer-events-none absolute -left-20 top-10 h-64 w-64 rounded-full bg-naranja-200/30 blur-3xl" />
-      <Parallax speed={0.2} className="pointer-events-none absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-marino-200/40 blur-3xl" />
-      <Parallax speed={-0.1} className="pointer-events-none absolute inset-0">
-        <FloatingIcons />
-      </Parallax>
-      <CursorGlow />
+    <section id="top" ref={seccionRef} className="relative isolate overflow-hidden">
+      <div ref={fondoRef} className="absolute inset-x-0 top-[-6%] -z-10 h-[112%]">
+        <Foto textura="encofrado" velo={0.28} />
+        {/* Viñeta: el texto siempre cae sobre la zona más oscura. */}
+        <div className="absolute inset-0 bg-linear-to-r from-carbon/70 via-carbon/20 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-b from-carbon/40 via-transparent to-carbon/50" />
+      </div>
 
-      <div className="relative mx-auto grid max-w-6xl gap-10 px-4 py-20 sm:px-8 lg:grid-cols-2 lg:items-center lg:py-28">
-        <div>
-          <span
-            style={{ animationDelay: "0ms" }}
-            className="animate-hero-in inline-flex items-center gap-1.5 rounded-full bg-naranja-50 px-3.5 py-1.5 text-xs font-medium text-naranja-700"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-naranja-600" />
-            Hecho en Cochabamba, para obras de Cochabamba
+      {/* Wordmark translúcido, grabado sobre el hormigón. Dos capas con
+          las mismas letras: la base y una de brillo que solo se ve donde
+          pasa la máscara (la luz que recorre la palabra). */}
+      <div
+        ref={wordmarkRef}
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-12 -z-10 flex select-none justify-center md:top-[14%]"
+      >
+        <span className="relative block text-[13vw] font-light uppercase leading-none md:text-[8.5vw] xl:text-[120px]">
+          <span className="block pl-[0.28em] tracking-[0.28em] text-yeso/7">
+            {LETRAS.map((letra, i) => (
+              <span key={i} data-letra className="inline-block opacity-0">
+                {letra}
+              </span>
+            ))}
           </span>
+          <span data-brillo className="hero-brillo absolute inset-0 block pl-[0.28em] tracking-[0.28em] text-yeso/30 opacity-0">
+            {LETRAS.map((letra, i) => (
+              <span key={i} data-letra-brillo className="inline-block">
+                {letra}
+              </span>
+            ))}
+          </span>
+        </span>
+      </div>
 
-          <h1
-            style={{ animationDelay: "100ms" }}
-            className="animate-hero-in mt-5 text-4xl font-semibold leading-tight tracking-tight text-marino-900 sm:text-5xl"
-          >
-            Todos los materiales de tu obra,
-            <br />
-            <span className="text-naranja-600">en un solo lugar</span>
+      <div className="contenedor flex min-h-[calc(100svh-4rem)] flex-col md:min-h-[min(calc(100svh-4rem),56rem)] lg:min-h-[min(calc(100svh-4.5rem),56rem)]">
+        <div ref={textoRef} className="flex flex-1 flex-col justify-center pb-14 pt-32 md:pb-20 md:pt-40">
+          <p className="etiqueta animate-aparecer flex items-center gap-4 text-arena/70" style={{ animationDelay: "250ms" }}>
+            <span className="animate-trazo block h-px w-8 bg-oxido" style={{ animationDelay: "350ms" }} />
+            Cochabamba · Bolivia
+          </p>
+
+          <h1 className="titulo mt-6 text-[2.75rem] text-yeso sm:text-6xl lg:text-[4.5rem]">
+            {LINEAS_TITULO.map((linea, i) => (
+              <span key={linea} className="mb-[-0.12em] block overflow-hidden pb-[0.12em]">
+                <span className="animate-linea block" style={{ animationDelay: `${380 + i * 110}ms` }}>
+                  {linea}
+                </span>
+              </span>
+            ))}
           </h1>
 
           <p
-            style={{ animationDelay: "200ms" }}
-            className="animate-hero-in mt-5 max-w-lg text-lg text-marino-500"
+            className="animate-aparecer mt-7 max-w-md text-[15px] leading-relaxed text-arena/80 md:text-base"
+            style={{ animationDelay: "650ms" }}
           >
-            Compara precios, tiempos de entrega y proveedores reales. Arma tu
-            pedido en minutos, sin perder la mañana en WhatsApp.
+            Mira quién tiene stock ahora y a qué precio, sin perder la mañana en WhatsApp.
           </p>
 
-          <div style={{ animationDelay: "300ms" }} className="animate-hero-in mt-8 flex flex-wrap gap-3">
-            <MagneticButton>
-              <a
-                href="#formulario"
-                className="animate-pulse-slow inline-block rounded-full bg-naranja-600 px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-naranja-700"
-              >
-                Quiero probarlo
-              </a>
-            </MagneticButton>
-            <MagneticButton>
-              <a
-                href="#para-quien-es"
-                className="inline-block rounded-full border border-marino-900 px-6 py-3.5 text-sm font-semibold text-marino-900 transition hover:bg-marino-900 hover:text-white"
-              >
-                Soy proveedor
-              </a>
-            </MagneticButton>
-          </div>
-
-          <div
-            style={{ animationDelay: "380ms" }}
-            className="animate-hero-in mt-6 flex flex-wrap gap-x-5 gap-y-1.5 text-sm text-marino-500"
-          >
-            <span className="flex items-center gap-1.5">
-              <Check size={15} className="text-naranja-600" /> Sin costo para tu obra
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Check size={15} className="text-naranja-600" /> Proveedores verificados
-            </span>
+          <div className="animate-aparecer mt-10 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "780ms" }}>
+            <a href="#comparar" className="boton boton-oxido">
+              Comparar precios
+            </a>
+            <a href="#proveedores" className="boton boton-linea">
+              Soy proveedor
+            </a>
           </div>
         </div>
 
-        <div style={{ animationDelay: "180ms" }} className="animate-hero-in">
-          <div className="rounded-2xl border border-marino-100 bg-white p-5 shadow-xl shadow-marino-900/10">
-            <p className="text-xs text-marino-400">Buscaste</p>
-            <p className="mb-4 font-semibold text-marino-900">Cemento IP-30 · 50 bolsas</p>
-
-            <div className="flex flex-col gap-2.5">
-              {PROVEEDORES.map((proveedor, i) => (
-                <div
-                  key={proveedor.nombre}
-                  style={{ animationDelay: `${520 + i * 100}ms` }}
-                  className="animate-fade-up flex items-center gap-3 rounded-xl border border-marino-100 p-3 transition hover:border-naranja-200 hover:bg-naranja-50/40"
-                >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-marino-500 text-[11px] font-semibold text-white">
-                    {proveedor.iniciales}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-marino-900">{proveedor.nombre}</p>
-                    <p className="flex items-center gap-1 text-xs text-marino-400">
-                      {proveedor.tiempo} · {proveedor.distancia} ·{" "}
-                      <Star size={11} className="fill-naranja-400 text-naranja-400" /> {proveedor.rating}
-                    </p>
-                  </div>
-                  <p className="shrink-0 text-sm font-semibold text-marino-900">{formatBs(proveedor.precio)}</p>
-                </div>
-              ))}
-            </div>
-
+        {/* Barra de métricas flotante, apoyada en el borde del hero. */}
+        <dl className="relative grid grid-cols-2 border-t border-yeso/8 bg-carbon/95 backdrop-blur-sm md:grid-cols-4">
+          {METRICAS.map((m, i) => (
             <div
-              style={{ animationDelay: "900ms" }}
-              className="animate-fade-up mt-3 rounded-xl bg-naranja-50 px-3.5 py-2.5 text-sm text-naranja-800"
+              key={m.label}
+              className={cn(
+                "animate-aparecer relative flex flex-col px-5 py-6 md:px-7 md:py-8",
+                i % 2 === 1 && "border-l border-yeso/8",
+                i >= 2 && "border-t border-yeso/8 md:border-t-0",
+                i === 2 && "md:border-l",
+              )}
+              style={{ animationDelay: `${900 + i * 90}ms` }}
             >
-              Ahorras{" "}
-              <span className="font-semibold">
-                Bs <CountUp value={ahorro} />
-              </span>{" "}
-              eligiendo el mejor precio de {PROVEEDORES.length} proveedores
+              <dt className="etiqueta order-2 mt-3 text-[10px] leading-relaxed tracking-[0.18em] text-oliva md:tracking-[0.32em]">{m.label}</dt>
+              <dd
+                className={cn(
+                  "-order-1 text-[1.65rem] font-light leading-none tabular-nums md:text-[2rem]",
+                  m.acento ? "text-oxido" : "text-yeso",
+                )}
+              >
+                {m.prefijo}
+                <CountUp value={m.valor} retraso={950 + i * 90} />
+                {m.sufijo}
+              </dd>
             </div>
-          </div>
-        </div>
+          ))}
+        </dl>
       </div>
     </section>
   );

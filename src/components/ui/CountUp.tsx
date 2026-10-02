@@ -1,39 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 /**
- * Cuenta de 0 al valor final al montar. El servidor manda el valor
- * final directo (sin JS no hay animación, pero el número correcto
- * igual se ve) — el conteo desde 0 es un efecto visual que se monta
- * encima, no un gate de visibilidad del contenido.
+ * Cuenta de 0 al valor final al montar (tras `retraso` ms). El servidor
+ * manda el valor final directo (sin JS no hay animación, pero el número
+ * correcto igual se ve) — el conteo es un efecto visual encima, no un
+ * gate de visibilidad del contenido.
  *
- * Sin guardas de "ya corrí" con useRef: en React StrictMode (dev) el
- * efecto se invoca, limpia y vuelve a invocar — una guarda de ese tipo
- * deja el segundo montaje sin arrancar nunca el requestAnimationFrame
- * (la guarda ya estaba en `true` por el primer montaje, que la
- * limpieza ya había cancelado), y el número se queda pegado en 0. La
- * función de limpieza de abajo ya se encarga de cancelar el frame
- * viejo correctamente sin necesidad de esa guarda.
+ * Sin guardas de "ya corrí" con useRef: en StrictMode (dev) el efecto
+ * se invoca, limpia y vuelve a invocar — una guarda así deja el segundo
+ * montaje sin arrancar y el número pegado en 0. La limpieza de abajo ya
+ * cancela el frame viejo correctamente.
  */
 export function CountUp({
   value,
-  duration = 1200,
+  duration = 1400,
+  retraso = 0,
   formatter = (n: number) => String(n),
 }: {
   value: number;
   duration?: number;
+  retraso?: number;
   formatter?: (n: number) => string;
 }) {
   const [display, setDisplay] = useState(value);
+  const reducido = usePrefersReducedMotion();
 
   useEffect(() => {
-    const inicio = performance.now();
+    if (reducido || value === 0) return;
     let frame: number;
+    let inicio: number | null = null;
 
     function tick(ahora: number) {
-      const progreso = Math.min((ahora - inicio) / duration, 1);
-      const facilitado = 1 - Math.pow(1 - progreso, 3);
+      inicio ??= ahora + retraso;
+      const progreso = Math.min(Math.max((ahora - inicio) / duration, 0), 1);
+      const facilitado = 1 - Math.pow(1 - progreso, 4);
       setDisplay(Math.round(facilitado * value));
       if (progreso < 1) frame = requestAnimationFrame(tick);
     }
@@ -42,7 +45,7 @@ export function CountUp({
     setDisplay(0);
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [value, duration]);
+  }, [value, duration, retraso, reducido]);
 
   return <>{formatter(display)}</>;
 }

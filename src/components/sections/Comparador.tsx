@@ -1,0 +1,243 @@
+"use client";
+
+import { useRef } from "react";
+import { useGSAP } from "@gsap/react";
+import gsap from "gsap";
+import { Flip } from "gsap/Flip";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollReveal, ScrollStagger } from "@/components/ui/ScrollReveal";
+import { AHORRO, formatBs, PROVEEDORES } from "@/lib/datos";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { cn } from "@/lib/utils";
+
+gsap.registerPlugin(ScrollTrigger, Flip);
+
+const VENTAJAS = [
+  "Mismo material, varios proveedores",
+  "Un pedido, aunque venga de tres ferreterías",
+  "Cada gasto ordenado por obra",
+];
+
+const NUMEROS = ["uno", "dos", "tres", "cuatro", "cinco"];
+
+// Orden en que aparecen las filas antes de que el comparador las ordene
+// por precio (PROVEEDORES ya viene ordenado de menor a mayor).
+const ORDEN_INICIAL = [1, 2, 0];
+
+const precios = PROVEEDORES.map((p) => p.precio);
+const MIN = Math.min(...precios);
+const MAX = Math.max(...precios);
+const anchoBarra = (precio: number) => 0.35 + (0.65 * (precio - MIN)) / (MAX - MIN || 1);
+
+const ESTADO_FINAL = "Ordenado por precio total";
+
+/**
+ * La tarjeta "compara" al entrar en pantalla: las filas llegan
+ * desordenadas, los precios cuentan hasta su valor, el comparador las
+ * ordena (Flip: cada fila se desliza a su lugar), marca la mejor opción
+ * y el ahorro cuenta hasta su total. El HTML del servidor ya es el
+ * estado final, así que sin JS o con movimiento reducido se ve completo.
+ */
+export function Comparador() {
+  const tarjetaRef = useRef<HTMLDivElement>(null);
+  const reducido = usePrefersReducedMotion();
+
+  useGSAP(
+    () => {
+      const tarjeta = tarjetaRef.current;
+      if (reducido || !tarjeta) return;
+      const filas = Array.from(tarjeta.querySelectorAll<HTMLElement>("[data-fila]"));
+      const montos = Array.from(tarjeta.querySelectorAll<HTMLElement>("[data-monto]"));
+      const barras = Array.from(tarjeta.querySelectorAll<HTMLElement>("[data-barra]"));
+      const marca = tarjeta.querySelector<HTMLElement>("[data-marca]");
+      const chip = tarjeta.querySelector<HTMLElement>("[data-chip]");
+      const escaneo = tarjeta.querySelector<HTMLElement>("[data-escaneo]");
+      const estado = tarjeta.querySelector<HTMLElement>("[data-estado]");
+      const ahorro = tarjeta.querySelector<HTMLElement>("[data-ahorro]");
+
+      if (!marca || !chip || !escaneo) return;
+      filas.forEach((fila, i) => (fila.style.order = String(ORDEN_INICIAL[i])));
+      gsap.set(filas, { opacity: 0, y: 14 });
+      gsap.set(barras, { scaleX: 0 });
+      gsap.set(barras[0], { backgroundColor: "#c4bdb2" });
+      gsap.set([marca, chip], { opacity: 0 });
+      gsap.set(marca, { scaleY: 0 });
+      gsap.set(escaneo, { scaleX: 0 });
+      if (estado) estado.textContent = `Comparando ${NUMEROS[PROVEEDORES.length - 1]} ferreterías…`;
+      montos.forEach((m) => (m.textContent = formatBs(0)));
+      if (ahorro) ahorro.textContent = formatBs(0);
+
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out" },
+        scrollTrigger: { trigger: tarjeta, start: "top 75%", once: true },
+      });
+
+      tl.to(filas, { opacity: 1, y: 0, duration: 0.45, stagger: 0.09 }, 0);
+      tl.to(escaneo, { scaleX: 1, duration: 1.3, ease: "power1.inOut" }, 0.1);
+      montos.forEach((m, i) => {
+        const valor = { n: 0 };
+        tl.to(
+          valor,
+          {
+            n: PROVEEDORES[i].precio,
+            duration: 1.05,
+            ease: "power2.out",
+            onUpdate: () => {
+              m.textContent = formatBs(Math.round(valor.n / 10) * 10);
+            },
+          },
+          0.2 + ORDEN_INICIAL[i] * 0.09,
+        );
+      });
+      tl.to(barras, { scaleX: (i) => anchoBarra(PROVEEDORES[i].precio), duration: 1.05, stagger: 0.09 }, 0.2);
+
+      tl.call(
+        () => {
+          if (estado) estado.textContent = ESTADO_FINAL;
+          const antes = Flip.getState(filas);
+          filas.forEach((fila) => (fila.style.order = ""));
+          Flip.from(antes, { duration: 0.75, ease: "power3.inOut" });
+        },
+        [],
+        1.5,
+      );
+
+      tl.to(marca, { opacity: 1, scaleY: 1, duration: 0.45 }, 2.2);
+      tl.to(chip, { opacity: 1, duration: 0.35 }, 2.25);
+      tl.to(barras[0], { backgroundColor: "#c2410c", duration: 0.35 }, 2.2);
+      if (ahorro) {
+        const valor = { n: 0 };
+        tl.to(
+          valor,
+          {
+            n: AHORRO,
+            duration: 0.8,
+            ease: "power2.out",
+            onUpdate: () => {
+              ahorro.textContent = formatBs(Math.round(valor.n));
+            },
+          },
+          2.25,
+        );
+      }
+    },
+    { scope: tarjetaRef, dependencies: [reducido] },
+  );
+
+  return (
+    <section id="comparar" className="bg-yeso py-24 text-tierra md:py-32">
+      <div className="contenedor grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-center lg:gap-20">
+        <ScrollReveal>
+          <p className="etiqueta text-oliva-oscuro">Comparador</p>
+          <h2 className="titulo mt-5 text-[2rem] text-carbon md:text-[2.75rem]">
+            No es un catálogo.
+            <br />
+            Es un comparador.
+          </h2>
+          <p className="mt-6 max-w-md text-[15px] leading-relaxed text-tierra/75">
+            Otras páginas te muestran productos. Entreobra te muestra cuál te conviene, según precio, stock,
+            distancia y quién cumple.
+          </p>
+
+          <ScrollStagger
+            itemSelector="li"
+            stagger={0.1}
+            from="left"
+            distance={10}
+            className="mt-10 max-w-md border-t border-arena pt-8"
+          >
+            <ul>
+              {VENTAJAS.map((ventaja) => (
+                <li key={ventaja} className="flex items-center gap-4 py-1.5 text-sm text-carbon">
+                  <span className="h-px w-3 shrink-0 bg-oxido" />
+                  {ventaja}
+                </li>
+              ))}
+            </ul>
+          </ScrollStagger>
+        </ScrollReveal>
+
+        <ScrollReveal delay={0.1}>
+          <div
+            ref={tarjetaRef}
+            className="border border-arena/70 bg-white px-5 py-7 shadow-[0_30px_60px_-40px_rgb(36_34_32/0.35)] sm:px-8 sm:py-9"
+          >
+            <div className="flex items-center justify-between gap-4">
+              <p className="etiqueta text-[10px] text-oliva-oscuro">Cemento IP-30 · 50 bolsas</p>
+              <p className="etiqueta hidden text-[10px] text-oliva-oscuro sm:block">Total</p>
+            </div>
+
+            <div className="mt-4">
+              <p data-estado className="text-[11px] text-oliva-oscuro">
+                {ESTADO_FINAL}
+              </p>
+              <div className="mt-2 h-px bg-arena/50">
+                <div data-escaneo className="h-full origin-left bg-oxido/70" />
+              </div>
+            </div>
+
+            <div className="mt-2 flex flex-col">
+              {PROVEEDORES.map((proveedor, i) => (
+                <div
+                  key={proveedor.nombre}
+                  data-fila
+                  className="relative border-b border-arena/50 bg-white py-5 pl-5"
+                >
+                  {i === 0 && (
+                    <span data-marca className="absolute inset-y-3 left-0 w-0.5 origin-top bg-oxido" />
+                  )}
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <p
+                        className={cn(
+                          "flex items-center gap-2.5 truncate text-[15px]",
+                          proveedor.sinConfirmar ? "text-oliva-oscuro" : "text-carbon",
+                        )}
+                      >
+                        {proveedor.nombre}
+                        {i === 0 && (
+                          <span data-chip className="etiqueta text-[9px] tracking-[0.2em] text-oxido">
+                            Mejor precio
+                          </span>
+                        )}
+                      </p>
+                      <p
+                        className={cn(
+                          "mt-1.5 text-xs tabular-nums",
+                          proveedor.sinConfirmar ? "text-oliva" : "text-oliva-oscuro",
+                        )}
+                      >
+                        {proveedor.entrega} · {proveedor.distancia} · {proveedor.stock}
+                      </p>
+                    </div>
+                    <p
+                      data-monto
+                      className={cn(
+                        "shrink-0 text-[15px] tabular-nums",
+                        i === 0 ? "text-carbon" : proveedor.sinConfirmar ? "text-oliva" : "text-tierra",
+                      )}
+                    >
+                      {formatBs(proveedor.precio)}
+                    </p>
+                  </div>
+                  <div className="mt-3 h-0.5 w-full bg-yeso">
+                    <div
+                      data-barra
+                      className={cn("h-full origin-left", i === 0 ? "bg-oxido" : "bg-arena")}
+                      style={{ transform: `scaleX(${anchoBarra(proveedor.precio)})` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="pt-6 text-[13px] text-tierra/80">
+              Ahorras <span data-ahorro className="tabular-nums text-oxido">{formatBs(AHORRO)}</span> eligiendo el mejor
+              precio de {NUMEROS[PROVEEDORES.length - 1]} proveedores
+            </p>
+          </div>
+        </ScrollReveal>
+      </div>
+    </section>
+  );
+}

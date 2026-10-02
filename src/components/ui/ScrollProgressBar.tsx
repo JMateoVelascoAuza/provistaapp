@@ -1,35 +1,39 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /**
- * Barra fina que se llena a medida que se hace scroll. Es un indicador,
- * no contenido — arranca en 0% tanto en servidor como en cliente, así
- * que no hay nada que esconder ni ningún riesgo de parpadeo.
+ * Hilo de óxido sobre el header que se llena con el scroll. Escala con
+ * `transform` (no `width`) directo sobre el nodo: no re-renderiza React
+ * en cada evento de scroll.
  */
 export function ScrollProgressBar() {
-  const [progreso, setProgreso] = useState(0);
+  const barraRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function onScroll() {
+    let frame = 0;
+    function actualizar() {
+      frame = 0;
       const alto = document.documentElement.scrollHeight - window.innerHeight;
-      setProgreso(alto > 0 ? (window.scrollY / alto) * 100 : 0);
+      const progreso = alto > 0 ? window.scrollY / alto : 0;
+      if (barraRef.current) barraRef.current.style.transform = `scaleX(${progreso})`;
     }
-    onScroll();
+    function onScroll() {
+      if (!frame) frame = requestAnimationFrame(actualizar);
+    }
+    actualizar();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
+      cancelAnimationFrame(frame);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
   }, []);
 
   return (
-    <div className="fixed inset-x-0 top-0 z-50 h-0.5 bg-transparent">
-      <div
-        className="h-full bg-naranja-600 transition-[width] duration-150 ease-out"
-        style={{ width: `${progreso}%` }}
-      />
+    <div aria-hidden className="pointer-events-none fixed inset-x-0 top-0 z-50 h-px">
+      <div ref={barraRef} className="h-full origin-left scale-x-0 bg-oxido" />
     </div>
   );
 }

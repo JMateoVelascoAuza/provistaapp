@@ -1,56 +1,57 @@
 import type { Metadata, Viewport } from "next";
-import localFont from "next/font/local";
 import { Header } from "@/components/sections/Header";
-import { Footer } from "@/components/sections/Footer";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { BackToTop } from "@/components/ui/BackToTop";
-import { SectionDots } from "@/components/ui/SectionDots";
+import { InstalarPwa } from "@/components/ui/InstalarPwa";
+import { LimpiarServiceWorkerDev } from "@/components/ui/LimpiarServiceWorkerDev";
 import "./globals.css";
 
-// Poppins autohospedada (next/font/local) — nunca next/font/google, que
-// depende de una conexión a Google Fonts en cada build.
-// Archivos descargados una sola vez a src/fonts/.
-const poppins = localFont({
-  src: [
-    { path: "../fonts/poppins-300.woff2", weight: "300", style: "normal" },
-    { path: "../fonts/poppins-400.woff2", weight: "400", style: "normal" },
-    { path: "../fonts/poppins-500.woff2", weight: "500", style: "normal" },
-    { path: "../fonts/poppins-600.woff2", weight: "600", style: "normal" },
-    { path: "../fonts/poppins-700.woff2", weight: "700", style: "normal" },
-  ],
-  variable: "--font-poppins",
-  display: "swap",
-});
+// Jost autohospedada vía `@font-face` en `fuentes.css` — no
+// `next/font/local` (no admite el assetPrefix relativo que necesita la
+// build estática sin servidor) ni `next/font/google` (depende de
+// internet en cada build).
 
-// TODO: reemplazar título/descripción si el Anexo A trae copy oficial
-// distinto a este placeholder.
 export const metadata: Metadata = {
-  title: "Provista — Todos los materiales de tu obra, en un solo lugar",
+  metadataBase: new URL("https://entreobra.com"),
+  title: "Entreobra — Entre tu obra y tu proveedor",
   description:
-    "Provista conecta obra y proveedores de materiales de construcción en Cochabamba. Compara precios, tiempos de entrega y proveedores reales.",
+    "Compara precios y stock de materiales de construcción en Cochabamba. Mira quién tiene stock ahora y a qué precio, sin perder la mañana en WhatsApp.",
   manifest: "/manifest.json",
   icons: {
-    icon: "/icons/icon-192.png",
+    icon: [{ url: "/favicon.png", sizes: "64x64", type: "image/png" }],
     apple: "/icons/icon-192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Entreobra",
+  },
+  openGraph: {
+    title: "Entreobra — Entre tu obra y tu proveedor",
+    description: "Compara precios y stock de materiales de construcción en Cochabamba.",
+    siteName: "Entreobra",
+    locale: "es_BO",
+    type: "website",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0c2340",
+  themeColor: "#242220",
+  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className={`${poppins.variable} antialiased`}>
+    <html lang="es" className="antialiased">
       <body className="flex min-h-screen flex-col bg-background text-foreground">
+        <LimpiarServiceWorkerDev />
         <ScrollProgressBar />
         <Header />
         {children}
-        <Footer />
         <BackToTop />
-        <SectionDots />
+        <InstalarPwa />
       </body>
     </html>
   );

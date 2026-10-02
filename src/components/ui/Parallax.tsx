@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,6 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
  * su sección padre pasa por la pantalla. Es puro movimiento decorativo
  * ligado al scroll (vía `scrub`) — no esconde ni revela nada, así que
  * no aplica ninguna de las precauciones de FOUC de `ScrollReveal`.
+ * Con `prefers-reduced-motion` no se aplica ningún desplazamiento.
  */
 export function Parallax({
   children,
@@ -23,10 +25,11 @@ export function Parallax({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const reducido = usePrefersReducedMotion();
 
   useGSAP(
     () => {
-      if (!ref.current?.parentElement) return;
+      if (!ref.current?.parentElement || reducido) return;
       gsap.to(ref.current, {
         y: window.innerHeight * speed,
         ease: "none",
@@ -38,7 +41,7 @@ export function Parallax({
         },
       });
     },
-    { scope: ref },
+    { scope: ref, dependencies: [reducido] },
   );
 
   return (

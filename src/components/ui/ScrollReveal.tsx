@@ -33,12 +33,17 @@ function yaVisible(el: HTMLElement) {
   return rect.top < window.innerHeight * 0.9;
 }
 
+/** Con `prefers-reduced-motion` el contenido se muestra directo, sin entrada. */
+function sinAnimar(el: HTMLElement) {
+  return yaVisible(el) || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
 export function ScrollReveal({
   children,
   className,
   delay = 0,
   from = "up",
-  distance = 32,
+  distance = 24,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -52,7 +57,7 @@ export function ScrollReveal({
     () => {
       if (!ref.current) return;
 
-      if (yaVisible(ref.current)) {
+      if (sinAnimar(ref.current)) {
         gsap.set(ref.current, { opacity: 1, y: 0, x: 0 });
         return;
       }
@@ -68,7 +73,7 @@ export function ScrollReveal({
           opacity: 1,
           y: 0,
           x: 0,
-          duration: 0.8,
+          duration: 1,
           delay,
           ease: "power3.out",
           scrollTrigger: {
@@ -96,7 +101,7 @@ export function ScrollStagger({
   itemSelector = ":scope > *",
   stagger = 0.1,
   from,
-  distance = 28,
+  distance = 24,
 }: {
   children: React.ReactNode;
   className?: string;
@@ -113,8 +118,8 @@ export function ScrollStagger({
       const items = ref.current.querySelectorAll(itemSelector);
       if (items.length === 0) return;
 
-      if (yaVisible(ref.current)) {
-        gsap.set(items, { opacity: 1, y: 0, x: 0, scale: 1 });
+      if (sinAnimar(ref.current)) {
+        gsap.set(items, { opacity: 1, y: 0, x: 0 });
         return;
       }
 
@@ -124,16 +129,14 @@ export function ScrollStagger({
           opacity: 0,
           y: from ? 0 : distance,
           x: from === "left" ? -distance : from === "right" ? distance : 0,
-          scale: from ? 1 : 0.96,
         },
         {
           opacity: 1,
           y: 0,
           x: 0,
-          scale: 1,
-          duration: 0.7,
+          duration: 0.9,
           stagger,
-          ease: from ? "power3.out" : "back.out(1.6)",
+          ease: "power3.out",
           scrollTrigger: {
             trigger: ref.current,
             start: "top 82%",

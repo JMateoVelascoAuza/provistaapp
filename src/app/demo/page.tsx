@@ -1,64 +1,70 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
 import { AppleScrollFeatures } from "@/components/demo/AppleScrollFeatures";
+import { Footer } from "@/components/sections/Footer";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { Enlace } from "@/components/ui/Enlace";
 
 export const metadata: Metadata = {
-  title: "Demo — Provista",
-  description: "Una mirada por dentro a la app completa de Provista.",
+  title: "Demo — Entreobra",
+  description: "Una mirada por dentro a la app completa de Entreobra.",
 };
 
 export default function DemoPage() {
   return (
     <>
-      <section className="bg-blueprint relative overflow-hidden bg-linear-to-b from-marino-900 to-marino-800 py-24 text-center text-white">
-        <div className="pointer-events-none absolute -left-24 top-0 h-72 w-72 rounded-full bg-naranja-500/20 blur-3xl" />
-        <div className="pointer-events-none absolute -right-24 bottom-0 h-72 w-72 rounded-full bg-naranja-500/10 blur-3xl" />
-        <div className="relative mx-auto max-w-2xl px-4 sm:px-8">
-          <span
-            style={{ animationDelay: "0ms" }}
-            className="animate-hero-in inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3.5 py-1.5 text-xs font-medium text-naranja-300"
-          >
-            <Sparkles size={13} /> Vista previa de la app completa
-          </span>
-          <h1
-            style={{ animationDelay: "100ms" }}
-            className="animate-hero-in mt-5 text-3xl font-semibold tracking-tight sm:text-5xl"
-          >
-            Así se ve Provista por dentro
+      <section className="tex-plano relative overflow-hidden bg-carbon py-24 text-center md:py-28">
+        <div className="relative mx-auto max-w-2xl px-5 sm:px-8">
+          <p style={{ animationDelay: "0ms" }} className="animate-hero-in etiqueta text-oliva">
+            Vista previa · App completa
+          </p>
+          <h1 style={{ animationDelay: "100ms" }} className="animate-hero-in titulo mt-5 text-[2.25rem] text-yeso sm:text-5xl">
+            Así se ve Entreobra por dentro.
           </h1>
-          <p style={{ animationDelay: "220ms" }} className="animate-hero-in mt-5 text-lg text-marino-200">
-            Esto es un adelanto de la aplicación completa — más allá de la
-            landing. Scrollea para ver los 5 momentos clave, del comprador al
-            proveedor y al chofer.
+          <p style={{ animationDelay: "220ms" }} className="animate-hero-in mt-6 text-[15px] leading-relaxed text-arena/80 md:text-base">
+            Un adelanto de la aplicación, más allá de la landing. Seis momentos: del que compra, del que vende y del
+            que transporta.
           </p>
         </div>
       </section>
 
       <AppleScrollFeatures />
 
-      <section className="bg-gris-seccion py-20">
-        <ScrollReveal className="mx-auto flex max-w-2xl flex-col items-center gap-5 px-4 text-center sm:px-8">
-          <h2 className="text-2xl font-semibold tracking-tight text-marino-900 sm:text-3xl">
-            ¿Te interesa llevar esto adelante?
-          </h2>
-          <p className="text-marino-500">
-            Esta es una propuesta para conversar, todavía no forma parte del
-            alcance contratado. Cuéntanos qué te pareció.
-          </p>
-          <Link
-            href="/#formulario"
-            className="group flex items-center gap-2 rounded-full bg-naranja-600 px-7 py-3.5 text-sm font-semibold text-white transition hover:scale-105 hover:bg-naranja-700"
+      <section className="bg-yeso pt-20">
+        <ScrollReveal className="contenedor" distance={16}>
+          <div
+            role="note"
+            className="mx-auto max-w-3xl border border-oxido/30 border-l-2 border-l-oxido bg-oxido-claro px-6 py-7 sm:px-8"
           >
-            Hablemos de esto
-            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link href="/" className="text-sm font-medium text-marino-500 underline-offset-2 hover:underline">
-            Volver a la landing
-          </Link>
+            <p className="etiqueta text-oxido-oscuro">Vista previa · En desarrollo</p>
+            <p className="titulo mt-3 text-xl text-carbon sm:text-2xl">Esto no es el producto final.</p>
+            <p className="mt-3 text-[15px] leading-relaxed text-tierra/85">
+              Las pantallas muestran hacia dónde va Entreobra. La app está en desarrollo: el diseño, los datos, las
+              empresas y los precios son de ejemplo, y pueden cambiar antes del lanzamiento.
+            </p>
+          </div>
         </ScrollReveal>
       </section>
+
+      <section className="bg-yeso py-24">
+        <ScrollReveal className="mx-auto flex max-w-2xl flex-col items-center px-5 text-center sm:px-8" distance={24}>
+          <h2 className="titulo text-[2rem] text-carbon md:text-[2.5rem]">¿Te interesa llevar esto adelante?</h2>
+          <p className="mt-5 max-w-md text-[15px] leading-relaxed text-tierra/75">
+            Esta es una propuesta para conversar, todavía no forma parte del alcance contratado. Cuéntanos qué te
+            pareció.
+          </p>
+          <Enlace href="/#acceso" className="boton boton-oxido mt-8">
+            Hablemos de esto
+          </Enlace>
+          <Enlace
+            href="/"
+            className="mt-5 text-sm text-oliva-oscuro underline-offset-4 transition-colors duration-300 hover:text-carbon hover:underline"
+          >
+            Volver a la landing
+          </Enlace>
+        </ScrollReveal>
+      </section>
+
+      <Footer tono="oscuro" />
     </>
   );
 }
