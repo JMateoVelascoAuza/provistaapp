@@ -15,6 +15,82 @@
   --foreground: #f2efea;
 }
 
+/*
+ * Tema claro. El oscuro es el diseño base y no se toca. El claro sigue
+ * las dos zonas del manual con contraste entre ellas:
+ *  - Zona atmosférica (data-zona="oscura": hero, materiales, cómo
+ *    funciona, dos lados, acceso, header): un neutro cálido más hondo
+ *    que el yeso, texto carbón y secundario en oliva oscurecido para
+ *    que se lea en tamaños chicos.
+ *  - Zona funcional (comparador, problema y data-zona="funcional"):
+ *    yeso, igual que en el tema oscuro.
+ *  - Piezas con foto (data-zona="foto"): conservan la capa de carbón
+ *    que exige el manual para fotos con texto.
+ * Tailwind pinta con estas variables, así que cada clase se adapta sola.
+ */
+html[data-tema="claro"] {
+  --background: #f2efea;
+  --foreground: #1c1b19;
+  color-scheme: light;
+  /* Zona funcional (yeso): textos más firmes que en el diseño base. */
+  --color-tierra: #2c2925;
+  --color-oliva: #6a6d64;
+  --color-oliva-oscuro: #4b4d46;
+}
+html[data-tema="claro"] [data-zona="oscura"] {
+  --color-carbon: #d6cec2;
+  --color-carbon-950: #c5bcae;
+  --color-carbon-900: #cdc5b8;
+  --color-carbon-800: #f7f5f1;
+  --color-carbon-700: #c9c1b4;
+  --color-tierra: #a69e91;
+  --color-oliva: #403d38;
+  --color-oliva-oscuro: #403d38;
+  --color-arena: #1f1d1b;
+  --color-yeso: #1c1b19;
+  --color-yeso-claro: #242220;
+  --color-oxido-claro: #f8e8df;
+  --color-oxido-oscuro: #8a2d08;
+}
+/* Óxido como texto en el tema claro: su tono oscuro, para que se lea.
+   Botones, barras y acentos de fondo siguen con el óxido del manual. */
+html[data-tema="claro"] .text-oxido {
+  color: var(--color-oxido-oscuro);
+}
+html[data-tema="claro"] [data-zona="foto"],
+html[data-tema="claro"] [data-zona="funcional"] {
+  --color-carbon: #242220;
+  --color-carbon-950: #1c1b19;
+  --color-carbon-900: #201e1c;
+  --color-carbon-800: #2b2926;
+  --color-carbon-700: #36332f;
+  --color-tierra: #46413c;
+  --color-oliva: #8f9289;
+  --color-oliva-oscuro: #696c63;
+  --color-arena: #c4bdb2;
+  --color-yeso: #f2efea;
+  --color-yeso-claro: #f8f6f2;
+  --color-oxido-claro: #f8e8df;
+  --color-oxido-oscuro: #a3360a;
+}
+html[data-tema="claro"] [data-zona="foto"] .text-oxido {
+  color: var(--color-oxido);
+}
+/* El formulario (zona funcional) usa los textos firmes del tema claro. */
+html[data-tema="claro"] [data-zona="funcional"] {
+  --color-tierra: #2c2925;
+  --color-oliva: #6a6d64;
+  --color-oliva-oscuro: #4b4d46;
+}
+/* Hero en tema claro: el hormigón queda de fondo, lavado con yeso. */
+html[data-tema="claro"] [data-velo-claro] .foto-velo {
+  opacity: 0.84 !important;
+}
+/* Mientras se cambia el idioma guardado al cargar (ver preferencias.tsx). */
+html[data-idioma-pendiente] body {
+  opacity: 0;
+}
+
 @theme {
   /* Paleta Tierra */
   --color-carbon: #242220;
@@ -258,12 +334,12 @@ body {
     background: var(--color-oxido-oscuro);
   }
   .boton-linea {
-    border-color: rgb(196 189 178 / 0.55);
+    border-color: color-mix(in oklab, var(--color-arena) 55%, transparent);
     color: var(--color-yeso);
   }
   .boton-linea:hover {
     border-color: var(--color-yeso);
-    background: rgb(242 239 234 / 0.06);
+    background: color-mix(in oklab, var(--color-yeso) 6%, transparent);
   }
   .boton-carbon {
     background: var(--color-carbon);
@@ -438,6 +514,11 @@ body {
       linear-gradient(to right, rgb(242 239 234 / 0.035) 1px, transparent 1px),
       linear-gradient(to bottom, rgb(242 239 234 / 0.035) 1px, transparent 1px);
     background-size: 120px 120px;
+  }
+  html[data-tema="claro"] .tex-plano:is([data-zona="oscura"], [data-zona="oscura"] *) {
+    background-image:
+      linear-gradient(to right, rgb(36 34 32 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(36 34 32 / 0.05) 1px, transparent 1px);
   }
 
   .scrollbar-none {

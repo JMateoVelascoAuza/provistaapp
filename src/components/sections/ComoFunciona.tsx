@@ -6,16 +6,13 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollReveal, ScrollStagger } from "@/components/ui/ScrollReveal";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
+import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const PASOS = [
-  { titulo: "Registra tu obra", descripcion: "Tus pedidos y gastos quedan ordenados por proyecto." },
-  { titulo: "Busca el material", descripcion: "Ves quién lo tiene en stock y a qué precio, al instante." },
-  { titulo: "Arma tu pedido", descripcion: "Un solo pedido, aunque venga de varios proveedores." },
-  { titulo: "Recibe en obra", descripcion: "Sabes cuándo sale y cuándo llega. Sin preguntar." },
-];
+// Los textos de cada paso están en t.comoFunciona.pasos.
+const CANTIDAD_PASOS = 4;
 
 function FilaMock({ nombre, valor, activo = false }: { nombre: string; valor: string; activo?: boolean }) {
   return (
@@ -27,22 +24,24 @@ function FilaMock({ nombre, valor, activo = false }: { nombre: string; valor: st
 }
 
 function MockRegistrarObra() {
+  const m = useIdioma().t.comoFunciona.mocks;
   return (
     <div>
-      <p className="etiqueta text-[10px] text-oliva">Nueva obra</p>
+      <p className="etiqueta text-[10px] text-oliva">{m.nuevaObra}</p>
       <div className="mt-4 space-y-2.5">
-        <div className="border border-yeso/10 px-4 py-3 text-sm text-yeso">Edificio Torre del Bosque</div>
-        <div className="border border-yeso/10 px-4 py-3 text-sm text-oliva">Cochabamba · Cercado</div>
+        <div className="border border-yeso/10 px-4 py-3 text-sm text-yeso">{m.nombreObra}</div>
+        <div className="border border-yeso/10 px-4 py-3 text-sm text-oliva">{m.zona}</div>
       </div>
-      <div className="boton boton-oxido mt-5 w-full">Crear obra</div>
+      <div className="boton boton-oxido mt-5 w-full">{m.crearObra}</div>
     </div>
   );
 }
 
 function MockBuscarMaterial() {
+  const m = useIdioma().t.comoFunciona.mocks;
   return (
     <div>
-      <p className="etiqueta text-[10px] text-oliva">Cemento IP-30</p>
+      <p className="etiqueta text-[10px] text-oliva">{m.producto}</p>
       <div className="mt-2">
         <FilaMock nombre="Ferretería San Antonio" valor="Bs 62" activo />
         <FilaMock nombre="Materiales Cochabamba" valor="Bs 68" />
@@ -53,15 +52,16 @@ function MockBuscarMaterial() {
 }
 
 function MockArmarPedido() {
+  const m = useIdioma().t.comoFunciona.mocks;
   return (
     <div>
-      <p className="etiqueta text-[10px] text-oliva">Tu pedido</p>
+      <p className="etiqueta text-[10px] text-oliva">{m.tuPedido}</p>
       <div className="mt-2">
-        <FilaMock nombre="Cemento IP-30 x5" valor="Bs 310" />
-        <FilaMock nombre="Fierro 3/8 x10" valor="Bs 480" />
+        <FilaMock nombre={m.lineas[0]} valor="Bs 310" />
+        <FilaMock nombre={m.lineas[1]} valor="Bs 480" />
       </div>
       <div className="mt-2 flex items-center justify-between border-t border-yeso/10 pt-4 text-sm">
-        <span className="text-yeso">Total</span>
+        <span className="text-yeso">{m.total}</span>
         <span className="font-normal text-oxido tabular-nums">Bs 790</span>
       </div>
     </div>
@@ -69,10 +69,11 @@ function MockArmarPedido() {
 }
 
 function MockRecibirObra() {
-  const pasos = ["Confirmado", "En preparación", "En camino", "Entregado"];
+  const m = useIdioma().t.comoFunciona.mocks;
+  const pasos = m.estados;
   return (
     <div>
-      <p className="etiqueta text-[10px] text-oliva">Pedido #4821</p>
+      <p className="etiqueta text-[10px] text-oliva">{m.pedido}</p>
       <div className="mt-4 space-y-3">
         {pasos.map((p, i) => (
           <div key={p} className="flex items-center gap-3">
@@ -108,6 +109,7 @@ export function ComoFunciona() {
   const triggerRef = useRef<ScrollTrigger | null>(null);
   const [activo, setActivo] = useState(0);
   const reducido = usePrefersReducedMotion();
+  const { t } = useIdioma();
 
   useGSAP(
     () => {
@@ -122,13 +124,13 @@ export function ComoFunciona() {
         const trigger = ScrollTrigger.create({
           trigger: panelRef.current,
           start: "top top",
-          end: () => `+=${PASOS.length * window.innerHeight * 0.8}`,
+          end: () => `+=${CANTIDAD_PASOS * window.innerHeight * 0.8}`,
           pin: true,
           scrub: 1,
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate(self) {
-            const maxRaw = PASOS.length - 1;
+            const maxRaw = CANTIDAD_PASOS - 1;
             const raw = self.progress * maxRaw;
             const idx = Math.min(maxRaw, Math.max(0, Math.round(raw)));
             setActivo(idx);
@@ -160,24 +162,24 @@ export function ComoFunciona() {
 
       return () => mm.revert();
     },
-    { scope: seccionRef, dependencies: [reducido] },
+    { scope: seccionRef, dependencies: [reducido], revertOnUpdate: true },
   );
 
   function irAlPaso(i: number) {
     const t = triggerRef.current;
     if (!t) return;
-    const maxRaw = PASOS.length - 1;
+    const maxRaw = CANTIDAD_PASOS - 1;
     const destino = t.start + ((t.end - t.start) * i) / (maxRaw || 1);
     window.scrollTo({ top: destino, behavior: "smooth" });
   }
 
   return (
-    <section id="como-funciona" ref={seccionRef} className="bg-carbon">
+    <section id="como-funciona" ref={seccionRef} data-zona="oscura" className="bg-carbon">
       {/* Desktop — panel fijo con título, pasos y pantalla */}
       <div ref={panelRef} className="hidden h-screen flex-col bg-carbon pt-[72px] lg:flex">
         <div className="contenedor flex w-full flex-1 flex-col justify-center py-10">
-          <p className="etiqueta text-oliva">Cómo funciona</p>
-          <h2 className="titulo mt-4 text-[2.75rem] text-yeso">Cuatro pasos, sin llamadas.</h2>
+          <p className="etiqueta text-oliva">{t.comoFunciona.etiqueta}</p>
+          <h2 className="titulo mt-4 text-[2.75rem] text-yeso">{t.comoFunciona.titulo}</h2>
 
           <div className="relative mt-10">
             <div className="absolute inset-x-0 top-0 h-px bg-yeso/8" />
@@ -189,9 +191,9 @@ export function ComoFunciona() {
 
             <div className="grid grid-cols-2 items-center gap-16 pt-8">
               <div className="flex flex-col">
-                {PASOS.map((paso, i) => (
+                {t.comoFunciona.pasos.map((paso, i) => (
                   <button
-                    key={paso.titulo}
+                    key={i}
                     onClick={() => irAlPaso(i)}
                     className="group flex flex-col items-start border-t border-yeso/8 py-5 text-left first:border-t-0"
                   >
@@ -246,12 +248,12 @@ export function ComoFunciona() {
       {/* Mobile — título y lista simple, sin pin */}
       <div className="contenedor pb-24 pt-24 lg:hidden">
         <ScrollReveal>
-          <p className="etiqueta text-oliva">Cómo funciona</p>
-          <h2 className="titulo mt-5 text-[2rem] text-yeso md:text-[2.75rem]">Cuatro pasos, sin llamadas.</h2>
+          <p className="etiqueta text-oliva">{t.comoFunciona.etiqueta}</p>
+          <h2 className="titulo mt-5 text-[2rem] text-yeso md:text-[2.75rem]">{t.comoFunciona.titulo}</h2>
         </ScrollReveal>
         <ScrollStagger stagger={0.09} className="mt-10 flex flex-col">
-          {PASOS.map((paso, i) => (
-            <div key={paso.titulo} className="border-t border-yeso/8 py-7 first:border-t-0">
+          {t.comoFunciona.pasos.map((paso, i) => (
+            <div key={i} className="border-t border-yeso/8 py-7 first:border-t-0">
               <p className="text-[11px] tracking-[0.3em] text-oxido">{String(i + 1).padStart(2, "0")}</p>
               <h3 className="mt-3 text-[17px] font-normal text-yeso">{paso.titulo}</h3>
               <p className="mt-2 text-sm leading-relaxed text-oliva">{paso.descripcion}</p>

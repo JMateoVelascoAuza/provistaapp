@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
 export function PrivacyModal({ className }: { className?: string }) {
   const [abierto, setAbierto] = useState(false);
+  const { t } = useIdioma();
 
   useEffect(() => {
     if (!abierto) return;
@@ -21,7 +23,7 @@ export function PrivacyModal({ className }: { className?: string }) {
         onClick={() => setAbierto(true)}
         className={cn("self-start transition-colors duration-300 sm:self-auto", className)}
       >
-        Aviso de privacidad
+        {t.privacidad.abrir}
       </button>
 
       {abierto && (
@@ -31,23 +33,21 @@ export function PrivacyModal({ className }: { className?: string }) {
             <button
               type="button"
               onClick={() => setAbierto(false)}
-              aria-label="Cerrar"
+              aria-label={t.privacidad.cerrar}
               className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center text-oliva-oscuro transition-colors hover:text-carbon"
             >
               <X size={16} strokeWidth={1.5} />
             </button>
             <p className="etiqueta text-[10px] text-oliva-oscuro">Entreobra</p>
             <h3 id="titulo-privacidad" className="titulo mt-3 text-2xl text-carbon">
-              Aviso de privacidad
+              {t.privacidad.titulo}
             </h3>
             <p className="mt-5 text-sm leading-relaxed text-tierra/85">
-              Los datos que nos dejas (nombre y WhatsApp) los usamos únicamente para avisarte cuando Entreobra
-              esté disponible en Cochabamba. No los compartimos ni vendemos a terceros. Si quieres que los
-              eliminemos, escríbenos a{" "}
+              {t.privacidad.texto[0]}
               <a href="mailto:hola@entreobra.com" className="text-carbon underline decoration-arena underline-offset-4 hover:decoration-oxido">
                 hola@entreobra.com
-              </a>{" "}
-              y lo hacemos.
+              </a>
+              {t.privacidad.texto[1]}
             </p>
           </div>
         </div>

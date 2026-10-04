@@ -30,9 +30,9 @@ export const CATEGORIAS: { nombre: string; detalle: string; textura: Textura; im
   { nombre: "Eléctricos", detalle: "Cables, ductos, tableros", textura: "electrico" },
 ];
 
-// Separador de miles a mano (no toLocaleString): "es-BO" no agrupa
+// Separador de miles a mano (punto en español, coma en inglés) (no toLocaleString): "es-BO" no agrupa
 // números de 4 cifras en todos los motores, y servidor y navegador
 // podrían renderizar distinto.
-export function formatBs(valor: number) {
-  return `Bs ${String(valor).replace(/\B(?=(\d{3})+(?!\d))/g, ".")}`;
+export function formatBs(valor: number, idioma: "es" | "en" = "es") {
+  return `Bs ${String(valor).replace(/\B(?=(\d{3})+(?!\d))/g, idioma === "en" ? "," : ".")}`;
 }

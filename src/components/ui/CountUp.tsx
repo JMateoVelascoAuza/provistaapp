@@ -29,7 +29,12 @@ export function CountUp({
   const reducido = usePrefersReducedMotion();
 
   useEffect(() => {
-    if (reducido || value === 0) return;
+    if (reducido || value === 0) {
+      // Si la preferencia llega después del primer render, deja el valor final.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDisplay(value);
+      return;
+    }
     let frame: number;
     let inicio: number | null = null;
 
@@ -41,7 +46,6 @@ export function CountUp({
       if (progreso < 1) frame = requestAnimationFrame(tick);
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setDisplay(0);
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);

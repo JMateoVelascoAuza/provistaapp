@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 /**
  * Los `@media (prefers-reduced-motion: reduce)` en `globals.css` ya
@@ -9,18 +9,25 @@ import { useEffect, useState } from "react";
  * JS y necesitan chequear la preferencia ellas mismas para caer a algo
  * simple (fade corto, sin pin ni scrub) en vez de saltarse el pedido
  * del usuario.
+ *
+ * useSyncExternalStore y no un useState inicializado con matchMedia:
+ * durante la hidratación React usa el valor del servidor (false) y
+ * recién después el real. Así el HTML del servidor y el primer render
+ * del navegador coinciden; si no, React reconstruía la página entera y
+ * se perdían el tema y el idioma aplicados antes de hidratar.
  */
+const CONSULTA = "(prefers-reduced-motion: reduce)";
+
+function suscribir(avisar: () => void) {
+  const media = window.matchMedia(CONSULTA);
+  media.addEventListener("change", avisar);
+  return () => media.removeEventListener("change", avisar);
+}
+
 export function usePrefersReducedMotion() {
-  const [reducido, setReducido] = useState(() =>
-    typeof window === "undefined" ? false : window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  return useSyncExternalStore(
+    suscribir,
+    () => window.matchMedia(CONSULTA).matches,
+    () => false,
   );
-
-  useEffect(() => {
-    const media = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onChange = () => setReducido(media.matches);
-    media.addEventListener("change", onChange);
-    return () => media.removeEventListener("change", onChange);
-  }, []);
-
-  return reducido;
 }

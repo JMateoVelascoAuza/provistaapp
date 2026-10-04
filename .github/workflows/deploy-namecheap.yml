@@ -1,0 +1,65 @@
+# Publica entreobra.com en Namecheap (hosting estático) en cada push a main.
+#
+# Configurar una sola vez en GitHub → Settings → Secrets and variables → Actions:
+#   Secrets:   FTP_SERVER    (ej: ftp.entreobra.com o el servidor que da cPanel)
+#              FTP_USERNAME  (cuenta FTP de cPanel)
+#              FTP_PASSWORD
+#   Variables: NEXT_PUBLIC_APPS_SCRIPT_URL  (la URL /exec del Apps Script del cliente)
+#
+# Sin los secrets, el trabajo se detiene con un aviso y no publica nada.
+name: Publicar en Namecheap
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: publicar-namecheap
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Revisar credenciales
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+        run: |
+          if [ -z "$FTP_SERVER" ]; then
+            echo "::error::Faltan los secrets FTP_SERVER / FTP_USERNAME / FTP_PASSWORD (ver comentario al inicio del archivo)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Compilar sitio estático
+        env:
+          NEXT_PUBLIC_APPS_SCRIPT_URL: ${{ vars.NEXT_PUBLIC_APPS_SCRIPT_URL }}
+        run: npm run build:hosting
+
+      - name: Revisar que la página de registro tenga la URL del script
+        run: |
+          if [ -n "${{ vars.NEXT_PUBLIC_APPS_SCRIPT_URL }}" ] && ! grep -q "${{ vars.NEXT_PUBLIC_APPS_SCRIPT_URL }}" out/registro/index.html; then
+            echo "::error::out/registro/index.html no tiene la URL del Apps Script."
+            exit 1
+          fi
+          test -f out/.htaccess || { echo "::error::Falta out/.htaccess"; exit 1; }
+
+      - name: Subir a public_html por FTPS
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: ./out/
+          server-dir: ./public_html/

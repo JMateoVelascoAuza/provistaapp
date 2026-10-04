@@ -54,6 +54,7 @@ export function PhoneFrame({ children, className }: { children: React.ReactNode;
         }}
       />
       <div
+        data-zona="foto"
         className="absolute overflow-hidden bg-carbon"
         style={{
           left: pct(CAPA_APP.left),

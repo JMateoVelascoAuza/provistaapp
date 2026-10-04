@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { AHORRO, formatBs, PROVEEDORES } from "@/lib/datos";
+import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
 /*
@@ -36,24 +37,13 @@ import { cn } from "@/lib/utils";
 
 type Pestana = { label: string; icono: LucideIcon };
 
-const PESTANAS_COMPRADOR: Pestana[] = [
-  { label: "Inicio", icono: House },
-  { label: "Buscar", icono: Search },
-  { label: "Pedido", icono: ShoppingCart },
-  { label: "Obras", icono: Building2 },
-];
-const PESTANAS_FERRETERIA: Pestana[] = [
-  { label: "Panel", icono: BarChart3 },
-  { label: "Pedidos", icono: ClipboardList },
-  { label: "Catálogo", icono: LayoutGrid },
-  { label: "Cuenta", icono: Store },
-];
-const PESTANAS_CHOFER: Pestana[] = [
-  { label: "Fletes", icono: Truck },
-  { label: "Ruta", icono: Navigation },
-  { label: "Ganancias", icono: Wallet },
-  { label: "Perfil", icono: User },
-];
+const ICONOS_COMPRADOR: LucideIcon[] = [House, Search, ShoppingCart, Building2];
+const ICONOS_FERRETERIA: LucideIcon[] = [BarChart3, ClipboardList, LayoutGrid, Store];
+const ICONOS_CHOFER: LucideIcon[] = [Truck, Navigation, Wallet, User];
+
+function pestanas(iconos: LucideIcon[], etiquetas: string[]): Pestana[] {
+  return iconos.map((icono, i) => ({ label: etiquetas[i], icono }));
+}
 
 function PantallaApp({
   etiqueta,
@@ -114,17 +104,19 @@ const EMPRESAS_DEMO = [
 ];
 
 export function MockInicio() {
+  const { idioma, t } = useIdioma();
+  const a = t.app;
   return (
     <PantallaApp
-      etiqueta="Buenos días"
-      titulo="Tus obras"
-      pestanas={PESTANAS_COMPRADOR}
+      etiqueta={a.inicio.etiqueta}
+      titulo={a.inicio.titulo}
+      pestanas={pestanas(ICONOS_COMPRADOR, a.pestanasComprador)}
       activa={0}
       extra={
         <div data-foco="ahorro" className="mt-5 flex items-center justify-between bg-carbon-800 px-4 py-3">
           <span>
-            <span className="block text-[11px] uppercase tracking-[0.22em] text-oliva">Ahorraste este mes</span>
-            <span className="mt-1 block text-[22px] font-light leading-none text-yeso">{formatBs(AHORRO)}</span>
+            <span className="block text-[11px] uppercase tracking-[0.22em] text-oliva">{a.inicio.ahorro}</span>
+            <span className="mt-1 block text-[22px] font-light leading-none text-yeso">{formatBs(AHORRO, idioma)}</span>
           </span>
           <ArrowUpRight size={20} strokeWidth={1.5} className="text-oxido" />
         </div>
@@ -133,13 +125,13 @@ export function MockInicio() {
       <div className="space-y-5 px-5 pt-4">
         <div data-foco="pedido-activo" className="border border-arena/70 bg-white px-4 py-3.5">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">Pedido #4821</span>
+            <span className="text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">{a.inicio.pedido}</span>
             <span className="flex items-center gap-1.5 text-[12px] text-oxido">
               <span className="h-1.5 w-1.5 animate-pulse bg-oxido" />
-              En camino
+              {a.inicio.enCamino}
             </span>
           </div>
-          <p className="mt-2 text-[15px] text-carbon">Llega en 25 min a Torre del Bosque</p>
+          <p className="mt-2 text-[15px] text-carbon">{a.inicio.llega}</p>
           <div className="mt-3 flex gap-1">
             {[0, 1, 2, 3].map((i) => (
               <span key={i} className={cn("h-1 flex-1", i < 3 ? "bg-oxido" : "bg-arena")} />
@@ -149,8 +141,8 @@ export function MockInicio() {
 
         <div data-foco="empresas">
           <p className="flex items-center justify-between text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">
-            Empresas que te venden
-            <span className="normal-case tracking-normal text-oxido">Ver todas</span>
+            {a.inicio.empresas}
+            <span className="normal-case tracking-normal text-oxido">{a.inicio.verTodas}</span>
           </p>
           <div className="mt-2.5 divide-y divide-arena/60 border border-arena/70 bg-white">
             {PROVEEDORES.map((p, i) => (
@@ -175,7 +167,7 @@ export function MockInicio() {
                     p.sinConfirmar ? "bg-yeso text-tierra" : "bg-oxido-claro text-oxido-oscuro",
                   )}
                 >
-                  {p.sinConfirmar ? "Sin confirmar" : "Con stock"}
+                  {p.sinConfirmar ? a.inicio.sinConfirmar : a.inicio.conStock}
                 </span>
               </div>
             ))}
@@ -183,10 +175,7 @@ export function MockInicio() {
         </div>
 
         <div data-foco="obras" className="grid grid-cols-2 gap-3">
-          {[
-            { nombre: "Torre del Bosque", detalle: "3 pedidos · Bs 1.150" },
-            { nombre: "Casa Sacaba #12", detalle: "1 pedido · Bs 480" },
-          ].map((obra) => (
+          {a.inicio.obras.map((obra) => (
             <div key={obra.nombre} className="border border-arena/70 bg-white px-3.5 py-3">
               <Building2 size={18} strokeWidth={1.5} className="text-oliva-oscuro" />
               <p className="mt-2 truncate text-[14px] text-carbon">{obra.nombre}</p>
@@ -199,31 +188,33 @@ export function MockInicio() {
   );
 }
 
+// Nombres en t.app.catalogo.productos (mismo orden).
 const PRODUCTOS_DEMO = [
-  { nombre: "Cemento IP-30", precio: "Bs 62", textura: "tex-concreto", proveedores: 3 },
-  { nombre: "Fierro 3/8", precio: "Bs 48", textura: "tex-fierro", proveedores: 4 },
-  { nombre: "Ladrillo 6H", precio: "Bs 1.8", textura: "tex-ladrillo", proveedores: 2 },
-  { nombre: "Pintura 20L", precio: "Bs 320", textura: "tex-encofrado", proveedores: 3 },
-  { nombre: "Arena fina", precio: "Bs 180", textura: "tex-aridos", proveedores: 2 },
-  { nombre: "Tubo PVC 4\"", precio: "Bs 95", textura: "tex-tubos", proveedores: 3 },
+  { precio: "Bs 62", textura: "tex-concreto", proveedores: 3 },
+  { precio: "Bs 48", textura: "tex-fierro", proveedores: 4 },
+  { precio: "Bs 1.8", textura: "tex-ladrillo", proveedores: 2 },
+  { precio: "Bs 320", textura: "tex-encofrado", proveedores: 3 },
+  { precio: "Bs 180", textura: "tex-aridos", proveedores: 2 },
+  { precio: "Bs 95", textura: "tex-tubos", proveedores: 3 },
 ];
 
 export function MockCatalogo() {
+  const a = useIdioma().t.app;
   return (
     <PantallaApp
-      etiqueta="Torre del Bosque"
-      titulo="Catálogo"
-      pestanas={PESTANAS_COMPRADOR}
+      etiqueta={a.catalogo.etiqueta}
+      titulo={a.catalogo.titulo}
+      pestanas={pestanas(ICONOS_COMPRADOR, a.pestanasComprador)}
       activa={1}
       extra={
         <div data-foco="busqueda" className="mt-5 flex items-center gap-2.5 bg-carbon-800 px-4 py-3 text-[15px] text-oliva">
           <Search size={17} strokeWidth={1.75} />
-          Buscar material…
+          {a.catalogo.buscar}
         </div>
       }
     >
       <div data-foco="filtros" data-foco-interior className="flex gap-2 overflow-hidden px-5 pt-4">
-        {["Todo", "Cemento", "Fierro", "Áridos"].map((c, i) => (
+        {a.catalogo.filtros.map((c, i) => (
           <span
             key={c}
             className={cn(
@@ -239,19 +230,19 @@ export function MockCatalogo() {
       <div className="grid grid-cols-2 gap-3 px-5 pt-4">
         {PRODUCTOS_DEMO.map((p, i) => (
           <div
-            key={p.nombre}
+            key={i}
             {...(i === 0 ? { "data-foco": "producto" } : {})}
             className={cn("overflow-hidden border bg-white", i === 0 ? "border-oxido/40" : "border-arena/70")}
           >
             <div className={cn("relative h-[72px]", p.textura)}>
               <span className="absolute left-2 top-2 bg-carbon/80 px-1.5 py-0.5 text-[10px] text-yeso">
-                {p.proveedores} proveedores
+                {a.catalogo.proveedores(p.proveedores)}
               </span>
             </div>
             <div className="px-3 py-2.5">
-              <p className="truncate text-[14px] text-carbon">{p.nombre}</p>
+              <p className="truncate text-[14px] text-carbon">{a.catalogo.productos[i]}</p>
               <p className="mt-0.5 text-[12px] text-oliva-oscuro">
-                desde <span className="text-[14px] font-normal text-oxido">{p.precio}</span>
+                {a.catalogo.desde} <span className="text-[14px] font-normal text-oxido">{p.precio}</span>
               </p>
             </div>
           </div>
@@ -265,19 +256,26 @@ const PEDIDO_DEMO = [
   {
     proveedor: "Ferretería San Antonio",
     items: [
-      { nombre: "Cemento IP-30", cantidad: 5, precio: "Bs 310" },
-      { nombre: "Fierro 3/8", cantidad: 10, precio: "Bs 480" },
+      { producto: 0, cantidad: 5, precio: "Bs 310" },
+      { producto: 1, cantidad: 10, precio: "Bs 480" },
     ],
   },
   {
     proveedor: "Materiales Cochabamba",
-    items: [{ nombre: "Ladrillo 6H", cantidad: 200, precio: "Bs 360" }],
+    items: [{ producto: 2, cantidad: 200, precio: "Bs 360" }],
   },
 ];
 
 export function MockCarrito() {
+  const { idioma, t } = useIdioma();
+  const a = t.app;
   return (
-    <PantallaApp etiqueta="3 productos · 2 proveedores" titulo="Tu pedido" pestanas={PESTANAS_COMPRADOR} activa={2}>
+    <PantallaApp
+      etiqueta={a.carrito.etiqueta}
+      titulo={a.carrito.titulo}
+      pestanas={pestanas(ICONOS_COMPRADOR, a.pestanasComprador)}
+      activa={2}
+    >
       <div className="flex h-full flex-col">
         <div className="flex-1 space-y-5 px-5 pt-5">
           {PEDIDO_DEMO.map((grupo, g) => (
@@ -288,12 +286,12 @@ export function MockCarrito() {
               </p>
               <div className="mt-2.5 divide-y divide-arena/60 border border-arena/70 bg-white">
                 {grupo.items.map((item, k) => (
-                  <div key={item.nombre} className="flex items-center gap-3 px-3.5 py-3">
+                  <div key={item.producto} className="flex items-center gap-3 px-3.5 py-3">
                     <span className="flex h-10 w-10 shrink-0 items-center justify-center bg-oxido-claro text-oxido">
                       <Package size={18} strokeWidth={1.5} />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[15px] text-carbon">{item.nombre}</p>
+                      <p className="truncate text-[15px] text-carbon">{a.carrito.productos[item.producto]}</p>
                       <p className="mt-0.5 text-[13px] text-oliva-oscuro">{item.precio}</p>
                     </div>
                     <span
@@ -313,8 +311,8 @@ export function MockCarrito() {
           <div data-foco="entrega" className="flex items-center gap-3 border border-arena/70 bg-white px-3.5 py-3">
             <Truck size={18} strokeWidth={1.5} className="text-oliva-oscuro" />
             <div className="flex-1">
-              <p className="text-[14px] text-carbon">Entrega en obra</p>
-              <p className="text-[12px] text-oliva-oscuro">Torre del Bosque · mañana</p>
+              <p className="text-[14px] text-carbon">{a.carrito.entrega}</p>
+              <p className="text-[12px] text-oliva-oscuro">{a.carrito.entregaDetalle}</p>
             </div>
             <ChevronRight size={16} className="text-oliva" />
           </div>
@@ -322,11 +320,11 @@ export function MockCarrito() {
 
         <div data-foco="total" data-foco-interior className="border-t border-arena bg-white px-5 pb-5 pt-4">
           <div className="flex items-baseline justify-between">
-            <span className="text-[14px] text-tierra">Total</span>
-            <span className="text-[24px] font-light tabular-nums text-carbon">Bs 1.150</span>
+            <span className="text-[14px] text-tierra">{a.carrito.total}</span>
+            <span className="text-[24px] font-light tabular-nums text-carbon">{formatBs(1150, idioma)}</span>
           </div>
           <div className="mt-3.5 bg-oxido py-3.5 text-center text-[13px] font-normal uppercase tracking-[0.18em] text-white">
-            Confirmar pedido
+            {a.carrito.confirmar}
           </div>
         </div>
       </div>
@@ -335,14 +333,20 @@ export function MockCarrito() {
 }
 
 export function MockSeguimiento() {
+  const a = useIdioma().t.app;
   const pasos = [
-    { label: "Confirmado", hora: "08:02", hecho: true },
-    { label: "En preparación", hora: "08:15", hecho: true },
-    { label: "En camino", hora: "08:40", hecho: true },
-    { label: "Entregado", hora: "—", hecho: false },
+    { hora: "08:02", hecho: true },
+    { hora: "08:15", hecho: true },
+    { hora: "08:40", hecho: true },
+    { hora: "—", hecho: false },
   ];
   return (
-    <PantallaApp etiqueta="En camino" titulo="Pedido #4821" pestanas={PESTANAS_COMPRADOR} activa={2}>
+    <PantallaApp
+      etiqueta={a.seguimiento.etiqueta}
+      titulo={a.seguimiento.titulo}
+      pestanas={pestanas(ICONOS_COMPRADOR, a.pestanasComprador)}
+      activa={2}
+    >
       <div data-foco="mapa" className="relative h-[268px] overflow-hidden bg-yeso">
         <svg viewBox="0 0 393 268" className="absolute inset-0 h-full w-full" aria-hidden>
           <g stroke="var(--color-arena)" strokeOpacity="0.55" strokeWidth="14" fill="none">
@@ -369,14 +373,14 @@ export function MockSeguimiento() {
       </div>
 
       <div data-foco="llegada" className="relative mx-5 -mt-6 border border-arena/70 bg-white px-4 py-3.5 shadow-[0_12px_30px_-18px_rgb(36_34_32/0.5)]">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">Llega en</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">{a.seguimiento.llegaEn}</p>
         <p className="mt-1 text-[26px] font-light leading-none text-carbon">25 min</p>
-        <p className="mt-2 text-[13px] text-tierra">Ferretería San Antonio · Toyota Dyna</p>
+        <p className="mt-2 text-[13px] text-tierra">{a.seguimiento.vehiculo}</p>
       </div>
 
       <div data-foco="estados" data-foco-interior className="space-y-3.5 px-5 pt-5">
-        {pasos.map((paso) => (
-          <div key={paso.label} className="flex items-center gap-3">
+        {pasos.map((paso, i) => (
+          <div key={i} className="flex items-center gap-3">
             <span
               className={cn(
                 "flex h-5 w-5 items-center justify-center",
@@ -385,7 +389,7 @@ export function MockSeguimiento() {
             >
               {paso.hecho && <Check size={12} strokeWidth={2.5} />}
             </span>
-            <span className={cn("flex-1 text-[15px]", paso.hecho ? "text-carbon" : "text-oliva")}>{paso.label}</span>
+            <span className={cn("flex-1 text-[15px]", paso.hecho ? "text-carbon" : "text-oliva")}>{a.seguimiento.estados[i]}</span>
             <span className="text-[13px] tabular-nums text-oliva-oscuro">{paso.hora}</span>
           </div>
         ))}
@@ -395,14 +399,20 @@ export function MockSeguimiento() {
 }
 
 export function MockDashboard() {
+  const a = useIdioma().t.app;
   const ventas = [38, 52, 44, 70, 58, 86, 64];
   return (
-    <PantallaApp etiqueta="Ferretería San Antonio" titulo="Mi ferretería" pestanas={PESTANAS_FERRETERIA} activa={0}>
+    <PantallaApp
+      etiqueta="Ferretería San Antonio"
+      titulo={a.panel.titulo}
+      pestanas={pestanas(ICONOS_FERRETERIA, a.pestanasFerreteria)}
+      activa={0}
+    >
       <div data-foco="resumen" data-foco-interior className="grid grid-cols-3 gap-2.5 px-5 pt-5">
         {[
-          { label: "Pedidos", valor: "128" },
-          { label: "Pendientes", valor: "6", destacado: true },
-          { label: "Vendido", valor: "Bs 24k" },
+          { label: a.panel.stats[0], valor: "128" },
+          { label: a.panel.stats[1], valor: "6", destacado: true },
+          { label: a.panel.stats[2], valor: "Bs 24k" },
         ].map((stat) => (
           <div key={stat.label} className="border border-arena/70 bg-white px-3 py-3">
             <p className={cn("text-[22px] font-light leading-none", stat.destacado ? "text-oxido" : "text-carbon")}>
@@ -414,7 +424,7 @@ export function MockDashboard() {
       </div>
 
       <div data-foco="semana" className="mx-5 mt-3 border border-arena/70 bg-white px-4 pb-3 pt-3.5">
-        <p className="text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">Esta semana</p>
+        <p className="text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">{a.panel.semana}</p>
         <div className="mt-3 flex h-[84px] items-end gap-2.5">
           {ventas.map((v, i) => (
             <span
@@ -426,13 +436,9 @@ export function MockDashboard() {
         </div>
       </div>
 
-      <p className="px-5 pt-5 text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">Pedidos entrantes</p>
+      <p className="px-5 pt-5 text-[11px] uppercase tracking-[0.22em] text-oliva-oscuro">{a.panel.entrantes}</p>
       <div data-foco="entrantes" className="mx-5 mt-2.5 divide-y divide-arena/60 border border-arena/70 bg-white">
-        {[
-          { obra: "Edificio Torre del Bosque", detalle: "Cemento IP-30 ×5", estado: "Nuevo" },
-          { obra: "Casa Sacaba #12", detalle: "Fierro 3/8 ×10", estado: "Nuevo" },
-          { obra: "Galpón Quillacollo", detalle: "Ladrillo 6H ×200", estado: "Preparando" },
-        ].map((p) => (
+        {a.panel.pedidos.map((p, i) => (
           <div key={p.obra} className="flex items-center gap-3 px-3.5 py-3">
             <div className="min-w-0 flex-1">
               <p className="truncate text-[14px] text-carbon">{p.obra}</p>
@@ -441,10 +447,10 @@ export function MockDashboard() {
             <span
               className={cn(
                 "px-2 py-1 text-[11px]",
-                p.estado === "Nuevo" ? "bg-oxido-claro text-oxido-oscuro" : "bg-yeso text-tierra",
+                i < 2 ? "bg-oxido-claro text-oxido-oscuro" : "bg-yeso text-tierra",
               )}
             >
-              {p.estado}
+              {i < 2 ? a.panel.nuevo : a.panel.preparando}
             </span>
           </div>
         ))}
@@ -454,21 +460,22 @@ export function MockDashboard() {
 }
 
 export function MockFletes() {
+  const a = useIdioma().t.app;
   const fletes = [
-    { origen: "Ferretería San Antonio", destino: "Torre del Bosque", distancia: "2.1 km", rating: 4.6, carga: "Cemento ×5 · Fierro ×10" },
-    { origen: "Materiales Cochabamba", destino: "Casa Sacaba #12", distancia: "3.8 km", rating: 4.4, carga: "Ladrillo 6H ×200" },
+    { origen: "Ferretería San Antonio", destino: "Torre del Bosque", distancia: "2.1 km", rating: 4.6, carga: a.fletes.cargas[0] },
+    { origen: "Materiales Cochabamba", destino: "Casa Sacaba #12", distancia: "3.8 km", rating: 4.4, carga: a.fletes.cargas[1] },
   ];
   return (
     <PantallaApp
-      etiqueta="Cerca de ti"
-      titulo="Fletes"
-      pestanas={PESTANAS_CHOFER}
+      etiqueta={a.fletes.etiqueta}
+      titulo={a.fletes.titulo}
+      pestanas={pestanas(ICONOS_CHOFER, a.pestanasChofer)}
       activa={0}
       extra={
         <div data-foco="disponible" className="mt-5 flex items-center justify-between bg-carbon-800 px-4 py-3">
           <span className="flex items-center gap-2.5 text-[14px] text-yeso">
             <span className="h-2 w-2 bg-oxido" />
-            Disponible
+            {a.fletes.disponible}
           </span>
           <span className="flex h-6 w-11 items-center justify-end bg-oxido p-0.5">
             <span className="h-5 w-5 bg-white" />
@@ -504,7 +511,7 @@ export function MockFletes() {
                 i === 0 ? "bg-carbon text-yeso" : "border border-carbon text-carbon",
               )}
             >
-              Aceptar
+              {a.fletes.aceptar}
             </div>
           </div>
         ))}

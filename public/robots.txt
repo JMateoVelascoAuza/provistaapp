@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /registro/
+
+Sitemap: https://entreobra.com/sitemap.xml

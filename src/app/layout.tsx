@@ -4,6 +4,7 @@ import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { InstalarPwa } from "@/components/ui/InstalarPwa";
 import { LimpiarServiceWorkerDev } from "@/components/ui/LimpiarServiceWorkerDev";
+import { PreferenciasProvider, SCRIPT_PREFERENCIAS } from "@/lib/preferencias";
 import "./globals.css";
 
 // Jost autohospedada vía `@font-face` en `fuentes.css` — no
@@ -44,14 +45,21 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="es" className="antialiased">
+    // suppressHydrationWarning: el script del <head> cambia `lang` y los
+    // atributos de tema/idioma antes de que React hidrate.
+    <html lang="es" className="antialiased" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_PREFERENCIAS }} />
+      </head>
       <body className="flex min-h-screen flex-col bg-background text-foreground">
-        <LimpiarServiceWorkerDev />
-        <ScrollProgressBar />
-        <Header />
-        {children}
-        <BackToTop />
-        <InstalarPwa />
+        <PreferenciasProvider>
+          <LimpiarServiceWorkerDev />
+          <ScrollProgressBar />
+          <Header />
+          {children}
+          <BackToTop />
+          <InstalarPwa />
+        </PreferenciasProvider>
       </body>
     </html>
   );

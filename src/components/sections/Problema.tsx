@@ -6,25 +6,23 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Check } from "lucide-react";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
+import { useIdioma } from "@/lib/preferencias";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const INTERCAMBIOS: { pregunta: string; horaPregunta: string; respuesta: string; horaRespuesta: string; esVisto?: boolean }[] = [
-  { pregunta: "¿A cuánto la bolsa de cemento?", horaPregunta: "08:02", respuesta: "Déjeme consultar", horaRespuesta: "08:47" },
-  { pregunta: "¿Y el flete hasta la obra?", horaPregunta: "08:49", respuesta: "Eso es aparte", horaRespuesta: "09:31" },
-  { pregunta: "¿Ya salió el camión?", horaPregunta: "09:35", respuesta: "Visto", horaRespuesta: "10:49", esVisto: true },
+// Textos en t.problema.intercambios (mismo orden).
+const INTERCAMBIOS: { horaPregunta: string; horaRespuesta: string; esVisto?: boolean }[] = [
+  { horaPregunta: "08:02", horaRespuesta: "08:47" },
+  { horaPregunta: "08:49", horaRespuesta: "09:31" },
+  { horaPregunta: "09:35", horaRespuesta: "10:49", esVisto: true },
 ];
 
 // Cada problema se enciende en un momento del chat: `momento` es el
 // índice del mensaje (pregunta 0, respuesta 0, pregunta 1, ...).
-const DOLORES = [
-  { titulo: "Cotizas uno por uno", detalle: "La misma pregunta, en cuatro chats distintos.", momento: 0 },
-  { titulo: "Comparas de memoria", detalle: "Los precios llegan sueltos, cuando llegan.", momento: 1 },
-  { titulo: "Coordinas cada flete aparte", detalle: "El transporte es otra conversación.", momento: 3 },
-  { titulo: "Nadie sabe cuándo llega", detalle: "El camión sale cuando sale.", momento: 5 },
-];
+// Textos en t.problema.dolores (mismo orden).
+const DOLORES = [{ momento: 0 }, { momento: 1 }, { momento: 3 }, { momento: 5 }];
 
 const CHATS = [
   { nombre: "San Antonio", sinLeer: 0 },
@@ -66,6 +64,7 @@ export function Problema() {
   const ref = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
   const reducido = usePrefersReducedMotion();
+  const { t } = useIdioma();
 
   useGSAP(
     () => {
@@ -91,6 +90,9 @@ export function Problema() {
       gsap.set(respuestas, { opacity: 0, y: 6, scale: 0.95 });
       gsap.set(dolores, { opacity: 0.35 });
       gsap.set(barras, { scaleY: 0 });
+      // El color final sale del CSS del tema activo (en el claro el óxido
+      // de texto es más oscuro, para que se lea).
+      const acento = numeros[0] ? getComputedStyle(numeros[0]).color : "#c2410c";
       gsap.set(numeros, { color: "#696c63" });
       if (cierre) gsap.set(cierre, { opacity: 0, y: 8 });
       const espera = { minutos: 0 };
@@ -110,10 +112,10 @@ export function Problema() {
       if (cierre) tl.to(cierre, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, "+=0.15");
 
       DOLORES.forEach((dolor, i) => {
-        const t = momentos[dolor.momento] - 0.1;
-        tl.to(dolores[i], { opacity: 1, duration: 0.35, ease: "power2.out" }, t);
-        tl.to(barras[i], { scaleY: 1, duration: 0.45, ease: "power3.out" }, t);
-        tl.to(numeros[i], { color: "#c2410c", duration: 0.3 }, t);
+        const tiempo = momentos[dolor.momento] - 0.1;
+        tl.to(dolores[i], { opacity: 1, duration: 0.35, ease: "power2.out" }, tiempo);
+        tl.to(barras[i], { scaleY: 1, duration: 0.45, ease: "power3.out" }, tiempo);
+        tl.to(numeros[i], { color: acento, duration: 0.3 }, tiempo);
       });
 
       if (contador) {
@@ -131,7 +133,7 @@ export function Problema() {
         );
       }
     },
-    { scope: ref, dependencies: [reducido] },
+    { scope: ref, dependencies: [reducido], revertOnUpdate: true },
   );
 
   return (
@@ -141,14 +143,14 @@ export function Problema() {
         className="contenedor grid gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:gap-x-20 lg:gap-y-12"
       >
         <ScrollReveal className="lg:col-start-1 lg:row-start-1">
-          <p className="etiqueta text-oliva-oscuro">El problema</p>
+          <p className="etiqueta text-oliva-oscuro">{t.problema.etiqueta}</p>
           <h2 className="titulo mt-5 text-[2rem] text-carbon md:text-[2.75rem]">
-            Hoy, pedir material
+            {t.problema.titulo[0]}
             <br />
-            se ve así.
+            {t.problema.titulo[1]}
           </h2>
           <p className="mt-6 max-w-md text-[15px] leading-relaxed text-tierra/75">
-            Cuatro chats abiertos y ninguna respuesta clara.
+            {t.problema.bajada}
           </p>
         </ScrollReveal>
 
@@ -158,9 +160,9 @@ export function Problema() {
             className="border border-arena/70 bg-white px-5 py-6 shadow-[0_30px_60px_-40px_rgb(36_34_32/0.35)] sm:px-8 sm:py-8"
           >
             <div className="flex items-baseline justify-between gap-4">
-              <p className="etiqueta text-[10px] text-oliva-oscuro">WhatsApp · 4 chats</p>
+              <p className="etiqueta text-[10px] text-oliva-oscuro">{t.problema.chat}</p>
               <p className="text-[11px] text-oliva-oscuro">
-                Esperando <span data-espera className="tabular-nums text-oxido">{formatoEspera(ESPERA_TOTAL)}</span>
+                {t.problema.esperando} <span data-espera className="tabular-nums text-oxido">{formatoEspera(ESPERA_TOTAL)}</span>
               </p>
             </div>
 
@@ -185,12 +187,12 @@ export function Problema() {
 
             <div className="mt-6 flex flex-col gap-3">
               {INTERCAMBIOS.map((item, i) => (
-                <div key={item.pregunta} className="flex flex-col gap-2">
+                <div key={i} className="flex flex-col gap-2">
                   <p
                     data-pregunta
                     className="max-w-[85%] self-start rounded-2xl rounded-bl-sm bg-yeso-claro px-4 py-2.5 text-[14px] text-carbon shadow-sm"
                   >
-                    {item.pregunta}
+                    {t.problema.intercambios[i].pregunta}
                     <span className="ml-2.5 text-[10px] tabular-nums text-oliva-oscuro">{item.horaPregunta}</span>
                   </p>
 
@@ -203,7 +205,7 @@ export function Problema() {
                         data-respuesta
                         className="absolute right-0 top-1.5 flex items-center gap-1.5 whitespace-nowrap px-1 text-xs text-oliva-oscuro"
                       >
-                        {item.respuesta} {item.horaRespuesta}
+                        {t.problema.intercambios[i].respuesta} {item.horaRespuesta}
                         <span className="flex items-center text-oxido">
                           <Check size={12} />
                           <Check size={12} className="-ml-1.5" />
@@ -214,7 +216,7 @@ export function Problema() {
                         data-respuesta
                         className="absolute right-0 top-0 whitespace-nowrap rounded-2xl rounded-br-sm bg-oxido-claro px-4 py-2.5 text-[14px] text-oxido-oscuro"
                       >
-                        {item.respuesta}
+                        {t.problema.intercambios[i].respuesta}
                         <span className="ml-2.5 text-[10px] tabular-nums text-oxido-oscuro/60">{item.horaRespuesta}</span>
                       </p>
                     )}
@@ -226,7 +228,9 @@ export function Problema() {
             </div>
 
             <p data-cierre className="mt-6 border-t border-arena pt-5 text-[13px] text-tierra/80">
-              Y mientras tanto, <span className="text-oxido">la obra espera</span>.
+              {t.problema.cierre[0]}
+              <span className="text-oxido">{t.problema.cierre[1]}</span>
+              {t.problema.cierre[2]}
             </p>
           </div>
         </ScrollReveal>
@@ -234,7 +238,7 @@ export function Problema() {
         <ol className="border-t border-arena lg:col-start-1 lg:row-start-2">
           {DOLORES.map((dolor, i) => (
             <li
-              key={dolor.titulo}
+              key={i}
               data-dolor
               className="relative grid grid-cols-[auto_minmax(0,1fr)] gap-x-5 border-b border-arena py-5 pl-5"
             >
@@ -243,8 +247,8 @@ export function Problema() {
                 {String(i + 1).padStart(2, "0")}
               </span>
               <div>
-                <p className="text-[17px] text-carbon">{dolor.titulo}</p>
-                <p className="mt-1 text-sm leading-relaxed text-tierra/75">{dolor.detalle}</p>
+                <p className="text-[17px] text-carbon">{t.problema.dolores[i].titulo}</p>
+                <p className="mt-1 text-sm leading-relaxed text-tierra/75">{t.problema.dolores[i].detalle}</p>
               </div>
             </li>
           ))}

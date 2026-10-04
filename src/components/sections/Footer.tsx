@@ -1,7 +1,10 @@
+"use client";
+
 import { Logo } from "@/components/ui/Logo";
 import { PrivacyModal } from "@/components/ui/PrivacyModal";
 import { ScrollStagger } from "@/components/ui/ScrollReveal";
 import { WHATSAPP_ENTREOBRA } from "@/lib/datos";
+import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
 // Usuario de redes según el manual de marca: @entreobra.
@@ -38,18 +41,19 @@ const TONOS = {
 
 export function Footer({ tono = "oscuro" }: { tono?: keyof typeof TONOS }) {
   const t = TONOS[tono];
+  const { t: tx } = useIdioma();
   const enlace = cn("transition-colors duration-300", t.enlace);
 
   return (
-    <footer className={cn("border-t", t.footer)}>
+    <footer data-zona={tono === "oscuro" ? "oscura" : undefined} className={cn("border-t", t.footer)}>
       <ScrollStagger stagger={0.1} className="contenedor grid gap-12 py-16 sm:grid-cols-3 md:py-20">
         <div>
           <Logo variante="principal" fondo={t.fondoLogo} animado="scroll" className="text-[20px] md:text-[26px]" />
-          <p className={cn("mt-6 text-[13px]", t.etiqueta)}>Cochabamba, Bolivia</p>
+          <p className={cn("mt-6 text-[13px]", t.etiqueta)}>{tx.footer.ubicacion}</p>
         </div>
 
         <div className="sm:justify-self-center">
-          <p className={cn("etiqueta text-[10px]", t.etiqueta)}>Contacto</p>
+          <p className={cn("etiqueta text-[10px]", t.etiqueta)}>{tx.footer.contacto}</p>
           <div className={cn("mt-5 flex flex-col gap-2 text-[13px]", t.texto)}>
             <a href={`https://wa.me/${WHATSAPP_ENTREOBRA}`} target="_blank" rel="noopener noreferrer" className={enlace}>
               WhatsApp +591 76971774
@@ -61,7 +65,7 @@ export function Footer({ tono = "oscuro" }: { tono?: keyof typeof TONOS }) {
         </div>
 
         <div className="sm:justify-self-end sm:text-right">
-          <p className={cn("etiqueta text-[10px]", t.etiqueta)}>Síguenos</p>
+          <p className={cn("etiqueta text-[10px]", t.etiqueta)}>{tx.footer.siguenos}</p>
           <p className={cn("mt-5 text-[13px]", t.texto)}>
             {REDES.map((red, i) => (
               <span key={red.label}>

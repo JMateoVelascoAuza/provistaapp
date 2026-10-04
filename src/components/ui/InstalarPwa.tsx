@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Download, PlusSquare, Share2, X } from "lucide-react";
+import { useIdioma } from "@/lib/preferencias";
 import { usePwaInstall } from "@/lib/usePwaInstall";
 
 /**
@@ -19,26 +20,32 @@ import { usePwaInstall } from "@/lib/usePwaInstall";
  * En cualquier otro navegador (desktop sin soporte, ya instalada, etc.)
  * el botón no se muestra — no se promete algo que ese navegador no puede.
  */
-const PASOS_IOS = [
-  <>
-    Toca el ícono de <span className="text-carbon">compartir</span>{" "}
-    <Share2 size={13} strokeWidth={1.5} className="mb-0.5 inline" /> en la barra de Safari.
-  </>,
-  <>
-    Desliza y elige{" "}
-    <span className="text-carbon">
-      Agregar a pantalla de inicio <PlusSquare size={13} strokeWidth={1.5} className="mb-0.5 inline" />
-    </span>
-    .
-  </>,
-  <>
-    Toca <span className="text-carbon">Agregar</span> arriba a la derecha. Listo.
-  </>,
-];
 
 export function InstalarPwa() {
   const { puedeInstalarNativo, instalada, esIOS, instalar } = usePwaInstall();
   const [abierto, setAbierto] = useState(false);
+  const { t } = useIdioma();
+  const ti = t.instalar;
+  const pasosIos = [
+    <>
+      {ti.iosCompartir[0]}
+      <span className="text-carbon">{ti.iosCompartir[1]}</span>{" "}
+      <Share2 size={13} strokeWidth={1.5} className="mb-0.5 inline" />
+      {ti.iosCompartir[2]}
+    </>,
+    <>
+      {ti.iosAgregar[0]}
+      <span className="text-carbon">
+        {ti.iosAgregar[1]} <PlusSquare size={13} strokeWidth={1.5} className="mb-0.5 inline" />
+      </span>
+      {ti.iosAgregar[2]}
+    </>,
+    <>
+      {ti.iosListo[0]}
+      <span className="text-carbon">{ti.iosListo[1]}</span>
+      {ti.iosListo[2]}
+    </>,
+  ];
 
   if (instalada || (!puedeInstalarNativo && !esIOS)) return null;
 
@@ -46,11 +53,12 @@ export function InstalarPwa() {
     <>
       <button
         type="button"
+        data-zona="oscura"
         onClick={() => setAbierto(true)}
         className="fixed bottom-5 left-5 z-30 flex h-11 items-center gap-2.5 border border-yeso/15 bg-carbon/90 px-4 text-[10px] font-normal uppercase tracking-[0.22em] text-arena backdrop-blur-sm transition-colors duration-300 hover:border-oxido hover:text-yeso md:bottom-8 md:left-8"
       >
         <Download size={14} strokeWidth={1.5} />
-        Instalar app
+        {ti.boton}
       </button>
 
       {abierto && (
@@ -60,7 +68,7 @@ export function InstalarPwa() {
             <button
               type="button"
               onClick={() => setAbierto(false)}
-              aria-label="Cerrar"
+              aria-label={ti.cerrar}
               className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center text-oliva-oscuro transition-colors hover:text-carbon"
             >
               <X size={16} strokeWidth={1.5} />
@@ -69,14 +77,14 @@ export function InstalarPwa() {
             <div className="flex items-center gap-4">
               <Image src="/icons/icon-192.png" alt="" width={48} height={48} />
               <div>
-                <p className="text-[15px] text-carbon">Entreobra en tu celular</p>
-                <p className="mt-0.5 text-xs text-oliva-oscuro">Como cualquier app, a un toque</p>
+                <p className="text-[15px] text-carbon">{ti.titulo}</p>
+                <p className="mt-0.5 text-xs text-oliva-oscuro">{ti.sub}</p>
               </div>
             </div>
 
             {esIOS ? (
               <ol className="mt-7 space-y-4 border-t border-arena pt-6">
-                {PASOS_IOS.map((paso, i) => (
+                {pasosIos.map((paso, i) => (
                   <li key={i} className="flex gap-4 text-sm leading-relaxed text-tierra/85">
                     <span className="pt-px text-[11px] tracking-[0.2em] text-oxido">{String(i + 1).padStart(2, "0")}</span>
                     <p>{paso}</p>
@@ -86,8 +94,7 @@ export function InstalarPwa() {
             ) : (
               <>
                 <p className="mt-7 border-t border-arena pt-6 text-sm leading-relaxed text-tierra/85">
-                  Te queda un ícono como cualquier app, abre a pantalla completa y funciona más rápido — sin
-                  pasar por una tienda de apps.
+                  {ti.texto}
                 </p>
                 <button
                   type="button"
@@ -97,7 +104,7 @@ export function InstalarPwa() {
                   }}
                   className="boton boton-oxido mt-7 w-full"
                 >
-                  Instalar Entreobra
+                  {ti.instalar}
                 </button>
               </>
             )}

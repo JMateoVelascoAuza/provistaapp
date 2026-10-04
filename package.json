@@ -3,9 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/sincronizar-registro.mjs",
     "dev": "next dev --webpack",
+    "prebuild": "node scripts/sincronizar-registro.mjs",
     "build": "next build --webpack",
+    "prebuild:local": "node scripts/sincronizar-registro.mjs",
     "build:local": "cross-env STATIC_EXPORT=1 next build --webpack",
+    "prebuild:hosting": "node scripts/sincronizar-registro.mjs",
+    "build:hosting": "cross-env STATIC_EXPORT=hosting next build --webpack",
+    "postbuild:hosting": "node scripts/ajustar-export.mjs",
     "start": "next start",
     "lint": "eslint"
   },

@@ -7,12 +7,21 @@ import withPWAInit from "@ducanh2912/next-pwa";
 // dev/build (con la API de /api/registro) queda intacto sin esa
 // variable — nunca la necesita.
 const exportEstatico = process.env.STATIC_EXPORT === "1";
+// `STATIC_EXPORT=hosting` (npm run build:hosting): build de producción
+// para un hosting estático como Namecheap. Rutas normales con barra final
+// (/demo/, /registro/), PWA activa y sin /api (los formularios envían
+// directo al Google Apps Script de NEXT_PUBLIC_APPS_SCRIPT_URL).
+const exportHosting = process.env.STATIC_EXPORT === "hosting";
 
 const nextConfig: NextConfig = {
   // Expone la misma bandera al cliente (`src/lib/enlace.ts` la usa para
   // reescribir los links de "/demo", "/#formulario", etc. a relativos)
   // — así con UNA sola variable (`STATIC_EXPORT=1`) alcanza para todo.
-  env: { NEXT_PUBLIC_STATIC_EXPORT: exportEstatico ? "1" : "0" },
+  env: {
+    NEXT_PUBLIC_STATIC_EXPORT: exportEstatico ? "1" : "0",
+    NEXT_PUBLIC_SIN_SERVIDOR: exportEstatico || exportHosting ? "1" : "0",
+  },
+  ...(exportHosting ? { output: "export", images: { unoptimized: true }, trailingSlash: true } : {}),
   ...(exportEstatico
     ? {
         output: "export",

@@ -6,6 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ANCHO_APP, CAPA_APP, PhoneFrame } from "./PhoneFrame";
 import { MockCarrito, MockCatalogo, MockDashboard, MockFletes, MockInicio, MockSeguimiento } from "./MockScreens";
+import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
@@ -13,71 +14,26 @@ gsap.registerPlugin(ScrollTrigger);
 
 type Foco = { id: string; titulo: string; texto: string };
 
-// Cada `id` apunta a un `data-foco` dentro de la pantalla (MockScreens).
-const PASOS: { titulo: string; descripcion: string; Pantalla: () => React.ReactNode; focos: Foco[] }[] = [
-  {
-    titulo: "Tu inicio",
-    descripcion: "Al abrir la app ves lo importante: tus pedidos en curso, las empresas que te venden y tus obras.",
-    Pantalla: MockInicio,
-    focos: [
-      { id: "ahorro", titulo: "Lo que ahorras, a la vista", texto: "Cada compra comparando suma la diferencia. Sabes cuánto te rinde usar Entreobra." },
-      { id: "pedido-activo", titulo: "Tu pedido en curso, primero", texto: "Lo que está en camino aparece arriba, con la hora estimada de llegada." },
-      { id: "empresas", titulo: "Las empresas que te venden", texto: "Ferreterías y distribuidoras de Cochabamba con su calificación, distancia y si tienen stock." },
-      { id: "obras", titulo: "Todo por obra", texto: "Cada obra con sus pedidos y gastos por separado. Nada se mezcla." },
-    ],
-  },
-  {
-    titulo: "Busca y compara",
-    descripcion: "Un solo catálogo para todos los materiales, con precios de varias ferreterías lado a lado.",
-    Pantalla: MockCatalogo,
-    focos: [
-      { id: "busqueda", titulo: "Busca como lo pides en obra", texto: "Escribe «cemento», «fierro 3/8» o la marca. Sin códigos ni catálogos en PDF." },
-      { id: "filtros", titulo: "Filtra en un toque", texto: "Cemento, fierro, áridos, ladrillos: tocas una categoría y ves solo eso." },
-      { id: "producto", titulo: "El mejor precio, primero", texto: "Cada producto te dice cuántas ferreterías lo tienen y desde cuánto. Lo tocas y comparas lado a lado." },
-    ],
-  },
-  {
-    titulo: "Arma tu pedido",
-    descripcion: "Todo en un carrito, aunque los productos vengan de proveedores distintos.",
-    Pantalla: MockCarrito,
-    focos: [
-      { id: "proveedor", titulo: "Ordenado por ferretería", texto: "Si el pedido sale de dos proveedores, ves qué trae cada uno. Igual es un solo pedido." },
-      { id: "cantidad", titulo: "Cantidades al toque", texto: "Subes o bajas bolsas, varillas o ladrillos sin volver a buscar el producto." },
-      { id: "entrega", titulo: "Llega a tu obra", texto: "Eliges la obra y el día. La dirección ya está guardada." },
-      { id: "total", titulo: "Un total, un botón", texto: "Confirmas una vez y cada ferretería recibe su parte del pedido." },
-    ],
-  },
-  {
-    titulo: "Síguelo en vivo",
-    descripcion: "Del taller a la obra: sabes en qué paso está tu pedido en cada momento, sin preguntar.",
-    Pantalla: MockSeguimiento,
-    focos: [
-      { id: "mapa", titulo: "Míralo llegar", texto: "El camión en el mapa, del depósito a tu obra, en tiempo real." },
-      { id: "llegada", titulo: "Sabes cuándo llega", texto: "Tiempo estimado, quién lo trae y en qué vehículo. Sin llamar a preguntar." },
-      { id: "estados", titulo: "Cada paso, con hora", texto: "Confirmado, en preparación, en camino, entregado. Queda registro de todo." },
-    ],
-  },
-  {
-    titulo: "Si tienes una ferretería",
-    descripcion: "Publica tu catálogo y gestiona tus pedidos entrantes desde un panel propio.",
-    Pantalla: MockDashboard,
-    focos: [
-      { id: "resumen", titulo: "Tu negocio de un vistazo", texto: "Pedidos, pendientes y lo vendido, siempre al día." },
-      { id: "semana", titulo: "Cómo va la semana", texto: "Ves qué días vendes más para tener stock cuando hace falta." },
-      { id: "entrantes", titulo: "Pedidos que llegan solos", texto: "Obras cercanas te piden directo, listos para preparar. Sin perseguir clientes por WhatsApp." },
-    ],
-  },
-  {
-    titulo: "Si haces fletes",
-    descripcion: "Recibe fletes disponibles cerca tuyo y acéptalos con un toque.",
-    Pantalla: MockFletes,
-    focos: [
-      { id: "disponible", titulo: "Trabajas cuando quieres", texto: "Te pones disponible y empiezan a llegar fletes cerca tuyo." },
-      { id: "ruta", titulo: "De dónde a dónde", texto: "Origen, destino, distancia y qué vas a cargar, antes de aceptar." },
-      { id: "aceptar", titulo: "Aceptas con un toque", texto: "El flete es tuyo y la ferretería ya sabe quién va a buscar el pedido." },
-    ],
-  },
+// Cada id apunta a un `data-foco` dentro de la pantalla (MockScreens).
+// Los textos de cada paso y cada foco están en t.demo.pasos (mismo orden).
+const BASE: { Pantalla: () => React.ReactNode; focos: string[] }[] = [
+  { Pantalla: MockInicio, focos: ["ahorro", "pedido-activo", "empresas", "obras"] },
+  { Pantalla: MockCatalogo, focos: ["busqueda", "filtros", "producto"] },
+  { Pantalla: MockCarrito, focos: ["proveedor", "cantidad", "entrega", "total"] },
+  { Pantalla: MockSeguimiento, focos: ["mapa", "llegada", "estados"] },
+  { Pantalla: MockDashboard, focos: ["resumen", "semana", "entrantes"] },
+  { Pantalla: MockFletes, focos: ["disponible", "ruta", "aceptar"] },
 ];
+
+function usePasos(): { titulo: string; descripcion: string; Pantalla: () => React.ReactNode; focos: Foco[] }[] {
+  const { t } = useIdioma();
+  return BASE.map((base, i) => ({
+    Pantalla: base.Pantalla,
+    titulo: t.demo.pasos[i].titulo,
+    descripcion: t.demo.pasos[i].descripcion,
+    focos: base.focos.map((id, j) => ({ id, ...t.demo.pasos[i].focos[j] })),
+  }));
+}
 
 const ASPECTO_TELEFONO = 2.069;
 const DESKTOP = 1024;
@@ -148,6 +104,8 @@ function RecorridoAnimado() {
   const notasRef = useRef<Array<HTMLDivElement | null>>([]);
   const navRef = useRef<{ st: ScrollTrigger; inicios: number[]; duracion: number } | null>(null);
   const [activo, setActivo] = useState(0);
+  const PASOS = usePasos();
+  const { idioma, t } = useIdioma();
   const [vista, setVista] = useState({ ancho: 260, version: 0 });
 
   useEffect(() => {
@@ -298,7 +256,9 @@ function RecorridoAnimado() {
         navRef.current = null;
       };
     },
-    { scope: escenaRef, dependencies: [vista], revertOnUpdate: true },
+    // Con otro idioma cambian los tamaños dentro del teléfono: se vuelve a
+    // medir cada detalle.
+    { scope: escenaRef, dependencies: [vista, idioma], revertOnUpdate: true },
   );
 
   function irAlPaso(i: number) {
@@ -353,18 +313,18 @@ function RecorridoAnimado() {
               </PhoneFrame>
             </div>
             <p ref={avisoRef} className="mt-4 max-w-[17rem] text-center text-[11px] leading-snug text-oliva-oscuro lg:mt-6 lg:text-xs">
-              * Pantallas de prueba. El diseño y los datos están sujetos a cambios.
+              {t.demo.notaTelefono}
             </p>
           </div>
 
           <div className="relative z-20 h-[40%] shrink-0 lg:order-1 lg:h-auto">
             {/* Desktop: la lista de pasos */}
             <div ref={listaRef} className="hidden h-full flex-col justify-center lg:flex">
-              <p className="etiqueta text-oliva-oscuro">La app por dentro</p>
+              <p className="etiqueta text-oliva-oscuro">{t.demo.appPorDentro}</p>
               <div className="mt-8 flex flex-col">
                 {PASOS.map((paso, i) => (
                   <button
-                    key={paso.titulo}
+                    key={i}
                     onClick={() => irAlPaso(i)}
                     className="group flex flex-col items-start border-t border-arena py-5 text-left first:border-t-0"
                   >
@@ -401,7 +361,7 @@ function RecorridoAnimado() {
             <div ref={pasoMovilRef} className="relative h-full lg:hidden">
               {PASOS.map((paso, i) => (
                 <div
-                  key={paso.titulo}
+                  key={i}
                   className={cn(
                     "absolute inset-x-0 top-4 transition-opacity duration-500",
                     i === activo ? "opacity-100" : "opacity-0",
@@ -464,6 +424,8 @@ function RecorridoAnimado() {
 
 /** Sin animaciones (`prefers-reduced-motion`): cada pantalla con sus detalles, en lista. */
 function RecorridoEstatico() {
+  const PASOS = usePasos();
+  const { t } = useIdioma();
   return (
     <div className="bg-yeso py-20">
       <div className="contenedor flex flex-col gap-24">
@@ -487,7 +449,7 @@ function RecorridoEstatico() {
                 <Pantalla />
               </PhoneFrame>
               <p className="mt-5 max-w-[17rem] text-center text-xs leading-snug text-oliva-oscuro">
-                * Pantallas de prueba. El diseño y los datos están sujetos a cambios.
+                {t.demo.notaTelefono}
               </p>
             </div>
           </div>

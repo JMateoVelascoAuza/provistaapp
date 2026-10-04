@@ -41,7 +41,7 @@ export function Parallax({
         },
       });
     },
-    { scope: ref, dependencies: [reducido] },
+    { scope: ref, dependencies: [reducido], revertOnUpdate: true },
   );
 
   return (

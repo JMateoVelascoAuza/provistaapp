@@ -96,17 +96,49 @@ Probado con Playwright simulando los 4 casos (Chrome de escritorio sin
 evento, Android/Chrome con el evento disparado, iOS por user-agent, y
 ya instalada) — el botón aparece solo cuando corresponde en cada uno.
 
-## Formulario → Google Sheets
+## Formularios → Google Sheets
 
-Sección 6 del documento pide que los envíos se registren automáticamente
-en una hoja de Google Sheets **provista por el comitente** (columnas:
-Fecha y hora | Nombre | Tipo de usuario | WhatsApp). Todavía no la
-tenemos, así que `src/app/api/registro/route.ts` está armado para pegar
-la URL de un Google Apps Script (publicado como "Web app") en
-`GOOGLE_SHEETS_WEBHOOK_URL` apenas el comitente la comparta — no hace
-falta cuenta de servicio ni credenciales de Google Cloud. Sin esa
-variable configurada, el registro queda en los logs del servidor, para
-poder probar el formulario de punta a punta ya mismo.
+Los dos formularios escriben en **la hoja del cliente** a través de un solo
+Google Apps Script (`apps-script/Code.gs`):
+
+| Formulario | Pestaña |
+|---|---|
+| Registro de productos (`/registro/`) | `Hoja 1` (las 14 columnas del cliente + `ID envío` al final) |
+| Acceso anticipado (landing) | `Acceso anticipado` (se crea sola) |
+
+La URL del script va en **un solo lugar**: `NEXT_PUBLIC_APPS_SCRIPT_URL`
+(ver `.env.example`). `scripts/sincronizar-registro.mjs` la escribe en la
+página de registro antes de cada `dev`/`build`. Sin URL, todo funciona
+igual en local: los formularios terminan en WhatsApp / CSV.
+
+## Publicar en producción (Namecheap, hosting estático)
+
+**Una vez, en la hoja del cliente:** Extensiones → Apps Script → pegar
+`apps-script/Code.gs` → Implementar → Nueva implementación → Aplicación web
+(Ejecutar como: yo · Acceso: cualquier persona) → copiar la URL `/exec`.
+Si después se cambia el script: Administrar implementaciones → Editar →
+Nueva versión (así la URL no cambia).
+
+**Cada publicación:**
+
+```bash
+cp .env.example .env.production.local     # la primera vez
+# pegar la URL en NEXT_PUBLIC_APPS_SCRIPT_URL
+npm run build:hosting                     # genera out/ (landing, /demo/, /registro/)
+```
+
+Subir **el contenido** de `out/` (incluido el `.htaccess`, que es un archivo
+oculto) a `public_html` en cPanel → Administrador de archivos (lo más
+rápido: comprimir `out/` en .zip, subirlo y extraerlo ahí). En cPanel →
+SSL/TLS Status, activar AutoSSL para `entreobra.com` y `www`.
+
+`public/.htaccess` fuerza HTTPS, redirige `www` → sin www, usa la 404 propia
+y define la caché (archivos con hash 1 año; HTML y service worker siempre
+frescos). `scripts/ajustar-export.mjs` corre solo después del build.
+
+Probar después de subir: la landing, `/demo/`, `/registro/`, un envío de
+cada formulario (deben aparecer en la hoja) y que `http://` redirija a
+`https://`.
 
 ## `/demo` — fuera de contrato, para pulsear interés del cliente
 
@@ -294,5 +326,5 @@ workers ni siquiera pueden registrarse ahí). `STATIC_EXPORT=1` (ver
       de presentación del producto; Hero con scroll-exit;
       `prefers-reduced-motion` en toda la capa nueva
 - [ ] Reemplazar ícono/logo con el Anexo C cuando llegue
-- [ ] Pegar `GOOGLE_SHEETS_WEBHOOK_URL` real cuando el comitente la pase
-- [ ] Deploy
+- [ ] Pegar la URL del Apps Script del cliente en `NEXT_PUBLIC_APPS_SCRIPT_URL`
+- [ ] Publicar en Namecheap (ver «Publicar en producción»)

@@ -35,14 +35,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const fila = {
-    fecha: new Date().toISOString(),
-    nombre,
-    tipoUsuario: tipoUsuario === "obra" ? "Estoy en obra" : "Vendo materiales",
-    whatsapp,
-  };
+  // Mismo formato que manda la página cuando no hay servidor
+  // (apps-script/Code.gs lo escribe en la pestaña "Acceso anticipado").
+  const fila = { tipo: "acceso", id: crypto.randomUUID(), nombre, whatsapp, tipoUsuario };
 
-  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
 
   if (!webhookUrl) {
     console.log("[registro] GOOGLE_SHEETS_WEBHOOK_URL no configurada. Registro:", fila);
@@ -52,12 +49,13 @@ export async function POST(request: Request) {
   try {
     const respuesta = await fetch(webhookUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(fila),
     });
 
-    if (!respuesta.ok) {
-      throw new Error(`La hoja respondió ${respuesta.status}`);
+    const data = await respuesta.json().catch(() => null);
+    if (!respuesta.ok || data?.ok !== true) {
+      throw new Error(`La hoja respondió ${respuesta.status}: ${data?.error ?? "sin detalle"}`);
     }
   } catch (error) {
     console.error("[registro] Error escribiendo en Google Sheets:", error);

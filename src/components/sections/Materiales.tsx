@@ -9,6 +9,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Foto } from "@/components/ui/Foto";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
 import { CATEGORIAS } from "@/lib/datos";
+import { useIdioma } from "@/lib/preferencias";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 gsap.registerPlugin(ScrollTrigger, Flip, ExpoScaleEase);
@@ -21,12 +22,14 @@ function yaVisible(el: HTMLElement) {
 }
 
 function PiezaCategoria({ categoria, numero }: { categoria: (typeof CATEGORIAS)[number]; numero: number }) {
+  const { t } = useIdioma();
+  const texto = t.materiales.categorias[numero - 1];
   return (
-    <article className="group relative overflow-hidden bg-carbon-800">
+    <article data-zona="foto" className="group relative overflow-hidden bg-carbon-800">
       <Foto
         textura={categoria.textura}
         src={categoria.imagen}
-        alt={categoria.imagen ? categoria.nombre : ""}
+        alt={categoria.imagen ? texto.nombre : ""}
         velo={0.12}
         imagenClassName="transition-transform duration-[1400ms] ease-obra group-hover:scale-[1.06]"
       />
@@ -38,8 +41,8 @@ function PiezaCategoria({ categoria, numero }: { categoria: (typeof CATEGORIAS)[
           {String(numero).padStart(2, "0")}
           <span className="h-px w-0 bg-oxido transition-all duration-700 ease-obra group-hover:w-6" />
         </p>
-        <h3 className="mt-2 text-lg font-light tracking-[0.01em] text-yeso md:text-[1.375rem]">{categoria.nombre}</h3>
-        <p className="mt-1.5 hidden text-xs text-arena/65 sm:block">{categoria.detalle}</p>
+        <h3 className="mt-2 text-lg font-light tracking-[0.01em] text-yeso md:text-[1.375rem]">{texto.nombre}</h3>
+        <p className="mt-1.5 hidden text-xs text-arena/65 sm:block">{texto.detalle}</p>
       </div>
     </article>
   );
@@ -51,8 +54,9 @@ function PiezaCategoria({ categoria, numero }: { categoria: (typeof CATEGORIAS)[
  * junto con ella durante el zoom en vez de quedar chico en el medio.
  */
 function PiezaCentral() {
+  const { t } = useIdioma();
   return (
-    <article className="@container relative overflow-hidden bg-carbon-800 max-lg:col-span-2 max-lg:row-span-2">
+    <article data-zona="foto" className="@container relative overflow-hidden bg-carbon-800 max-lg:col-span-2 max-lg:row-span-2">
       <Foto textura="deposito" velo={0.35} />
       <div className="absolute inset-0 bg-linear-to-t from-carbon/85 via-carbon/35 to-carbon/15" />
       <div className="absolute inset-0 ring-1 ring-yeso/6 ring-inset" />
@@ -60,12 +64,12 @@ function PiezaCentral() {
       <div className="relative flex h-full flex-col items-center justify-center px-[7cqw] text-center">
         <p className="etiqueta text-[10px] text-arena/70">Entreobra</p>
         <p className="titulo mt-[2.5cqw] text-[clamp(1.375rem,6.5cqw,5.5rem)] text-yeso">
-          Mira quién tiene stock
+          {t.materiales.centroTitulo[0]}
           <br />
-          ahora y a qué precio.
+          {t.materiales.centroTitulo[1]}
         </p>
         <a data-centro-cta href="#comparar" className="boton boton-oxido mt-[4cqw]">
-          Comparar precios
+          {t.materiales.centroCta}
         </a>
       </div>
     </article>
@@ -88,6 +92,7 @@ export function Materiales() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const reducido = usePrefersReducedMotion();
+  const { t } = useIdioma();
   const [medida, setMedida] = useState(0);
 
   useEffect(() => {
@@ -173,19 +178,19 @@ export function Materiales() {
   );
 
   return (
-    <section id="materiales" ref={seccionRef} className="bg-carbon pb-24 pt-24 md:pt-32 lg:pb-0">
+    <section id="materiales" ref={seccionRef} data-zona="oscura" className="bg-carbon pb-24 pt-24 md:pt-32 lg:pb-0">
       <div className="contenedor">
         <ScrollReveal className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="etiqueta text-oliva">Materiales</p>
+            <p className="etiqueta text-oliva">{t.materiales.etiqueta}</p>
             <h2 className="titulo mt-5 text-[2rem] text-yeso md:text-[2.75rem]">
-              Todo lo que necesitas,
+              {t.materiales.titulo[0]}
               <br />
-              comparado en un lugar.
+              {t.materiales.titulo[1]}
             </h2>
           </div>
           <a href="#comparar" className="boton boton-linea self-start sm:self-auto">
-            Ver todo
+            {t.materiales.verTodo}
           </a>
         </ScrollReveal>
       </div>

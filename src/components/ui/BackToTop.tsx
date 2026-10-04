@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
+import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
 /**
@@ -10,6 +11,7 @@ import { cn } from "@/lib/utils";
  */
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
+  const { t } = useIdioma();
 
   useEffect(() => {
     function onScroll() {
@@ -23,8 +25,9 @@ export function BackToTop() {
   return (
     <button
       type="button"
+      data-zona="oscura"
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      aria-label="Volver arriba"
+      aria-label={t.volverArriba}
       tabIndex={visible ? 0 : -1}
       className={cn(
         "fixed bottom-5 right-5 z-30 flex h-11 w-11 items-center justify-center border border-yeso/15 bg-carbon/90 text-arena backdrop-blur-sm transition-all duration-500 ease-obra md:bottom-8 md:right-8",

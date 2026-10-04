@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/ui/Logo";
 import { Enlace } from "@/components/ui/Enlace";
+import { SelectorPreferencias } from "@/components/ui/Preferencias";
+import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
 // Las anclas van con "/#..." (no solo "#...") porque el Header también
@@ -12,11 +14,11 @@ import { cn } from "@/lib/utils";
 // propio `href` explícito en vez del patrón `/#${id}` del resto, y
 // `destacado` para distinguirla visualmente (está fuera del alcance
 // contratado, pensada para pulsear interés del cliente).
-const NAV: { id: string; label: string; href?: string; destacado?: boolean }[] = [
-  { id: "comparar", label: "Comparar" },
-  { id: "como-funciona", label: "Cómo funciona" },
-  { id: "proveedores", label: "Proveedores" },
-  { id: "demo", label: "Demo", href: "/demo", destacado: true },
+const NAV: { id: "comparar" | "como-funciona" | "proveedores" | "demo"; href?: string; destacado?: boolean }[] = [
+  { id: "comparar" },
+  { id: "como-funciona" },
+  { id: "proveedores" },
+  { id: "demo", href: "/demo", destacado: true },
 ];
 
 // Todas las secciones de "/" en orden, para que al pasar por una que no
@@ -25,6 +27,7 @@ const SECCIONES_OBSERVADAS = ["top", "materiales", "problema", "como-funciona", 
 
 export function Header() {
   const pathname = usePathname();
+  const { t } = useIdioma();
   const [conScroll, setConScroll] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [activo, setActivo] = useState<string | null>(null);
@@ -64,13 +67,14 @@ export function Header() {
   return (
     <>
       <header
+        data-zona="oscura"
         className={cn(
           "sticky top-0 z-40 border-b transition-[background-color,border-color] duration-500",
           conScroll || menuAbierto ? "border-yeso/8 bg-carbon/92 backdrop-blur-md" : "border-yeso/6 bg-carbon",
         )}
       >
         <div className="contenedor flex h-16 items-center justify-between lg:h-18">
-          <Enlace href="/#top" aria-label="Entreobra, ir al inicio" onClick={() => setMenuAbierto(false)}>
+          <Enlace href="/#top" aria-label={t.header.irInicio} onClick={() => setMenuAbierto(false)}>
             <Logo variante="icono" animado="carga" className="text-[13px] lg:text-[15px]" />
           </Enlace>
 
@@ -82,7 +86,7 @@ export function Header() {
                   href={item.href ?? `/#${item.id}`}
                   className="py-2 text-[11px] uppercase tracking-[0.24em] text-oxido transition-colors duration-300 hover:text-oxido-oscuro"
                 >
-                  {item.label}
+                  {t.header.nav[item.id]}
                 </Enlace>
               ) : (
                 <Enlace
@@ -93,7 +97,7 @@ export function Header() {
                     activo === item.id ? "text-yeso" : "text-arena/80 hover:text-yeso",
                   )}
                 >
-                  {item.label}
+                  {t.header.nav[item.id]}
                   <span
                     className={cn(
                       "absolute inset-x-0 -bottom-px h-px origin-left bg-oxido transition-transform duration-500 ease-obra",
@@ -104,14 +108,18 @@ export function Header() {
               ),
             )}
             <Enlace href="/#acceso" className="boton boton-linea min-h-10 px-5">
-              Contacto
+              {t.header.nav.acceso}
             </Enlace>
+            <SelectorPreferencias className="-ml-2" />
           </nav>
+
+          <div className="flex items-center gap-2 lg:hidden">
+            <SelectorPreferencias />
 
           <button
             type="button"
             onClick={() => setMenuAbierto((v) => !v)}
-            aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+            aria-label={menuAbierto ? t.header.cerrarMenu : t.header.abrirMenu}
             aria-expanded={menuAbierto}
             aria-controls="menu-movil"
             className="relative -mr-2 flex h-11 w-11 items-center justify-center lg:hidden"
@@ -129,6 +137,7 @@ export function Header() {
               )}
             />
           </button>
+          </div>
         </div>
       </header>
 
@@ -138,13 +147,14 @@ export function Header() {
           `fixed`, y el overlay quedaba recortado y transparente. */}
       <div
         id="menu-movil"
+        data-zona="oscura"
         className={cn(
           "fixed inset-x-0 bottom-0 top-16 z-40 bg-carbon transition-[opacity,visibility] duration-500 lg:hidden",
           menuAbierto ? "visible opacity-100" : "invisible opacity-0",
         )}
       >
         <nav aria-label="Principal" className="contenedor flex h-full flex-col pb-10 pt-6">
-          {[...NAV, { id: "acceso", label: "Contacto" }].map((item, i) => (
+          {[...NAV, { id: "acceso" as const, href: undefined, destacado: false }].map((item, i) => (
             <Enlace
               key={item.id}
               href={item.href ?? `/#${item.id}`}
@@ -157,15 +167,15 @@ export function Header() {
             >
               <span className="text-[11px] tracking-[0.2em] text-oliva">{String(i + 1).padStart(2, "0")}</span>
               <span className={cn("text-2xl font-light", item.destacado ? "text-oxido" : "text-yeso")}>
-                {item.label}
+                {t.header.nav[item.id]}
               </span>
             </Enlace>
           ))}
           <div className="mt-auto">
             <Enlace href="/#comparar" onClick={() => setMenuAbierto(false)} className="boton boton-oxido w-full">
-              Comparar precios
+              {t.header.ctaMovil}
             </Enlace>
-            <p className="etiqueta mt-6 text-center text-oliva">Cochabamba · Bolivia</p>
+            <p className="etiqueta mt-6 text-center text-oliva">{t.header.ubicacion}</p>
           </div>
         </nav>
       </div>

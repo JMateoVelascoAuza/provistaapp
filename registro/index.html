@@ -1,0 +1,1689 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Registro de productos — Entreobra</title>
+<meta name="description" content="Registra los productos de tu ferretería en Entreobra.">
+<meta name="theme-color" content="#F2EFEA">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --carbon: #242220;
+    --tierra: #46413C;
+    --oliva: #8F9289;
+    --oliva-texto: #696C63;
+    --arena: #C4BDB2;
+    --yeso: #F2EFEA;
+    --oxido: #C2410C;
+    /* Óxido para texto chico de error: el #C2410C no llega a AA sobre yeso. */
+    --oxido-texto: #A3360A;
+    --superficie: #FBFAF8;
+    --fuente: "Jost", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 24px; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--yeso);
+    color: var(--carbon);
+    font-family: var(--fuente);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+  @media (min-width: 900px) { body { padding-bottom: 0; } }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--oxido); outline-offset: 2px; }
+  .oculto-visual {
+    position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+  .contenedor { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+  @media (min-width: 768px) { .contenedor { padding: 0 32px; } }
+
+  /* Tipografía */
+  .etiqueta {
+    font-size: 11px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--oliva-texto); line-height: 1.6; margin: 0;
+  }
+  h1, h2 { font-weight: 300; letter-spacing: -0.01em; line-height: 1.12; margin: 0; color: var(--tierra); }
+  h1 { font-size: 34px; }
+  h2 { font-size: 26px; }
+  @media (min-width: 768px) { h1 { font-size: 46px; } h2 { font-size: 30px; } }
+  p { margin: 0; }
+
+  /* Encabezado */
+  .cabecera { border-bottom: 1px solid var(--arena); }
+  .cabecera-int { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
+  .logo { display: inline-flex; align-items: center; gap: 12px; color: var(--carbon); text-decoration: none; }
+  .logo svg { width: 26px; height: 26px; flex: none; }
+  .logo span { font-weight: 300; font-size: 14px; letter-spacing: 0.28em; margin-right: -0.28em; text-transform: uppercase; }
+  .cabecera .etiqueta { display: none; }
+  @media (min-width: 600px) { .cabecera .etiqueta { display: block; } }
+
+  /* Bloques */
+  .intro { padding: 48px 0 32px; }
+  .intro .etiqueta { margin-bottom: 16px; }
+  .intro .bajada { margin-top: 16px; max-width: 560px; color: var(--tierra); font-size: 16px; }
+  .bloque { border-top: 1px solid var(--arena); padding: 32px 0 40px; }
+  .bloque-cabeza { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+  .bloque-cabeza .etiqueta { margin-bottom: 8px; }
+  .ayuda { color: var(--tierra); font-size: 15px; margin-top: 8px; max-width: 560px; }
+
+  /* Avisos */
+  .aviso {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+    border-left: 2px solid var(--oxido); background: var(--superficie); padding: 14px 16px; margin-top: 24px;
+    font-size: 15px; color: var(--tierra);
+  }
+  .aviso[hidden] { display: none; }
+
+  /* Botones */
+  .boton {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    min-height: 48px; padding: 0 24px; border: 1px solid transparent; border-radius: 0; cursor: pointer;
+    font-size: 12px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none;
+    transition: background-color .25s, border-color .25s, color .25s;
+    text-align: center; line-height: 1.35; padding-top: 10px; padding-bottom: 10px;
+  }
+  .boton[disabled] { opacity: .55; cursor: not-allowed; }
+  .boton-primario { background: var(--oxido); color: #fff; }
+  .boton-primario:hover:not([disabled]) { background: #A3360A; }
+  .boton-carbon { background: var(--carbon); color: var(--yeso); }
+  .boton-carbon:hover:not([disabled]) { background: var(--tierra); }
+  .boton-linea { background: transparent; border-color: var(--carbon); color: var(--carbon); }
+  .boton-linea:hover:not([disabled]) { background: var(--carbon); color: var(--yeso); }
+  .boton-texto {
+    background: none; border: 0; padding: 8px 0; min-height: 44px; cursor: pointer;
+    font-size: 14px; color: var(--carbon); text-decoration: underline; text-underline-offset: 4px;
+  }
+  .boton-texto:hover { color: var(--oxido-texto); }
+  .acciones { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+
+  /* Campos */
+  .grupo { display: grid; gap: 20px; }
+  @media (min-width: 700px) { .grupo-ferreteria { grid-template-columns: 1fr 1fr; } }
+  .campo { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .campo > label { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--oliva-texto); }
+  .campo > label .req { color: var(--oxido-texto); letter-spacing: 0; margin-left: 2px; }
+  .campo input, .campo select, .campo textarea {
+    width: 100%; min-height: 44px; padding: 10px 12px; border-radius: 0;
+    border: 1px solid var(--arena); background: #fff; font-size: 16px; color: var(--carbon);
+  }
+  .campo select { appearance: none; -webkit-appearance: none; padding-right: 32px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23242220' stroke-width='1.3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; }
+  .campo input::placeholder, .campo textarea::placeholder { color: var(--oliva-texto); opacity: 1; }
+  .campo input:focus, .campo select:focus, .campo textarea:focus { outline: none; border-color: var(--carbon); box-shadow: inset 0 0 0 1px var(--carbon); }
+  .campo [aria-invalid="true"] { border-color: var(--oxido); box-shadow: inset 0 0 0 1px var(--oxido); }
+  .error { font-size: 13px; color: var(--oxido-texto); line-height: 1.4; }
+  .error:empty { display: none; }
+  .error .mini { display: inline-block; margin: 4px 12px 0 0; background: none; border: 0; padding: 4px 0; min-height: 32px;
+    font: inherit; color: var(--carbon); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+
+  /* Trampa para bots */
+  .trampa { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+
+  /* Lista de productos */
+  .barra-productos { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .contador { font-size: 14px; color: var(--tierra); }
+  .lista { display: grid; gap: 12px; }
+  .cabecera-tabla { display: none; }
+  .fila {
+    position: relative; background: #fff; border: 1px solid var(--arena); padding: 16px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 14px 12px;
+  }
+  .fila.con-error { border-left: 2px solid var(--oxido); }
+  .fila-num { grid-column: 1 / 2; align-self: center; font-size: 11px; letter-spacing: 0.3em; color: var(--oliva-texto); }
+  .fila-acciones { grid-column: 2 / 3; display: flex; justify-content: flex-end; gap: 4px; }
+  .fila .campo.completo { grid-column: 1 / -1; }
+  /* Misma altura de etiqueta en las dos columnas de la tarjeta: así los
+     campos quedan alineados aunque una etiqueta ocupe dos líneas. */
+  .fila .campo:not(.completo) > label { min-height: 34px; display: flex; align-items: flex-end; }
+  .icono {
+    display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+    border: 1px solid transparent; background: none; color: var(--tierra); cursor: pointer; border-radius: 0;
+  }
+  .icono:hover { border-color: var(--arena); color: var(--carbon); }
+  .icono svg { width: 18px; height: 18px; }
+  .vacio-lista { border: 1px dashed var(--arena); padding: 28px 20px; text-align: center; color: var(--tierra); }
+  .agregar { margin-top: 16px; }
+  .limite { margin-top: 12px; font-size: 14px; color: var(--oxido-texto); }
+
+  @media (min-width: 900px) {
+    .lista { gap: 0; border: 1px solid var(--arena); background: #fff; }
+    .cabecera-tabla, .fila {
+      display: grid; grid-template-columns: var(--columnas); gap: 0 10px; align-items: start;
+      padding: 10px 12px;
+    }
+    .cabecera-tabla {
+      font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--oliva-texto);
+      border-bottom: 1px solid var(--arena); background: var(--superficie);
+    }
+    .fila { border: 0; border-bottom: 1px solid #E4DFD7; }
+    .fila:last-child { border-bottom: 0; }
+    .fila.con-error { border-left: 0; box-shadow: inset 2px 0 0 var(--oxido); }
+    .fila-num, .fila-acciones, .fila .campo.completo { grid-column: auto; }
+    .fila-num { padding-top: 13px; align-self: start; }
+    .fila-acciones { order: 99; justify-content: flex-start; }
+    .fila .campo:not(.completo) > label { min-height: 0; }
+    .fila .campo > label { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+    .fila .campo input, .fila .campo select { min-height: 44px; padding: 8px 10px; }
+    .fila .campo select { padding-right: 28px; background-position: right 10px center; }
+  }
+
+  /* Resumen y envío */
+  .resumen { background: #fff; border: 1px solid var(--arena); padding: 20px; display: grid; gap: 12px; }
+  .resumen-cifras { font-size: 18px; font-weight: 300; }
+  .resumen-cifras strong { font-weight: 400; }
+  .lista-errores { margin: 0; padding: 0; list-style: none; display: grid; gap: 2px; }
+  .lista-errores a { color: var(--oxido-texto); font-size: 14px; text-underline-offset: 3px; }
+  .estado-envio { margin-top: 16px; }
+  .estado-envio[hidden] { display: none; }
+  .fallo { border-left: 2px solid var(--oxido); background: #fff; padding: 16px; display: grid; gap: 12px; color: var(--tierra); }
+  .modo-csv { font-size: 14px; color: var(--tierra); margin-top: 12px; }
+
+  /* Confirmación */
+  .confirmacion { padding: 56px 0 72px; }
+  .confirmacion[hidden] { display: none; }
+  .confirmacion svg { width: 40px; height: 40px; }
+  .confirmacion h1 { margin-top: 28px; }
+  .confirmacion .bajada { margin-top: 16px; max-width: 560px; color: var(--tierra); }
+  .codigo { margin-top: 20px; font-size: 14px; color: var(--tierra); }
+  .codigo strong { font-weight: 400; letter-spacing: 0.12em; color: var(--carbon); }
+  .confirmacion .acciones { margin-top: 32px; }
+
+  /* Pie */
+  .pie { border-top: 1px solid var(--arena); padding: 28px 0 32px; margin-top: 24px; font-size: 13px; color: var(--oliva-texto); }
+  .pie a { color: inherit; }
+
+  /* Barra fija inferior (celular) */
+  .barra-inferior {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    background: var(--carbon); color: var(--yeso);
+    padding: 12px 20px calc(12px + env(safe-area-inset-bottom));
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .barra-inferior .boton-primario { min-height: 44px; padding: 0 18px; }
+  .barra-inferior span { font-size: 14px; }
+  .barra-inferior[hidden] { display: none; }
+  @media (min-width: 900px) { .barra-inferior { display: none; } }
+
+  /* Aviso flotante con deshacer */
+  .toast {
+    position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 40;
+    background: var(--carbon); color: var(--yeso); padding: 10px 12px 10px 16px; display: flex; align-items: center; gap: 16px;
+    max-width: calc(100% - 32px); font-size: 14px;
+  }
+  .toast[hidden] { display: none; }
+  .toast button { background: none; border: 0; color: #fff; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; padding: 0 8px; cursor: pointer; font-size: 14px; }
+  @media (min-width: 900px) { .toast { bottom: 32px; } }
+
+  /* Diálogo de pegado */
+  .fondo-dialogo { position: fixed; inset: 0; z-index: 50; background: rgba(36, 34, 32, .55); display: flex; align-items: flex-end; justify-content: center; }
+  .fondo-dialogo[hidden] { display: none; }
+  .dialogo {
+    background: var(--yeso); width: 100%; max-height: 100%; overflow-y: auto; padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+  }
+  @media (min-width: 760px) {
+    .fondo-dialogo { align-items: center; padding: 32px; }
+    .dialogo { max-width: 760px; max-height: calc(100vh - 64px); padding: 32px; border: 1px solid var(--arena); }
+  }
+  .dialogo-cabeza { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
+  .dialogo textarea { min-height: 180px; font-size: 14px; line-height: 1.4; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
+  .paso[hidden] { display: none; }
+  .columnas { display: grid; gap: 12px; margin: 16px 0; }
+  .columna { background: #fff; border: 1px solid var(--arena); padding: 14px; display: grid; gap: 10px; }
+  .columna .muestras { font-size: 13px; color: var(--tierra); display: grid; gap: 2px; }
+  .columna .muestras span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .vista-previa { background: #fff; border: 1px solid var(--arena); margin: 16px 0; }
+  .vista-previa li { padding: 8px 12px; border-bottom: 1px solid #E4DFD7; font-size: 14px; display: flex; justify-content: space-between; gap: 12px; }
+  .vista-previa li:last-child { border-bottom: 0; }
+  .vista-previa ul { list-style: none; margin: 0; padding: 0; }
+  .marca-error { color: var(--oxido-texto); white-space: nowrap; font-size: 13px; }
+  .mensaje-paso { font-size: 14px; color: var(--oxido-texto); margin-top: 8px; }
+  .mensaje-paso:empty { display: none; }
+</style>
+</head>
+<body>
+
+<header class="cabecera">
+  <div class="contenedor cabecera-int">
+    <a class="logo" href="https://entreobra.com" aria-label="Entreobra">
+      <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+        <path d="M11 5H6.5v22H11" fill="none" stroke="#C2410C" stroke-width="1.45" stroke-linecap="square"/>
+        <path d="M21 5h4.5v22H21" fill="none" stroke="#C2410C" stroke-width="1.45" stroke-linecap="square"/>
+        <path d="M18.9 11h-5.6v10h5.6" fill="none" stroke="#242220" stroke-width="0.95" stroke-linecap="square"/>
+        <path d="M13.3 16h4.9" fill="none" stroke="#242220" stroke-width="0.95" stroke-linecap="square"/>
+      </svg>
+      <span>Entreobra</span>
+    </a>
+    <p class="etiqueta">Registro de productos</p>
+  </div>
+</header>
+
+<main id="formulario">
+  <div class="contenedor">
+    <section class="intro">
+      <p class="etiqueta">Ferreterías y distribuidoras</p>
+      <h1>Registra tus productos.</h1>
+      <p class="bajada">Cargas tu lista una sola vez. Si la tienes en Excel, pégala directo y la ordenamos por ti.</p>
+      <div class="aviso" id="aviso-borrador" role="status" hidden>
+        <span>Recuperamos tu avance.</span>
+        <button type="button" class="boton-texto" id="borrar-todo">Empezar de cero</button>
+      </div>
+    </section>
+
+    <section class="bloque" aria-labelledby="titulo-ferreteria">
+      <div class="bloque-cabeza">
+        <div>
+          <p class="etiqueta">01</p>
+          <h2 id="titulo-ferreteria">Tu ferretería</h2>
+        </div>
+      </div>
+      <div class="grupo grupo-ferreteria" id="campos-ferreteria"></div>
+      <div class="trampa" aria-hidden="true">
+        <label for="sitio_web">Sitio web</label>
+        <input type="text" id="sitio_web" name="sitio_web" tabindex="-1" autocomplete="off">
+      </div>
+    </section>
+
+    <section class="bloque" aria-labelledby="titulo-productos">
+      <div class="bloque-cabeza">
+        <div>
+          <p class="etiqueta">02</p>
+          <h2 id="titulo-productos">Tus productos</h2>
+          <p class="ayuda">Un producto por fila. ¿Ya tienes tu lista en Excel? Pégala y te ahorras escribirla.</p>
+        </div>
+        <button type="button" class="boton boton-linea" id="abrir-pegar">Pegar desde Excel</button>
+      </div>
+      <div class="barra-productos">
+        <p class="contador" id="contador" aria-live="polite">0 productos</p>
+      </div>
+      <div class="lista" id="lista" role="list" aria-label="Productos"></div>
+      <button type="button" class="boton boton-carbon agregar" id="agregar">Agregar producto</button>
+      <p class="limite" id="limite" hidden></p>
+    </section>
+
+    <section class="bloque" id="revisar" aria-labelledby="titulo-revisar">
+      <div class="bloque-cabeza">
+        <div>
+          <p class="etiqueta">03</p>
+          <h2 id="titulo-revisar">Revisar y enviar</h2>
+        </div>
+      </div>
+      <div class="resumen" id="resumen" aria-live="polite"></div>
+      <div class="acciones" style="margin-top:20px">
+        <button type="button" class="boton boton-primario" id="enviar">Enviar lista</button>
+      </div>
+      <p class="modo-csv" id="nota-modo" hidden></p>
+      <div class="estado-envio" id="estado-envio" hidden></div>
+    </section>
+  </div>
+</main>
+
+<section class="confirmacion" id="confirmacion" hidden tabindex="-1" aria-labelledby="titulo-confirmacion">
+  <div class="contenedor">
+    <svg viewBox="0 0 32 32" aria-hidden="true">
+      <path d="M11 5H6.5v22H11" fill="none" stroke="#C2410C" stroke-width="1.45" stroke-linecap="square"/>
+      <path d="M21 5h4.5v22H21" fill="none" stroke="#C2410C" stroke-width="1.45" stroke-linecap="square"/>
+      <path d="M18.9 11h-5.6v10h5.6" fill="none" stroke="#242220" stroke-width="0.95" stroke-linecap="square"/>
+      <path d="M13.3 16h4.9" fill="none" stroke="#242220" stroke-width="0.95" stroke-linecap="square"/>
+    </svg>
+    <h1 id="titulo-confirmacion"></h1>
+    <p class="bajada" id="texto-confirmacion"></p>
+    <p class="codigo" id="codigo-confirmacion"></p>
+    <div class="acciones" id="acciones-confirmacion"></div>
+  </div>
+</section>
+
+<footer class="pie">
+  <div class="contenedor" id="pie"></div>
+</footer>
+
+<div class="barra-inferior" id="barra-inferior">
+  <span id="contador-barra">0 productos</span>
+  <button type="button" class="boton boton-primario" id="ir-revisar">Revisar y enviar</button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden>
+  <span id="toast-texto"></span>
+  <button type="button" id="toast-deshacer">Deshacer</button>
+</div>
+
+<div class="fondo-dialogo" id="fondo-dialogo" hidden>
+  <div class="dialogo" role="dialog" aria-modal="true" aria-labelledby="titulo-dialogo">
+    <div class="dialogo-cabeza">
+      <div>
+        <p class="etiqueta">Pegar desde Excel</p>
+        <h2 id="titulo-dialogo">Trae tu lista</h2>
+      </div>
+      <button type="button" class="icono" id="cerrar-dialogo" aria-label="Cerrar">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.4" fill="none"/></svg>
+      </button>
+    </div>
+
+    <div class="paso" id="paso-pegar">
+      <div class="campo">
+        <label for="texto-pegado">Selecciona tus columnas en Excel, copia y pega aquí</label>
+        <textarea id="texto-pegado" spellcheck="false" placeholder="Producto&#9;Unidad&#9;Precio&#10;Cemento IP-30&#9;bolsa&#9;62"></textarea>
+      </div>
+      <p class="mensaje-paso" id="mensaje-pegar" role="alert"></p>
+      <div class="acciones" style="margin-top:16px">
+        <button type="button" class="boton boton-carbon" id="leer-pegado">Leer datos</button>
+        <button type="button" class="boton-texto" data-cerrar>Cancelar</button>
+      </div>
+    </div>
+
+    <div class="paso" id="paso-columnas" hidden>
+      <p class="ayuda">Dinos qué tiene cada columna. Lo que no sirva, márcalo como «Ignorar».</p>
+      <div class="columnas" id="columnas"></div>
+      <p class="mensaje-paso" id="mensaje-columnas" role="alert"></p>
+      <div class="acciones">
+        <button type="button" class="boton boton-carbon" id="confirmar-columnas">Continuar</button>
+        <button type="button" class="boton-texto" id="volver-pegar">Volver</button>
+      </div>
+    </div>
+
+    <div class="paso" id="paso-previa" hidden>
+      <p class="resumen-cifras" id="texto-previa"></p>
+      <p class="mensaje-paso" id="mensaje-previa"></p>
+      <div class="vista-previa"><ul id="lista-previa"></ul></div>
+      <div class="acciones">
+        <button type="button" class="boton boton-primario" id="agregar-pegado">Agregar a mi lista</button>
+        <button type="button" class="boton boton-linea" id="reemplazar-pegado">Reemplazar mi lista</button>
+        <button type="button" class="boton-texto" data-cerrar>Cancelar</button>
+      </div>
+      <p style="margin-top:8px"><button type="button" class="boton-texto" id="cambiar-columnas">Cambiar columnas</button></p>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ==========================================================================
+   CONFIG — lo único que hay que tocar cuando llegue el formulario definitivo.
+   Campos, categorías, unidades y textos de error salen de aquí: la tabla, la
+   validación, el pegado de Excel, el CSV y el envío se arman solos.
+   Si cambias campos, actualiza también CAMPOS en apps-script/Code.gs.
+   ========================================================================== */
+const CONFIG = {
+  APPS_SCRIPT_URL: "",              // vacío = modo CSV (descarga + WhatsApp)
+  WHATSAPP: "59176971774",
+  WHATSAPP_VISIBLE: "+591 76971774",
+  EMAIL: "hola@entreobra.com",
+  DRAFT_KEY: "entreobra_registro_v2",
+  MAX_PRODUCTOS: 500,
+  CATEGORIAS: ["Cemento", "Fierro y acero", "Áridos", "Ladrillos", "Tubos", "Eléctricos", "Otros"],
+  UNIDADES: ["bolsa", "varilla", "pieza", "m³", "metro", "rollo", "kg", "litro", "otra"],
+  SINO: ["Sí", "No"],
+  // Sinónimos para mapear lo que viene de Excel. Se comparan sin tildes, en
+  // minúsculas y sin espacios extra.
+  SINONIMOS_CATEGORIA: {
+    "cemento": "Cemento", "cementos": "Cemento",
+    "fierro": "Fierro y acero", "fierros": "Fierro y acero", "acero": "Fierro y acero", "hierro": "Fierro y acero",
+    "fierro y acero": "Fierro y acero", "alambre": "Fierro y acero", "malla": "Fierro y acero", "mallas": "Fierro y acero",
+    "arido": "Áridos", "aridos": "Áridos", "arena": "Áridos", "grava": "Áridos", "gravilla": "Áridos",
+    "ripio": "Áridos", "piedra": "Áridos", "agregado": "Áridos", "agregados": "Áridos",
+    "ladrillo": "Ladrillos", "ladrillos": "Ladrillos", "bloque": "Ladrillos", "bloques": "Ladrillos", "gambote": "Ladrillos",
+    "tubo": "Tubos", "tubos": "Tubos", "tuberia": "Tubos", "tuberias": "Tubos", "pvc": "Tubos", "caneria": "Tubos",
+    "cable": "Eléctricos", "cables": "Eléctricos", "electrico": "Eléctricos", "electricos": "Eléctricos",
+    "electricidad": "Eléctricos", "material electrico": "Eléctricos",
+    "otro": "Otros", "otros": "Otros", "varios": "Otros",
+  },
+  SINONIMOS_UNIDAD: {
+    "bolsa": "bolsa", "bolsas": "bolsa", "bls": "bolsa", "bol": "bolsa", "bl": "bolsa",
+    "varilla": "varilla", "varillas": "varilla", "var": "varilla", "barra": "varilla", "barras": "varilla",
+    "pieza": "pieza", "piezas": "pieza", "pza": "pieza", "pzas": "pieza", "pz": "pieza",
+    "unid": "pieza", "unidad": "pieza", "unidades": "pieza", "und": "pieza", "u": "pieza", "un": "pieza",
+    "m3": "m³", "mt3": "m³", "mts3": "m³", "metro cubico": "m³", "metros cubicos": "m³", "cubo": "m³", "cubos": "m³",
+    "metro": "metro", "metros": "metro", "ml": "metro", "mts": "metro", "mt": "metro", "m": "metro", "metro lineal": "metro",
+    "rollo": "rollo", "rollos": "rollo", "rll": "rollo",
+    "kg": "kg", "kgs": "kg", "kilo": "kg", "kilos": "kg", "kilogramo": "kg", "kilogramos": "kg",
+    "litro": "litro", "litros": "litro", "lt": "litro", "lts": "litro", "l": "litro",
+    "otra": "otra",
+  },
+  // Respuestas Sí/No como llegan de Excel. Un número también vale:
+  // mayor a 0 = Sí (por ejemplo, la cantidad en stock), 0 = No.
+  SINONIMOS_SINO: {
+    "si": "Sí", "s": "Sí", "x": "Sí", "yes": "Sí", "y": "Sí", "ok": "Sí", "true": "Sí", "verdadero": "Sí",
+    "hay": "Sí", "disponible": "Sí", "con stock": "Sí", "en stock": "Sí", "entrega": "Sí", "entregamos": "Sí",
+    "no": "No", "n": "No", "false": "No", "falso": "No", "agotado": "No", "sin stock": "No", "no hay": "No",
+    "-": "No", "no entrega": "No", "no entregamos": "No",
+  },
+  // El campo que identifica al producto (el que se exige al pegar desde Excel).
+  CAMPO_PRINCIPAL: "material",
+  // Datos de la ferretería (una vez por envío). `columna` es el encabezado
+  // exacto de la hoja del cliente; `label`, lo que ve el vendedor.
+  CAMPOS_FERRETERIA: [
+    { key: "negocio",  label: "Ferretería",         columna: "Ferreteria", tipo: "texto",    requerido: true,  max: 120, autocomplete: "organization", vacio: "Falta el nombre de la ferretería." },
+    { key: "contacto", label: "Nombre de contacto", columna: "Contacto",   tipo: "texto",    requerido: true,  max: 80,  autocomplete: "name",         vacio: "Falta el nombre de contacto." },
+    { key: "whatsapp", label: "WhatsApp",           columna: "WhatsApp",   tipo: "telefono", requerido: true,  max: 30,  autocomplete: "tel",          vacio: "Falta el WhatsApp.", placeholder: "7XXXXXXX" },
+    { key: "zona",     label: "Zona o barrio",      columna: "Zona",       tipo: "texto",    requerido: true,  max: 80,                                vacio: "Falta la zona o barrio." },
+    { key: "correo",   label: "Correo",             columna: "Correo",     tipo: "correo",   requerido: false, max: 120, autocomplete: "email" },
+  ],
+  // Campos del producto, en el mismo orden que las columnas de la hoja del
+  // cliente. La tabla, la validación, el pegado de Excel, el CSV y el envío
+  // salen de aquí. `vacio` e `invalido` son los mensajes de error.
+  CAMPOS_PRODUCTO: [
+    { key: "categoria", label: "Categoría",         columna: "Categoria",              tipo: "lista",  requerido: true,  opciones: "CATEGORIAS", vacio: "Elige una categoría." },
+    { key: "material",  label: "Material",          columna: "Material",               tipo: "texto",  requerido: true,  max: 120, vacio: "Escribe qué material es.", placeholder: "Ej: Cemento IP-30" },
+    { key: "medida",    label: "Medida / variante", columna: "Medida/variante",        tipo: "texto",  requerido: false, max: 60, placeholder: 'Ej: 3/8"' },
+    { key: "marca",     label: "Marca",             columna: "Marca",                  tipo: "texto",  requerido: false, max: 60 },
+    { key: "unidad",    label: "Unidad",            columna: "Unidad",                 tipo: "lista",  requerido: true,  opciones: "UNIDADES", vacio: "Elige una unidad." },
+    { key: "precio",    label: "Precio Bs",         columna: "Precio (Bs)",            tipo: "numero", requerido: true,  min: 0.01, decimales: 2, vacio: "Falta el precio.", invalido: "El precio tiene que ser un número mayor a 0." },
+    { key: "stock",     label: "¿Hay stock?",       columna: "Stock (Si/No)",          tipo: "lista",  requerido: false, opciones: "SINO" },
+    { key: "entrega",   label: "¿Entrega a obra?",  columna: "Entrega a obra (Si/No)", tipo: "lista",  requerido: false, opciones: "SINO" },
+  ],
+  // Encabezados que se reconocen al pegar desde Excel (lo que va entre
+  // paréntesis se ignora: "Precio (Bs)" → "precio").
+  ENCABEZADOS: {
+    categoria: ["categoria", "categoría", "rubro", "tipo", "linea", "línea", "familia"],
+    material: ["material", "producto", "descripcion", "descripción", "articulo", "artículo", "item", "detalle", "nombre"],
+    medida: ["medida", "variante", "medida/variante", "medida / variante", "medidas", "tamaño", "tamano", "dimension", "dimensión", "diametro", "diámetro", "calibre", "presentacion", "presentación", "espesor"],
+    marca: ["marca", "fabricante"],
+    unidad: ["unidad", "und", "u/m", "um", "medida de venta", "unid"],
+    precio: ["precio", "p/u", "pu", "precio unitario", "bs", "costo", "precio bs", "p. unit", "p unit"],
+    stock: ["stock", "hay stock", "disponible", "disponibilidad", "existencia", "existencias", "cantidad", "cant", "saldo"],
+    entrega: ["entrega", "entrega a obra", "entrega en obra", "envio", "envío", "delivery", "transporte", "llevan a obra"],
+  },
+};
+
+/* ==========================================================================
+   Utilidades
+   ========================================================================== */
+const $ = (sel, raiz = document) => raiz.querySelector(sel);
+const $$ = (sel, raiz = document) => Array.from(raiz.querySelectorAll(sel));
+
+/** Minúsculas, sin tildes, "³" → "3", espacios colapsados. */
+function normalizar(texto) {
+  return String(texto ?? "")
+    .normalize("NFKD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function escapar(texto) {
+  return String(texto ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function opcionesDe(campo) {
+  return CONFIG[campo.opciones] || [];
+}
+
+function nuevoId() {
+  if (window.crypto && typeof window.crypto.randomUUID === "function") {
+    try { return window.crypto.randomUUID(); } catch (e) { /* file:// en algunos navegadores */ }
+  }
+  const h = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(1);
+  return `${h()}${h()}-${h()}-4${h().slice(1)}-${h()}-${h()}${h()}${h()}`;
+}
+
+function codigoCorto(id) {
+  return String(id).replace(/-/g, "").slice(0, 8).toUpperCase();
+}
+
+let contadorUid = 0;
+const uid = () => `p${Date.now().toString(36)}${(contadorUid++).toString(36)}`;
+
+/* Mapas normalizados para categorías y unidades */
+const MAPA_CATEGORIA = {};
+CONFIG.CATEGORIAS.forEach((c) => { MAPA_CATEGORIA[normalizar(c)] = c; });
+Object.entries(CONFIG.SINONIMOS_CATEGORIA).forEach(([k, v]) => { MAPA_CATEGORIA[normalizar(k)] = v; });
+const MAPA_UNIDAD = {};
+CONFIG.UNIDADES.forEach((u) => { MAPA_UNIDAD[normalizar(u)] = u; });
+Object.entries(CONFIG.SINONIMOS_UNIDAD).forEach(([k, v]) => { MAPA_UNIDAD[normalizar(k)] = v; });
+
+const MAPA_SINO = {};
+CONFIG.SINO.forEach((v) => { MAPA_SINO[normalizar(v)] = v; });
+Object.entries(CONFIG.SINONIMOS_SINO || {}).forEach(([k, v]) => { MAPA_SINO[normalizar(k)] = v; });
+/** Sí/No desde un valor de Excel. Un número mayor a 0 es Sí (por ejemplo, la cantidad en stock); 0 es No. */
+function mapearSiNo(valor) {
+  const n = normalizar(valor).replace(/[.!]/g, "").trim();
+  if (!n) return "";
+  if (MAPA_SINO[n]) return MAPA_SINO[n];
+  const r = interpretarNumero(valor, 2);
+  if (!r.vacio && !r.invalido) return r.valor > 0 ? CONFIG.SINO[0] : CONFIG.SINO[1];
+  return "";
+}
+
+/** Categoría desde un valor de Excel. `buscarPalabras` permite inferirla del nombre del producto. */
+function mapearCategoria(valor, buscarPalabras) {
+  const n = normalizar(valor);
+  if (!n) return "";
+  if (MAPA_CATEGORIA[n]) return MAPA_CATEGORIA[n];
+  if (buscarPalabras) {
+    for (const palabra of n.split(/[^a-z0-9]+/)) {
+      if (palabra && MAPA_CATEGORIA[palabra]) return MAPA_CATEGORIA[palabra];
+    }
+  }
+  return "";
+}
+
+/** Unidad desde un valor de Excel: solo coincidencias exactas (no adivinar). */
+function mapearUnidad(valor) {
+  const n = normalizar(valor).replace(/\./g, "").trim();
+  return n ? MAPA_UNIDAD[n] || "" : "";
+}
+
+/**
+ * Interpreta números como los escriben en Bolivia:
+ * "Bs 45", "Bs. 45,50", "45.50", "45,5", "1.250,00", "1,250.00".
+ * - Coma y punto: el último separador es el decimal.
+ * - Solo coma: decimal (salvo grupos de miles tipo "1,250,000").
+ * - Un punto seguido de exactamente 3 dígitos ("1.250"): ambiguo, se
+ *   interpreta como miles y se marca para revisión.
+ */
+function interpretarNumero(texto, decimales) {
+  let t = String(texto ?? "").replace(/ /g, " ").trim();
+  if (!t) return { vacio: true };
+  t = t.replace(/^(bs\.?|bob|\$b)\s*/i, "").replace(/\s*(bs\.?|bob)$/i, "").replace(/\s+/g, "");
+  if (!/^\d[\d.,]*$/.test(t)) return { invalido: true };
+  const coma = t.includes(","), punto = t.includes(".");
+  let s = t, ambiguo = false;
+  const soloMiles = (partes) => partes.slice(1).every((p) => p.length === 3);
+  if (coma && punto) {
+    const dec = t.lastIndexOf(",") > t.lastIndexOf(".") ? "," : ".";
+    const mil = dec === "," ? "." : ",";
+    s = t.split(mil).join("");
+    if (s.split(dec).length > 2) return { invalido: true };
+    s = s.replace(dec, ".");
+  } else if (coma) {
+    const partes = t.split(",");
+    if (partes.length > 2) { if (!soloMiles(partes)) return { invalido: true }; s = partes.join(""); }
+    else s = t.replace(",", ".");
+  } else if (punto) {
+    const partes = t.split(".");
+    if (partes.length > 2) { if (!soloMiles(partes)) return { invalido: true }; s = partes.join(""); }
+    else if (partes[1].length === 3) { s = partes.join(""); ambiguo = decimales !== 0; }
+  }
+  const valor = Number(s);
+  if (!Number.isFinite(valor)) return { invalido: true };
+  return { valor, ambiguo };
+}
+
+/** Número en formato local, sin separador de miles para no crear ambigüedad: 2600 · 45,50. */
+function formatoLocal(valor, decimales) {
+  if (decimales === 0 || Number.isInteger(valor)) return String(Math.round(valor));
+  return valor.toFixed(decimales).replace(".", ",");
+}
+function formatoMiles(valor) {
+  return String(Math.round(valor)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+/* ==========================================================================
+   Estado
+   ========================================================================== */
+const CAMPOS = CONFIG.CAMPOS_PRODUCTO;
+const CLAVE_PRINCIPAL = CONFIG.CAMPO_PRINCIPAL && CAMPOS.some((c) => c.key === CONFIG.CAMPO_PRINCIPAL)
+  ? CONFIG.CAMPO_PRINCIPAL : (CAMPOS.find((c) => c.tipo === "texto") || CAMPOS[0]).key;
+const NOMBRE_PRINCIPAL = (CAMPOS.find((c) => c.key === CLAVE_PRINCIPAL) || {}).label || "el producto";
+const estado = {
+  ferreteria: Object.fromEntries(CONFIG.CAMPOS_FERRETERIA.map((c) => [c.key, ""])),
+  productos: [],
+  tocados: new Set(),        // "uid:key" o "f:key" de campos ya visitados
+  intentoEnvio: false,
+  envioId: null,
+  envioHuella: null,
+  enviando: false,
+};
+
+function productoVacio() {
+  const p = { _uid: uid(), _origen: {}, _ok: {} };
+  CAMPOS.forEach((c) => { p[c.key] = ""; });
+  return p;
+}
+function filaVacia(p) {
+  return CAMPOS.every((c) => !String(p[c.key] ?? "").trim());
+}
+function productosConDatos() {
+  return estado.productos.filter((p) => !filaVacia(p));
+}
+
+/* ==========================================================================
+   Validación
+   ========================================================================== */
+function errorCampoProducto(p, campo) {
+  const v = String(p[campo.key] ?? "").trim();
+  if (campo.tipo === "texto") {
+    if (!v) return campo.requerido ? campo.vacio || "Completa este campo." : "";
+    if (campo.max && v.length > campo.max) return `Máximo ${campo.max} caracteres (tiene ${v.length}).`;
+    return "";
+  }
+  if (campo.tipo === "lista") {
+    if (!v) {
+      const origen = p._origen && p._origen[campo.key];
+      if (origen) return `No reconocemos «${origen}». ${campo.vacio || "Elige una opción."}`;
+      return campo.requerido ? campo.vacio || "Elige una opción." : "";
+    }
+    if (!opcionesDe(campo).includes(v)) return campo.vacio || "Elige una opción.";
+    return "";
+  }
+  if (campo.tipo === "numero") {
+    const r = interpretarNumero(v, campo.decimales);
+    if (r.vacio) return campo.requerido ? campo.vacio || "Completa este campo." : "";
+    if (r.invalido) return campo.invalido || "Tiene que ser un número.";
+    if (campo.min !== undefined && r.valor < campo.min) return campo.invalido || `Tiene que ser ${campo.min} o más.`;
+    if (campo.decimales === 0 && !Number.isInteger(r.valor)) return campo.invalido || "Va sin decimales.";
+    if (campo.decimales > 0) {
+      const escalado = r.valor * 10 ** campo.decimales;
+      if (Math.abs(escalado - Math.round(escalado)) > 1e-6) return `Usa como máximo ${campo.decimales} decimales.`;
+    }
+    if (r.ambiguo && p._ok[campo.key] !== v) return { revisar: true, valor: r.valor, texto: v };
+    return "";
+  }
+  return "";
+}
+
+function erroresProducto(p) {
+  const out = {};
+  if (filaVacia(p)) return out;
+  CAMPOS.forEach((c) => {
+    const e = errorCampoProducto(p, c);
+    if (e) out[c.key] = e;
+  });
+  return out;
+}
+
+function normalizarTelefono(v) {
+  const limpio = String(v).replace(/[\s\-().]/g, "");
+  if (/^(\+?591)?[67]\d{7}$/.test(limpio)) return "+591" + limpio.slice(-8);
+  if (/^\+\d{8,15}$/.test(limpio)) return limpio;
+  return null;
+}
+
+function errorFerreteria(campo) {
+  const v = String(estado.ferreteria[campo.key] ?? "").trim();
+  if (!v) return campo.requerido ? campo.vacio || "Completa este campo." : "";
+  if (campo.max && v.length > campo.max) return `Máximo ${campo.max} caracteres.`;
+  if (campo.tipo === "telefono" && !normalizarTelefono(v)) return "Revisa el número: 8 dígitos que empiecen con 6 o 7, o un número internacional con +.";
+  if (campo.tipo === "correo" && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return "Revisa el correo: falta algo (ejemplo: nombre@gmail.com).";
+  return "";
+}
+
+/* ==========================================================================
+   Borrador (localStorage, todo con try/catch)
+   ========================================================================== */
+let esperaGuardado = null;
+function guardarBorrador() {
+  clearTimeout(esperaGuardado);
+  esperaGuardado = setTimeout(() => {
+    try {
+      const datos = {
+        v: 1,
+        ferreteria: estado.ferreteria,
+        productos: estado.productos.map((p) => {
+          const o = { _origen: p._origen, _ok: p._ok };
+          CAMPOS.forEach((c) => { o[c.key] = p[c.key]; });
+          return o;
+        }),
+        guardadoEn: new Date().toISOString(),
+      };
+      localStorage.setItem(CONFIG.DRAFT_KEY, JSON.stringify(datos));
+    } catch (e) { /* modo privado o file://: la página sigue funcionando sin borrador */ }
+  }, 400);
+}
+
+function leerBorrador() {
+  try {
+    const crudo = localStorage.getItem(CONFIG.DRAFT_KEY);
+    if (!crudo) return null;
+    const datos = JSON.parse(crudo);
+    return datos && datos.v === 1 ? datos : null;
+  } catch (e) { return null; }
+}
+
+/* ==========================================================================
+   Render: datos de la ferretería
+   ========================================================================== */
+function renderFerreteria() {
+  const cont = $("#campos-ferreteria");
+  cont.innerHTML = CONFIG.CAMPOS_FERRETERIA.map((c) => {
+    const id = `f-${c.key}`;
+    const tipo = c.tipo === "telefono" ? "tel" : c.tipo === "correo" ? "email" : "text";
+    const extra = [
+      c.tipo === "telefono" ? 'inputmode="tel"' : "",
+      c.autocomplete ? `autocomplete="${c.autocomplete}"` : "",
+      c.placeholder ? `placeholder="${escapar(c.placeholder)}"` : "",
+      c.max ? `maxlength="${c.max + 20}"` : "",
+    ].join(" ");
+    return `
+      <div class="campo">
+        <label for="${id}">${escapar(c.label)}${c.requerido ? '<span class="req" aria-hidden="true">*</span>' : ' <span style="letter-spacing:0;text-transform:none">(opcional)</span>'}</label>
+        <input id="${id}" type="${tipo}" data-f="${c.key}" value="${escapar(estado.ferreteria[c.key])}" ${extra}
+               ${c.requerido ? 'aria-required="true"' : ""} aria-describedby="${id}-error">
+        <p class="error" id="${id}-error"></p>
+      </div>`;
+  }).join("");
+}
+
+function pintarErrorFerreteria(key) {
+  const campo = CONFIG.CAMPOS_FERRETERIA.find((c) => c.key === key);
+  const input = $(`#f-${key}`);
+  const p = $(`#f-${key}-error`);
+  if (!campo || !input || !p) return;
+  const mostrar = estado.intentoEnvio || estado.tocados.has(`f:${key}`);
+  const e = mostrar ? errorFerreteria(campo) : "";
+  p.textContent = e;
+  input.setAttribute("aria-invalid", e ? "true" : "false");
+}
+
+/* ==========================================================================
+   Render: productos
+   ========================================================================== */
+function anchoColumna(c) {
+  if (c.tipo === "numero") return "minmax(72px, .75fr)";
+  if (c.tipo === "lista") return opcionesDe(c).every((o) => o.length <= 3) ? "minmax(80px, .75fr)" : "minmax(112px, 1.35fr)";
+  if ((c.max || 0) >= 150) return "minmax(96px, 1.1fr)";
+  if ((c.max || 0) >= 100) return "minmax(150px, 2fr)";
+  return "minmax(80px, .85fr)";
+}
+/** En celular, ocupa todo el ancho de la tarjeta: textos largos y listas con opciones largas. */
+function esCompleto(c) {
+  if (c.tipo === "texto") return (c.max || 0) >= 100;
+  if (c.tipo === "lista") return opcionesDe(c).some((o) => o.length > 10);
+  return false;
+}
+
+const ICONO_DUPLICAR = '<svg viewBox="0 0 20 20" aria-hidden="true"><rect x="6.5" y="6.5" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M4.5 13V4.5H13" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>';
+const ICONO_ELIMINAR = '<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4.5 6h11M8 6V4.5h4V6M6 6l.7 9.5h6.6L14 6" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>';
+
+function htmlCampoProducto(p, c, n) {
+  const id = `${p._uid}-${c.key}`;
+  const req = c.requerido ? '<span class="req" aria-hidden="true">*</span>' : "";
+  const comun = `id="${id}" data-uid="${p._uid}" data-key="${c.key}" aria-describedby="${id}-error" ${c.requerido ? 'aria-required="true"' : ""}`;
+  let control;
+  if (c.tipo === "lista") {
+    const ops = opcionesDe(c).map((o) => `<option value="${escapar(o)}"${p[c.key] === o ? " selected" : ""}>${escapar(o)}</option>`).join("");
+    const vacia = opcionesDe(c).every((o) => o.length <= 3) ? "—" : "Elegir…";
+    control = `<select ${comun}><option value="">${vacia}</option>${ops}</select>`;
+  } else {
+    const modo = c.tipo === "numero" ? (c.decimales === 0 ? 'inputmode="numeric"' : 'inputmode="decimal"') : "";
+    control = `<input type="text" ${comun} ${modo} value="${escapar(p[c.key])}" autocomplete="off"${c.max ? ` maxlength="${c.max + 40}"` : ""}${c.placeholder ? ` placeholder="${escapar(c.placeholder)}"` : ""}>`;
+  }
+  return `
+    <div class="campo${esCompleto(c) ? " completo" : ""}">
+      <label for="${id}">${escapar(c.label)}${req}<span class="oculto-visual"> del producto ${n}</span></label>
+      ${control}
+      <p class="error" id="${id}-error"></p>
+    </div>`;
+}
+
+function renderLista() {
+  const lista = $("#lista");
+  lista.style.setProperty("--columnas", `40px ${CAMPOS.map(anchoColumna).join(" ")} 92px`);
+  if (estado.productos.length === 0) {
+    lista.innerHTML = `<div class="vacio-lista">Todavía no hay productos. Agrega uno o pega tu lista desde Excel.</div>`;
+  } else {
+    const cabecera = `<div class="cabecera-tabla" aria-hidden="true"><span>#</span>${CAMPOS.map((c) => `<span>${escapar(c.label)}${c.requerido ? "&nbsp;*" : ""}</span>`).join("")}<span></span></div>`;
+    lista.innerHTML = cabecera + estado.productos.map((p, i) => {
+      const n = i + 1;
+      return `
+        <div class="fila" role="listitem" data-fila="${p._uid}" aria-label="Producto ${n}">
+          <span class="fila-num">${String(n).padStart(2, "0")}</span>
+          ${CAMPOS.map((c) => htmlCampoProducto(p, c, n)).join("")}
+          <div class="fila-acciones">
+            <button type="button" class="icono" data-accion="duplicar" data-uid="${p._uid}" aria-label="Duplicar producto ${n}" title="Duplicar">${ICONO_DUPLICAR}</button>
+            <button type="button" class="icono" data-accion="eliminar" data-uid="${p._uid}" aria-label="Eliminar producto ${n}" title="Eliminar">${ICONO_ELIMINAR}</button>
+          </div>
+        </div>`;
+    }).join("");
+  }
+  estado.productos.forEach((p) => CAMPOS.forEach((c) => pintarErrorProducto(p, c.key)));
+  actualizarContadores();
+}
+
+function pintarErrorProducto(p, key) {
+  const input = document.getElementById(`${p._uid}-${key}`);
+  const out = document.getElementById(`${p._uid}-${key}-error`);
+  if (!input || !out) return;
+  const campo = CAMPOS.find((c) => c.key === key);
+  const mostrar = estado.intentoEnvio || estado.tocados.has(`${p._uid}:${key}`);
+  const e = mostrar && !filaVacia(p) ? errorCampoProducto(p, campo) : "";
+  let html;
+  if (e && typeof e === "object") {
+    const comoDecimal = formatoLocal(e.valor / 1000, 2);
+    html = `Revisa este precio: ¿son ${formatoMiles(e.valor)} Bs o ${comoDecimal} Bs?<br>
+      <button type="button" class="mini" data-confirmar="${p._uid}" data-key="${key}">Son ${formatoMiles(e.valor)} Bs</button>
+      <button type="button" class="mini" data-corregir="${p._uid}" data-key="${key}">Son ${comoDecimal} Bs</button>`;
+  } else {
+    html = escapar(e || "");
+  }
+  // Solo se redibuja si cambió: si no, al salir del campo se borrarían los
+  // botones del mensaje justo cuando la persona los está tocando.
+  if (out.dataset.html !== html) {
+    out.innerHTML = html;
+    out.dataset.html = html;
+  }
+  input.setAttribute("aria-invalid", e ? "true" : "false");
+  const fila = input.closest(".fila");
+  if (fila) {
+    const conError = estado.intentoEnvio || CAMPOS.some((c) => estado.tocados.has(`${p._uid}:${c.key}`))
+      ? Object.keys(erroresProducto(p)).length > 0 : false;
+    fila.classList.toggle("con-error", conError);
+  }
+}
+
+/* ==========================================================================
+   Contadores, límite y resumen
+   ========================================================================== */
+function textoCantidad(n) {
+  return `${n} ${n === 1 ? "producto" : "productos"}`;
+}
+
+function actualizarContadores() {
+  const n = productosConDatos().length;
+  $("#contador").textContent = textoCantidad(n);
+  $("#contador-barra").textContent = textoCantidad(n);
+  const lleno = estado.productos.length >= CONFIG.MAX_PRODUCTOS;
+  $("#agregar").disabled = lleno;
+  const limite = $("#limite");
+  limite.hidden = !lleno;
+  limite.textContent = lleno ? `Llegaste al máximo de ${CONFIG.MAX_PRODUCTOS} productos por envío. Envía esta lista y luego registra otra.` : "";
+  actualizarResumen();
+}
+
+function recolectarErrores() {
+  const lista = [];
+  CONFIG.CAMPOS_FERRETERIA.forEach((c) => {
+    const e = errorFerreteria(c);
+    if (e) lista.push({ id: `f-${c.key}`, texto: `${c.label}: ${e}` });
+  });
+  estado.productos.forEach((p, i) => {
+    const errs = erroresProducto(p);
+    CAMPOS.forEach((c) => {
+      const e = errs[c.key];
+      if (!e) return;
+      const texto = typeof e === "object" ? "revisa el precio (¿miles o decimales?)." : e;
+      lista.push({ id: `${p._uid}-${c.key}`, texto: `Producto ${i + 1}: ${texto}`, fila: p._uid });
+    });
+  });
+  return lista;
+}
+
+function actualizarResumen() {
+  const resumen = $("#resumen");
+  const n = productosConDatos().length;
+  const errores = recolectarErrores();
+  const filasConError = new Set(errores.filter((e) => e.fila).map((e) => e.fila)).size;
+  let html = `<p class="resumen-cifras"><strong>${textoCantidad(n)}</strong> en tu lista`;
+  if (estado.intentoEnvio || errores.length) {
+    html += filasConError ? ` · <span style="color:var(--oxido-texto)">${filasConError} con algo por corregir</span>` : n ? " · todo en orden" : "";
+  }
+  html += "</p>";
+  if (estado.intentoEnvio && errores.length) {
+    const max = 12;
+    html += `<ul class="lista-errores">${errores.slice(0, max).map((e) => `<li><a href="#${e.id}" data-ir="${e.id}">${escapar(e.texto)}</a></li>`).join("")}</ul>`;
+    if (errores.length > max) html += `<p class="error">Y ${errores.length - max} más.</p>`;
+  } else if (!n) {
+    html += `<p class="ayuda" style="margin:0">Agrega al menos un producto para enviar.</p>`;
+  } else {
+    html += `<p class="ayuda" style="margin:0">Revisa que los precios estén bien. Cuando envíes, el equipo de Entreobra recibe tu lista.</p>`;
+  }
+  resumen.innerHTML = html;
+}
+
+/* ==========================================================================
+   Acciones sobre la lista
+   ========================================================================== */
+function agregarProducto(foco = true) {
+  if (estado.productos.length >= CONFIG.MAX_PRODUCTOS) return;
+  const p = productoVacio();
+  estado.productos.push(p);
+  renderLista();
+  guardarBorrador();
+  if (foco) enfocar(`${p._uid}-${CAMPOS[0].key}`);
+}
+
+function duplicar(uidFila) {
+  if (estado.productos.length >= CONFIG.MAX_PRODUCTOS) { mostrarToast(`Máximo ${CONFIG.MAX_PRODUCTOS} productos por envío.`); return; }
+  const i = estado.productos.findIndex((p) => p._uid === uidFila);
+  if (i < 0) return;
+  const copia = { ...estado.productos[i], _uid: uid(), _origen: { ...estado.productos[i]._origen }, _ok: { ...estado.productos[i]._ok } };
+  estado.productos.splice(i + 1, 0, copia);
+  renderLista();
+  guardarBorrador();
+  enfocar(`${copia._uid}-${CLAVE_PRINCIPAL}`, true);
+}
+
+function eliminar(uidFila) {
+  const i = estado.productos.findIndex((p) => p._uid === uidFila);
+  if (i < 0) return;
+  const [quitado] = estado.productos.splice(i, 1);
+  renderLista();
+  guardarBorrador();
+  mostrarToast("Producto eliminado.", () => {
+    estado.productos.splice(Math.min(i, estado.productos.length), 0, quitado);
+    renderLista();
+    guardarBorrador();
+    enfocar(`${quitado._uid}-${CAMPOS[0].key}`);
+  });
+  const siguiente = estado.productos[i] || estado.productos[i - 1];
+  if (siguiente) {
+    const boton = $(`[data-accion="eliminar"][data-uid="${siguiente._uid}"]`);
+    if (boton) boton.focus({ preventScroll: true });
+  } else {
+    $("#agregar").focus({ preventScroll: true });
+  }
+}
+
+function enfocar(id, seleccionar) {
+  requestAnimationFrame(() => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ block: "center", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    if (seleccionar && el.select) el.select();
+  });
+}
+
+/* ==========================================================================
+   Aviso flotante con deshacer
+   ========================================================================== */
+let esperaToast = null;
+let deshacerToast = null;
+function mostrarToast(texto, alDeshacer) {
+  clearTimeout(esperaToast);
+  deshacerToast = alDeshacer || null;
+  $("#toast-texto").textContent = texto;
+  $("#toast-deshacer").hidden = !alDeshacer;
+  $("#toast").hidden = false;
+  esperaToast = setTimeout(() => { $("#toast").hidden = true; deshacerToast = null; }, alDeshacer ? 7000 : 4000);
+}
+
+/* ==========================================================================
+   Pegar desde Excel
+   ========================================================================== */
+/** TSV como lo genera Excel: tabulaciones, \r\n o \n, celdas entre comillas con saltos de línea y comillas dobladas. */
+function parsearTSV(texto) {
+  const filas = [];
+  let fila = [], celda = "", enComillas = false, inicio = true;
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto[i];
+    if (enComillas) {
+      if (c === '"') {
+        if (texto[i + 1] === '"') { celda += '"'; i++; }
+        else enComillas = false;
+      } else celda += c;
+      continue;
+    }
+    if (c === '"' && inicio) { enComillas = true; inicio = false; continue; }
+    if (c === "\t") { fila.push(celda); celda = ""; inicio = true; continue; }
+    if (c === "\r" || c === "\n") {
+      if (c === "\r" && texto[i + 1] === "\n") i++;
+      fila.push(celda); filas.push(fila);
+      fila = []; celda = ""; inicio = true;
+      continue;
+    }
+    celda += c; inicio = false;
+  }
+  if (celda !== "" || fila.length) { fila.push(celda); filas.push(fila); }
+  return filas
+    .map((f) => f.map((v) => v.replace(/\s+/g, " ").trim()))
+    .filter((f) => f.some((v) => v !== ""));
+}
+
+const ENCABEZADOS_NORM = Object.fromEntries(
+  Object.entries(CONFIG.ENCABEZADOS).map(([k, lista]) => [k, lista.map((e) => normalizar(e).replace(/[.:]+$/, ""))]),
+);
+function campoDeEncabezado(celda) {
+  const n = normalizar(celda).replace(/[.:]+$/, "").replace(/\s*\(.*\)$/, "");
+  if (!n) return "";
+  // También prueba sin el "Bs" final: "P/U Bs.", "Precio (Bs)".
+  const variantes = [n, n.replace(/\s*(bs|bob)$/, "").replace(/[.:]+$/, "").trim()];
+  for (const [key, lista] of Object.entries(ENCABEZADOS_NORM)) {
+    if (CAMPOS.some((c) => c.key === key) && variantes.some((v) => v && lista.includes(v))) return key;
+  }
+  return "";
+}
+function puntajeEncabezado(fila) {
+  const vistos = new Set(fila.map(campoDeEncabezado).filter(Boolean));
+  return vistos.size;
+}
+
+function esFilaTotal(fila) {
+  return fila.some((v) => /^(sub ?total|total|totales|suma|total general)\b/.test(normalizar(v)));
+}
+
+/** Propone qué es cada columna cuando no hay encabezados. */
+function asignacionAutomatica(datos, columnas) {
+  const stats = [];
+  for (let j = 0; j < columnas; j++) {
+    const valores = datos.map((f) => f[j] || "").filter(Boolean);
+    const total = valores.length || 1;
+    const num = valores.filter((v) => { const r = interpretarNumero(v, 2); return !r.vacio && !r.invalido; });
+    stats.push({
+      j,
+      numerico: num.length / total,
+      conDecimales: valores.filter((v) => /bs|[.,]\d{1,2}$/i.test(v)).length / total,
+      enteros: num.filter((v) => /^\d+$/.test(v.replace(/[.\s]/g, ""))).length / total,
+      categoria: valores.filter((v) => mapearCategoria(v, false)).length / total,
+      unidad: valores.filter((v) => mapearUnidad(v)).length / total,
+      sino: valores.filter((v) => MAPA_SINO[normalizar(v).replace(/[.!]/g, "")]).length / total,
+      conDigitos: valores.filter((v) => /\d/.test(v)).length / total,
+      largo: valores.reduce((s, v) => s + v.length, 0) / total,
+    });
+  }
+  const asignacion = new Array(columnas).fill("");
+  const usar = (key, j) => { if (j !== undefined && j !== null && !asignacion[j] && CAMPOS.some((c) => c.key === key)) asignacion[j] = key; };
+  const mejor = (filtro, orden) => stats.filter((s) => !asignacion[s.j] && filtro(s)).sort(orden)[0];
+  usar("unidad", mejor((s) => s.unidad >= 0.6, (a, b) => b.unidad - a.unidad)?.j);
+  usar("categoria", mejor((s) => s.categoria >= 0.6, (a, b) => b.categoria - a.categoria)?.j);
+  const numericas = stats.filter((s) => !asignacion[s.j] && s.numerico >= 0.7);
+  const precio = numericas.find((s) => s.conDecimales > 0) || numericas[0];
+  if (precio) usar("precio", precio.j);
+  // Columnas Sí/No, en orden: la primera a stock, la segunda a entrega.
+  const camposSiNo = CAMPOS.filter((c) => c.opciones === "SINO").map((c) => c.key);
+  stats.filter((s) => !asignacion[s.j] && s.sino >= 0.6).forEach((s, k) => { if (camposSiNo[k]) usar(camposSiNo[k], s.j); });
+  // Una columna de enteros después del precio suele ser la cantidad en stock.
+  const cantidad = stats.find((s) => !asignacion[s.j] && s.numerico >= 0.7 && s.enteros >= 0.8);
+  if (cantidad && camposSiNo[0] && !asignacion.includes(camposSiNo[0])) usar(camposSiNo[0], cantidad.j);
+  usar(CLAVE_PRINCIPAL, mejor((s) => s.numerico < 0.5, (a, b) => b.largo - a.largo)?.j);
+  // Texto corto con números (3/8", 50 kg, 6 huecos): medida o variante.
+  if (CAMPOS.some((c) => c.key === "medida")) usar("medida", mejor((s) => s.numerico < 0.5 && s.conDigitos >= 0.5 && s.largo <= 20, (a, b) => b.conDigitos - a.conDigitos)?.j);
+  return asignacion;
+}
+
+const pegado = { filas: [], datos: [], columnas: 0, asignacion: [], conEncabezado: false, nuevos: [] };
+
+function abrirDialogo() {
+  $("#fondo-dialogo").hidden = false;
+  document.body.style.overflow = "hidden";
+  $("#barra-inferior").hidden = true;
+  mostrarPaso("paso-pegar");
+  $("#mensaje-pegar").textContent = "";
+  setTimeout(() => $("#texto-pegado").focus(), 30);
+}
+function cerrarDialogo() {
+  $("#fondo-dialogo").hidden = true;
+  document.body.style.overflow = "";
+  $("#barra-inferior").hidden = !$("#confirmacion").hidden;
+  $("#abrir-pegar").focus({ preventScroll: true });
+}
+function mostrarPaso(id) {
+  ["paso-pegar", "paso-columnas", "paso-previa"].forEach((p) => { $(`#${p}`).hidden = p !== id; });
+  const primero = $(`#${id} button, #${id} select, #${id} textarea`);
+  if (id !== "paso-pegar" && primero) setTimeout(() => primero.focus(), 30);
+}
+
+function leerPegado() {
+  const filas = parsearTSV($("#texto-pegado").value);
+  if (!filas.length) {
+    $("#mensaje-pegar").textContent = "No encontramos datos. Copia las celdas en Excel y pégalas aquí.";
+    return;
+  }
+  pegado.filas = filas;
+  pegado.columnas = Math.max(...filas.map((f) => f.length));
+  // Busca la fila de encabezados en las primeras 5 (puede haber un título arriba).
+  let idx = -1;
+  for (let i = 0; i < Math.min(5, filas.length); i++) {
+    if (puntajeEncabezado(filas[i]) >= 2) { idx = i; break; }
+  }
+  if (idx >= 0) {
+    pegado.conEncabezado = true;
+    pegado.datos = filas.slice(idx + 1);
+    const vistos = new Set();
+    pegado.asignacion = Array.from({ length: pegado.columnas }, (_, j) => {
+      const key = campoDeEncabezado(filas[idx][j] || "");
+      if (!key || vistos.has(key)) return "";
+      vistos.add(key);
+      return key;
+    });
+    if (!pegado.asignacion.includes(CLAVE_PRINCIPAL)) { mostrarColumnas(); return; }
+    mostrarPrevia();
+  } else {
+    pegado.conEncabezado = false;
+    pegado.datos = filas;
+    pegado.asignacion = asignacionAutomatica(filas, pegado.columnas);
+    mostrarColumnas();
+  }
+}
+
+function mostrarColumnas() {
+  const muestras = pegado.datos.filter((f) => !esFilaTotal(f));
+  $("#columnas").innerHTML = Array.from({ length: pegado.columnas }, (_, j) => {
+    const ejemplos = muestras.map((f) => f[j]).filter(Boolean).slice(0, 3);
+    const opciones = [`<option value="">Ignorar</option>`]
+      .concat(CAMPOS.map((c) => `<option value="${c.key}"${pegado.asignacion[j] === c.key ? " selected" : ""}>${escapar(c.label)}</option>`))
+      .join("");
+    return `
+      <div class="columna">
+        <div class="campo">
+          <label for="col-${j}">Columna ${j + 1}: ¿qué es?</label>
+          <select id="col-${j}" data-col="${j}">${opciones}</select>
+        </div>
+        <div class="muestras">${ejemplos.length ? ejemplos.map((e) => `<span>${escapar(e)}</span>`).join("") : "<span>(vacía)</span>"}</div>
+      </div>`;
+  }).join("");
+  $("#mensaje-columnas").textContent = "";
+  mostrarPaso("paso-columnas");
+}
+
+function convertirPegado() {
+  const nuevos = [];
+  let categoriaSeccion = "";
+  const colDe = (key) => pegado.asignacion.indexOf(key);
+  const colNombre = colDe(CLAVE_PRINCIPAL);
+  const colPrecio = colDe("precio");
+  for (const fila of pegado.datos) {
+    if (esFilaTotal(fila)) continue;
+    if (puntajeEncabezado(fila) >= 2) continue; // encabezado repetido
+    const llenas = fila.filter(Boolean);
+    const precioCrudo = colPrecio >= 0 ? fila[colPrecio] || "" : "";
+    const tienePrecio = precioCrudo && !interpretarNumero(precioCrudo, 2).invalido;
+    // Fila de título o de sección ("CEMENTOS", "LISTA DE PRECIOS 2026")
+    if (llenas.length === 1 && !tienePrecio) {
+      const cat = mapearCategoria(llenas[0], true);
+      if (cat) categoriaSeccion = cat;
+      continue;
+    }
+    const p = productoVacio();
+    CAMPOS.forEach((c) => {
+      const j = colDe(c.key);
+      const crudo = j >= 0 ? fila[j] || "" : "";
+      if (c.tipo === "lista") {
+        const mapeado = c.opciones === "CATEGORIAS" ? mapearCategoria(crudo, false)
+          : c.opciones === "UNIDADES" ? mapearUnidad(crudo)
+          : c.opciones === "SINO" ? mapearSiNo(crudo)
+          : opcionesDe(c).find((o) => normalizar(o) === normalizar(crudo)) || "";
+        p[c.key] = mapeado;
+        if (!mapeado && crudo) p._origen[c.key] = crudo;
+      } else if (c.tipo === "numero") {
+        const r = interpretarNumero(crudo, c.decimales);
+        p[c.key] = !r.vacio && !r.invalido && !r.ambiguo ? formatoLocal(r.valor, c.decimales) : crudo;
+      } else {
+        p[c.key] = crudo;
+      }
+    });
+    // Sin categoría en la fila: la de la sección, o una palabra clara del nombre.
+    if (CAMPOS.some((c) => c.key === "categoria") && !p.categoria && !p._origen.categoria) {
+      p.categoria = categoriaSeccion || (colNombre >= 0 ? mapearCategoria(p[CLAVE_PRINCIPAL], true) : "");
+    }
+    if (!filaVacia(p)) nuevos.push(p);
+  }
+  return nuevos;
+}
+
+function mostrarPrevia() {
+  if (!pegado.asignacion.includes(CLAVE_PRINCIPAL)) {
+    $("#mensaje-columnas").textContent = `Indica qué columna tiene: ${NOMBRE_PRINCIPAL}.`;
+    mostrarColumnas();
+    return;
+  }
+  const nuevos = convertirPegado();
+  pegado.nuevos = nuevos;
+  if (!nuevos.length) {
+    mostrarPaso("paso-pegar");
+    $("#mensaje-pegar").textContent = "No encontramos productos en lo que pegaste. Revisa que copiaste las filas con datos.";
+    return;
+  }
+  const conError = nuevos.filter((p) => Object.keys(erroresProducto(p)).length).length;
+  $("#texto-previa").innerHTML = `Se van a agregar <strong>${textoCantidad(nuevos.length)}</strong>${conError ? ` (${conError} con algo por corregir)` : " (todo en orden)"}.`;
+  const libres = CONFIG.MAX_PRODUCTOS - productosConDatos().length;
+  const msg = [];
+  if (nuevos.length > CONFIG.MAX_PRODUCTOS) msg.push(`El máximo por envío es ${CONFIG.MAX_PRODUCTOS}: se cargarán los primeros ${CONFIG.MAX_PRODUCTOS}. Envía el resto en otra lista.`);
+  else if (nuevos.length > libres) msg.push(`Tu lista ya tiene ${productosConDatos().length} productos: al agregar se pasaría del máximo de ${CONFIG.MAX_PRODUCTOS}. Puedes reemplazar tu lista o enviar primero la actual.`);
+  $("#mensaje-previa").textContent = msg.join(" ");
+  $("#agregar-pegado").disabled = nuevos.length > libres;
+  $("#lista-previa").innerHTML = nuevos.slice(0, 6).map((p) => {
+    const errs = erroresProducto(p);
+    const precioCampo = CAMPOS.find((c) => c.key === "precio");
+    const precio = precioCampo && p.precio ? ` · Bs ${escapar(p.precio)}` : "";
+    const detalle = [p[CLAVE_PRINCIPAL], p.medida].filter(Boolean).join(" ");
+    return `<li><span>${escapar(detalle || "(sin nombre)")}${precio}</span>${Object.keys(errs).length ? '<span class="marca-error">Por corregir</span>' : ""}</li>`;
+  }).join("") + (nuevos.length > 6 ? `<li><span>y ${nuevos.length - 6} más…</span></li>` : "");
+  $("#cambiar-columnas").parentElement.hidden = false;
+  mostrarPaso("paso-previa");
+}
+
+function aplicarPegado(reemplazar) {
+  let nuevos = pegado.nuevos.slice(0, CONFIG.MAX_PRODUCTOS);
+  const anteriores = estado.productos.slice();
+  if (reemplazar) {
+    estado.productos = nuevos;
+  } else {
+    const conDatos = estado.productos.filter((p) => !filaVacia(p));
+    nuevos = nuevos.slice(0, CONFIG.MAX_PRODUCTOS - conDatos.length);
+    estado.productos = conDatos.concat(nuevos);
+  }
+  nuevos.forEach((p) => CAMPOS.forEach((c) => estado.tocados.add(`${p._uid}:${c.key}`)));
+  renderLista();
+  guardarBorrador();
+  cerrarDialogo();
+  $("#texto-pegado").value = "";
+  mostrarToast(`Agregamos ${textoCantidad(nuevos.length)}.`, () => {
+    estado.productos = anteriores;
+    renderLista();
+    guardarBorrador();
+  });
+  if (nuevos[0]) {
+    const conError = nuevos.find((p) => Object.keys(erroresProducto(p)).length);
+    const destino = conError || nuevos[0];
+    const key = conError ? Object.keys(erroresProducto(conError))[0] : CLAVE_PRINCIPAL;
+    enfocar(`${destino._uid}-${key}`);
+  }
+}
+
+/* ==========================================================================
+   Envío, CSV y confirmación
+   ========================================================================== */
+function datosParaEnvio() {
+  const ferreteria = {};
+  CONFIG.CAMPOS_FERRETERIA.forEach((c) => {
+    const v = String(estado.ferreteria[c.key] ?? "").trim();
+    ferreteria[c.key] = c.tipo === "telefono" ? normalizarTelefono(v) || v : v;
+  });
+  const productos = productosConDatos().map((p) => {
+    const o = {};
+    CAMPOS.forEach((c) => {
+      const v = String(p[c.key] ?? "").trim();
+      if (c.tipo === "numero") {
+        const r = interpretarNumero(v, c.decimales);
+        o[c.key] = r.vacio || r.invalido ? null : Number(r.valor.toFixed(c.decimales || 0));
+      } else {
+        o[c.key] = v;
+      }
+    });
+    return o;
+  });
+  return { ferreteria, productos };
+}
+
+/** Mismo orden que la hoja del cliente; el ID del envío va al final (evita duplicados). */
+function encabezadosHoja() {
+  return ["Fecha"]
+    .concat(CONFIG.CAMPOS_FERRETERIA.map((c) => c.columna || c.label))
+    .concat(CAMPOS.map((c) => c.columna || c.label))
+    .concat(["ID envío"]);
+}
+
+/** Evita que Excel/Sheets interprete una celda como fórmula. */
+function sanearCelda(v) {
+  const s = String(v ?? "");
+  return /^[=+\-@]/.test(s) ? "'" + s : s;
+}
+
+function generarCSV(id, datos) {
+  const ahora = new Date();
+  const dos = (n) => String(n).padStart(2, "0");
+  const fecha = `${ahora.getFullYear()}-${dos(ahora.getMonth() + 1)}-${dos(ahora.getDate())} ${dos(ahora.getHours())}:${dos(ahora.getMinutes())}`;
+  const celda = (v) => {
+    const s = sanearCelda(v);
+    return /[;"\r\n]|^\s|\s$/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const filas = [encabezadosHoja()];
+  datos.productos.forEach((p) => {
+    filas.push(
+      [fecha]
+        .concat(CONFIG.CAMPOS_FERRETERIA.map((c) => datos.ferreteria[c.key]))
+        .concat(CAMPOS.map((c) => (c.tipo === "numero" ? (p[c.key] === null ? "" : formatoLocal(p[c.key], c.decimales)) : p[c.key])))
+        .concat([id]),
+    );
+  });
+  const texto = "﻿" + filas.map((f) => f.map(celda).join(";")).join("\r\n") + "\r\n";
+  const slug = normalizar(datos.ferreteria.negocio).replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "ferreteria";
+  const nombre = `entreobra-productos-${slug}-${ahora.getFullYear()}-${dos(ahora.getMonth() + 1)}-${dos(ahora.getDate())}.csv`;
+  return { texto, nombre };
+}
+
+let ultimoCSV = null;
+function descargarCSV(id, datos) {
+  ultimoCSV = generarCSV(id, datos);
+  const blob = new Blob([ultimoCSV.texto], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = ultimoCSV.nombre;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  return ultimoCSV.nombre;
+}
+
+function enlaceWhatsApp(texto) {
+  return `https://wa.me/${CONFIG.WHATSAPP}?text=${encodeURIComponent(texto)}`;
+}
+
+function validarTodo() {
+  estado.intentoEnvio = true;
+  CONFIG.CAMPOS_FERRETERIA.forEach((c) => pintarErrorFerreteria(c.key));
+  estado.productos.forEach((p) => CAMPOS.forEach((c) => pintarErrorProducto(p, c.key)));
+  actualizarResumen();
+  return recolectarErrores();
+}
+
+function revisar() {
+  const errores = validarTodo();
+  document.getElementById("revisar").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  return errores;
+}
+
+async function enviar() {
+  if (estado.enviando) return;
+  const errores = validarTodo();
+  const estadoEnvio = $("#estado-envio");
+  estadoEnvio.hidden = true;
+  if (!productosConDatos().length) {
+    estadoEnvio.hidden = false;
+    estadoEnvio.innerHTML = `<div class="fallo" role="alert">Agrega al menos un producto antes de enviar.</div>`;
+    return;
+  }
+  if (errores.length) {
+    enfocar(errores[0].id);
+    return;
+  }
+  const datos = datosParaEnvio();
+  const huella = JSON.stringify(datos);
+  // Reintento con los mismos datos: mismo ID (el servidor no duplica).
+  if (!estado.envioId || estado.envioHuella !== huella) {
+    estado.envioId = nuevoId();
+    estado.envioHuella = huella;
+  }
+  const id = estado.envioId;
+  const n = datos.productos.length;
+
+  // Trampa para bots: se muestra la confirmación sin enviar nada.
+  if ($("#sitio_web").value.trim()) {
+    mostrarConfirmacion({ modo: "enviado", n, id, negocio: datos.ferreteria.negocio });
+    return;
+  }
+
+  if (!CONFIG.APPS_SCRIPT_URL) {
+    const nombre = descargarCSV(id, datos);
+    mostrarConfirmacion({ modo: "csv", n, id, negocio: datos.ferreteria.negocio, archivo: nombre, datos });
+    return;
+  }
+
+  const boton = $("#enviar");
+  estado.enviando = true;
+  boton.disabled = true;
+  boton.textContent = "Enviando…";
+  const payload = { id, enviadoEn: new Date().toISOString(), ferreteria: datos.ferreteria, productos: datos.productos, honeypot: "", version: 1 };
+  const control = typeof AbortController === "function" ? new AbortController() : null;
+  const espera = control ? setTimeout(() => control.abort(), 30000) : null;
+  try {
+    const respuesta = await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" }, // evita el preflight CORS
+      body: JSON.stringify(payload),
+      redirect: "follow",
+      signal: control ? control.signal : undefined,
+    });
+    const json = await respuesta.json();
+    if (!json || json.ok !== true) throw new Error((json && json.error) || "Respuesta inválida");
+    // Éxito: se borran los productos del borrador (se conservan los datos de la ferretería).
+    const enviados = typeof json.filas === "number" ? json.filas : n;
+    estado.productos = [];
+    estado.envioId = null;
+    estado.envioHuella = null;
+    guardarBorrador();
+    mostrarConfirmacion({ modo: "enviado", n: enviados || n, id, negocio: datos.ferreteria.negocio, duplicado: json.duplicado });
+  } catch (error) {
+    mostrarFallo(datos);
+  } finally {
+    if (espera) clearTimeout(espera);
+    estado.enviando = false;
+    boton.disabled = false;
+    boton.textContent = "Enviar lista";
+  }
+}
+
+function mostrarFallo(datos) {
+  const estadoEnvio = $("#estado-envio");
+  estadoEnvio.hidden = false;
+  estadoEnvio.innerHTML = `
+    <div class="fallo" role="alert">
+      <p>No pudimos enviar tu lista. Revisa tu conexión e intenta de nuevo. Tus datos siguen aquí.</p>
+      <div class="acciones">
+        <button type="button" class="boton boton-primario" id="reintentar">Reintentar</button>
+        <button type="button" class="boton boton-linea" id="csv-respaldo">Descargar CSV para enviar por WhatsApp</button>
+      </div>
+    </div>`;
+  $("#reintentar").addEventListener("click", enviar);
+  $("#csv-respaldo").addEventListener("click", () => {
+    const nombre = descargarCSV(estado.envioId, datos);
+    mostrarToast(`Descargamos ${nombre}. Envíalo por WhatsApp al ${CONFIG.WHATSAPP_VISIBLE}.`);
+  });
+  $("#reintentar").focus();
+}
+
+function mostrarConfirmacion({ modo, n, id, negocio, archivo, datos, duplicado }) {
+  $("#formulario").hidden = true;
+  $("#barra-inferior").hidden = true;
+  const conf = $("#confirmacion");
+  conf.hidden = false;
+  const codigo = codigoCorto(id);
+  const acciones = $("#acciones-confirmacion");
+  if (modo === "csv") {
+    $("#titulo-confirmacion").textContent = "Tu lista está lista para enviar.";
+    $("#texto-confirmacion").textContent = `Descargamos el archivo «${archivo}» con ${textoCantidad(n)}. Envíalo por WhatsApp al ${CONFIG.WHATSAPP_VISIBLE} (adjúntalo como documento) y lo cargamos.`;
+    $("#codigo-confirmacion").innerHTML = `Código de envío: <strong>${codigo}</strong>`;
+    acciones.innerHTML = `
+      <a class="boton boton-primario" target="_blank" rel="noopener" href="${enlaceWhatsApp(`Hola, soy de ${negocio}. Te envío mi lista de productos (${textoCantidad(n)}). Código: ${codigo}`)}">Abrir WhatsApp</a>
+      <button type="button" class="boton boton-linea" id="descargar-otra-vez">Descargar de nuevo</button>
+      <button type="button" class="boton-texto" id="otra-lista">Registrar otra lista</button>`;
+    $("#descargar-otra-vez").addEventListener("click", () => descargarCSV(id, datos));
+  } else {
+    $("#titulo-confirmacion").textContent = "Listo. Recibimos tu lista.";
+    $("#texto-confirmacion").textContent = duplicado
+      ? `Esta lista ya nos había llegado (${textoCantidad(n)} de ${negocio}). No se duplicó.`
+      : `${textoCantidad(n)} de ${negocio}. Si necesitas corregir algo, envía la lista de nuevo o escríbenos.`;
+    $("#codigo-confirmacion").innerHTML = `Código de envío: <strong>${codigo}</strong>`;
+    acciones.innerHTML = `
+      <button type="button" class="boton boton-carbon" id="otra-lista">Registrar otra lista</button>
+      <a class="boton boton-linea" target="_blank" rel="noopener" href="${enlaceWhatsApp(`Hola, soy de ${negocio}. Envié mi lista de productos. Código: ${codigo}`)}">Contactar por WhatsApp</a>`;
+  }
+  $("#otra-lista").addEventListener("click", registrarOtra);
+  window.scrollTo(0, 0);
+  conf.focus({ preventScroll: true });
+}
+
+function registrarOtra() {
+  estado.productos = [productoVacio()];
+  estado.tocados = new Set();
+  estado.intentoEnvio = false;
+  estado.envioId = null;
+  estado.envioHuella = null;
+  $("#estado-envio").hidden = true;
+  $("#confirmacion").hidden = true;
+  $("#formulario").hidden = false;
+  $("#barra-inferior").hidden = false;
+  $("#aviso-borrador").hidden = true;
+  renderFerreteria();
+  renderLista();
+  guardarBorrador();
+  window.scrollTo(0, 0);
+  enfocar(`${estado.productos[0]._uid}-${CAMPOS[0].key}`);
+}
+
+/* ==========================================================================
+   Eventos
+   ========================================================================== */
+function conectarEventos() {
+  // Ferretería
+  const contF = $("#campos-ferreteria");
+  contF.addEventListener("input", (e) => {
+    const key = e.target.dataset.f;
+    if (!key) return;
+    estado.ferreteria[key] = e.target.value;
+    if (estado.tocados.has(`f:${key}`) || estado.intentoEnvio) pintarErrorFerreteria(key);
+    guardarBorrador();
+    if (estado.intentoEnvio) actualizarResumen();
+  });
+  contF.addEventListener("focusout", (e) => {
+    const key = e.target.dataset.f;
+    if (!key) return;
+    estado.tocados.add(`f:${key}`);
+    pintarErrorFerreteria(key);
+    actualizarResumen();
+  });
+
+  // Productos (delegación)
+  const lista = $("#lista");
+  const alCambiar = (e) => {
+    const { uid: u, key } = e.target.dataset;
+    if (!u || !key) return;
+    const p = estado.productos.find((x) => x._uid === u);
+    if (!p) return;
+    p[key] = e.target.value;
+    if (p._origen[key] && e.target.value) delete p._origen[key];
+    if (estado.tocados.has(`${u}:${key}`) || estado.intentoEnvio || e.type === "change") {
+      if (e.type === "change") estado.tocados.add(`${u}:${key}`);
+      pintarErrorProducto(p, key);
+    }
+    actualizarContadores();
+    guardarBorrador();
+  };
+  lista.addEventListener("input", alCambiar);
+  lista.addEventListener("change", alCambiar);
+  lista.addEventListener("focusout", (e) => {
+    const { uid: u, key } = e.target.dataset;
+    if (!u || !key) return;
+    const p = estado.productos.find((x) => x._uid === u);
+    if (!p) return;
+    estado.tocados.add(`${u}:${key}`);
+    pintarErrorProducto(p, key);
+    actualizarResumen();
+  });
+  lista.addEventListener("click", (e) => {
+    const accion = e.target.closest("[data-accion]");
+    if (accion) {
+      if (accion.dataset.accion === "duplicar") duplicar(accion.dataset.uid);
+      if (accion.dataset.accion === "eliminar") eliminar(accion.dataset.uid);
+      return;
+    }
+    const confirmar = e.target.closest("[data-confirmar]");
+    const corregir = e.target.closest("[data-corregir]");
+    if (confirmar || corregir) {
+      const boton = confirmar || corregir;
+      const u = boton.dataset.confirmar || boton.dataset.corregir;
+      const key = boton.dataset.key;
+      const p = estado.productos.find((x) => x._uid === u);
+      if (!p) return;
+      const r = interpretarNumero(p[key], 2);
+      // "Son 1.250" deja 1250; "Son 1,25" deja 1,25.
+      p[key] = formatoLocal(confirmar ? r.valor : r.valor / 1000, 2);
+      p._ok[key] = p[key];
+      const input = document.getElementById(`${u}-${key}`);
+      if (input) input.value = p[key];
+      pintarErrorProducto(p, key);
+      actualizarResumen();
+      guardarBorrador();
+      if (input) input.focus();
+    }
+  });
+
+  $("#agregar").addEventListener("click", () => agregarProducto(true));
+  $("#enviar").addEventListener("click", enviar);
+  $("#ir-revisar").addEventListener("click", revisar);
+  $("#resumen").addEventListener("click", (e) => {
+    const a = e.target.closest("[data-ir]");
+    if (!a) return;
+    e.preventDefault();
+    enfocar(a.dataset.ir);
+  });
+
+  // Toast
+  $("#toast-deshacer").addEventListener("click", () => {
+    const fn = deshacerToast;
+    $("#toast").hidden = true;
+    deshacerToast = null;
+    if (fn) fn();
+  });
+
+  // Borrador
+  $("#borrar-todo").addEventListener("click", () => {
+    const antes = { ferreteria: { ...estado.ferreteria }, productos: estado.productos.slice() };
+    CONFIG.CAMPOS_FERRETERIA.forEach((c) => { estado.ferreteria[c.key] = ""; });
+    estado.productos = [productoVacio()];
+    estado.tocados = new Set();
+    estado.intentoEnvio = false;
+    $("#aviso-borrador").hidden = true;
+    renderFerreteria();
+    renderLista();
+    guardarBorrador();
+    mostrarToast("Empezaste de cero.", () => {
+      estado.ferreteria = antes.ferreteria;
+      estado.productos = antes.productos;
+      renderFerreteria();
+      renderLista();
+      guardarBorrador();
+    });
+  });
+
+  // Diálogo de pegado
+  $("#abrir-pegar").addEventListener("click", abrirDialogo);
+  $("#cerrar-dialogo").addEventListener("click", cerrarDialogo);
+  $$("[data-cerrar]").forEach((b) => b.addEventListener("click", cerrarDialogo));
+  $("#fondo-dialogo").addEventListener("click", (e) => { if (e.target.id === "fondo-dialogo") cerrarDialogo(); });
+  $("#leer-pegado").addEventListener("click", leerPegado);
+  $("#texto-pegado").addEventListener("paste", () => setTimeout(leerPegado, 0));
+  $("#volver-pegar").addEventListener("click", () => mostrarPaso("paso-pegar"));
+  $("#cambiar-columnas").addEventListener("click", mostrarColumnas);
+  $("#columnas").addEventListener("change", (e) => {
+    const j = Number(e.target.dataset.col);
+    const key = e.target.value;
+    if (key) pegado.asignacion = pegado.asignacion.map((k, i) => (k === key && i !== j ? "" : k));
+    pegado.asignacion[j] = key;
+    $$("#columnas select").forEach((s) => { s.value = pegado.asignacion[Number(s.dataset.col)] || ""; });
+  });
+  $("#confirmar-columnas").addEventListener("click", mostrarPrevia);
+  $("#agregar-pegado").addEventListener("click", () => aplicarPegado(false));
+  $("#reemplazar-pegado").addEventListener("click", () => aplicarPegado(true));
+  document.addEventListener("keydown", (e) => {
+    if ($("#fondo-dialogo").hidden) return;
+    if (e.key === "Escape") { cerrarDialogo(); return; }
+    if (e.key === "Tab") {
+      const focos = $$('.dialogo button:not([disabled]), .dialogo select, .dialogo textarea, .dialogo input')
+        .filter((el) => el.offsetParent !== null);
+      if (!focos.length) return;
+      const primero = focos[0], ultimo = focos[focos.length - 1];
+      if (e.shiftKey && document.activeElement === primero) { e.preventDefault(); ultimo.focus(); }
+      else if (!e.shiftKey && document.activeElement === ultimo) { e.preventDefault(); primero.focus(); }
+    }
+  });
+}
+
+/* ==========================================================================
+   Inicio
+   ========================================================================== */
+function iniciar() {
+  $("#pie").innerHTML = `<a href="mailto:${CONFIG.EMAIL}">${CONFIG.EMAIL}</a> · WhatsApp <a href="https://wa.me/${CONFIG.WHATSAPP}" target="_blank" rel="noopener">${CONFIG.WHATSAPP_VISIBLE}</a> · Cochabamba, Bolivia`;
+  const borrador = leerBorrador();
+  if (borrador) {
+    CONFIG.CAMPOS_FERRETERIA.forEach((c) => { estado.ferreteria[c.key] = String(borrador.ferreteria?.[c.key] ?? ""); });
+    estado.productos = (borrador.productos || []).slice(0, CONFIG.MAX_PRODUCTOS).map((o) => {
+      const p = productoVacio();
+      CAMPOS.forEach((c) => { p[c.key] = String(o[c.key] ?? ""); });
+      p._origen = o._origen || {};
+      p._ok = o._ok || {};
+      return p;
+    });
+    const hayAlgo = Object.values(estado.ferreteria).some(Boolean) || estado.productos.some((p) => !filaVacia(p));
+    $("#aviso-borrador").hidden = !hayAlgo;
+  }
+  if (!estado.productos.length) estado.productos.push(productoVacio());
+  if (!CONFIG.APPS_SCRIPT_URL) {
+    const nota = $("#nota-modo");
+    nota.hidden = false;
+    nota.textContent = `Al enviar se descarga un archivo con tu lista. Lo mandas por WhatsApp al ${CONFIG.WHATSAPP_VISIBLE}.`;
+  }
+  renderFerreteria();
+  renderLista();
+  conectarEventos();
+}
+
+iniciar();
+</script>
+</body>
+</html>

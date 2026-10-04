@@ -53,7 +53,7 @@ export function Foto({
       <div className="tex-grano absolute inset-0 opacity-[0.22]" />
       {/* Manual de marca: toda foto con texto encima lleva carbón al
           40–60%. Las texturas de reemplazo usan el `velo` que se pida. */}
-      <div className="absolute inset-0 bg-carbon" style={{ opacity: src ? Math.min(0.6, Math.max(0.4, velo)) : velo }} />
+      <div className="foto-velo absolute inset-0 bg-carbon" style={{ opacity: src ? Math.min(0.6, Math.max(0.4, velo)) : velo }} />
     </div>
   );
 }

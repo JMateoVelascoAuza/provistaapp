@@ -54,3 +54,6 @@ next-env.d.ts
 
 # archivos de entrega generados (index.html / demo.html / Entreobra.html autocontenidos)
 /entrega/
+
+# Copia generada de registro/index.html (scripts/sincronizar-registro.mjs)
+/public/registro/

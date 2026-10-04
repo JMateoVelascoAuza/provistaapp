@@ -1,5 +1,11 @@
 export const ES_EXPORT_ESTATICO = process.env.NEXT_PUBLIC_STATIC_EXPORT === "1";
 
+/** Build para hosting estático (Namecheap): sin servidor, así que sin /api. */
+export const SIN_SERVIDOR = process.env.NEXT_PUBLIC_SIN_SERVIDOR === "1";
+
+/** URL del Google Apps Script que recibe los formularios (vacía en local). */
+export const APPS_SCRIPT_URL = process.env.NEXT_PUBLIC_APPS_SCRIPT_URL ?? "";
+
 /**
  * Los links de Next (`/demo`, `/#formulario`) son rutas absolutas —
  * perfectas con un servidor real, pero rotas si alguien abre el HTML
