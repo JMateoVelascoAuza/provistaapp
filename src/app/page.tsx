@@ -10,7 +10,7 @@ import { Footer } from "@/components/sections/Footer";
 export default function Home() {
   return (
     <>
-      <main>
+      <main id="contenido">
         <Hero />
         <Materiales />
         <Problema />

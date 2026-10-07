@@ -53,6 +53,7 @@ export function Comparador() {
       const escaneo = tarjeta.querySelector<HTMLElement>("[data-escaneo]");
       const estado = tarjeta.querySelector<HTMLElement>("[data-estado]");
       const ahorro = tarjeta.querySelector<HTMLElement>("[data-ahorro]");
+      const lineaAhorro = tarjeta.querySelector<HTMLElement>("[data-linea-ahorro]");
 
       if (!marca || !chip || !escaneo) return;
       // Textos que la animación reescribe: se restauran al deshacerla
@@ -65,20 +66,31 @@ export function Comparador() {
       gsap.set([marca, chip], { opacity: 0 });
       gsap.set(marca, { scaleY: 0 });
       gsap.set(escaneo, { scaleX: 0 });
+      // La línea del ahorro espera oculta: nunca se ve "Bs 0" antes de
+      // que la animación arranque (en celular puede tardar en dispararse).
+      if (lineaAhorro) gsap.set(lineaAhorro, { opacity: 0 });
       const tc = actual.current.t.comparador;
       if (estado) estado.textContent = tc.comparando(tc.numeros[PROVEEDORES.length - 1]);
-      montos.forEach((m) => (m.textContent = formatBs(0, actual.current.idioma)));
-      if (ahorro) ahorro.textContent = formatBs(0, actual.current.idioma);
 
       const tl = gsap.timeline({
         defaults: { ease: "power3.out" },
-        scrollTrigger: { trigger: tarjeta, start: "top 75%", once: true },
+        scrollTrigger: { trigger: tarjeta, start: "top 85%", once: true },
       });
 
+      // Los montos cuentan desde el 60 % de su valor (nunca se ve "Bs 0").
+      const desde = (n: number) => Math.round((n * 0.6) / 10) * 10;
+      tl.call(
+        () => {
+          montos.forEach((m, i) => (m.textContent = formatBs(desde(PROVEEDORES[i].precio), actual.current.idioma)));
+          if (ahorro) ahorro.textContent = formatBs(desde(AHORRO), actual.current.idioma);
+        },
+        [],
+        0,
+      );
       tl.to(filas, { opacity: 1, y: 0, duration: 0.45, stagger: 0.09 }, 0);
       tl.to(escaneo, { scaleX: 1, duration: 1.3, ease: "power1.inOut" }, 0.1);
       montos.forEach((m, i) => {
-        const valor = { n: 0 };
+        const valor = { n: desde(PROVEEDORES[i].precio) };
         tl.to(
           valor,
           {
@@ -108,8 +120,9 @@ export function Comparador() {
       tl.to(marca, { opacity: 1, scaleY: 1, duration: 0.45 }, 2.2);
       tl.to(chip, { opacity: 1, duration: 0.35 }, 2.25);
       tl.to(barras[0], { backgroundColor: "#c2410c", duration: 0.35 }, 2.2);
+      if (lineaAhorro) tl.to(lineaAhorro, { opacity: 1, duration: 0.4 }, 2.2);
       if (ahorro) {
-        const valor = { n: 0 };
+        const valor = { n: desde(AHORRO) };
         tl.to(
           valor,
           {
@@ -208,12 +221,7 @@ export function Comparador() {
                           </span>
                         )}
                       </p>
-                      <p
-                        className={cn(
-                          "mt-1.5 text-xs tabular-nums",
-                          proveedor.sinConfirmar ? "text-oliva" : "text-oliva-oscuro",
-                        )}
-                      >
+                      <p className="mt-1.5 text-xs tabular-nums text-oliva-oscuro">
                         {proveedor.entrega} · {proveedor.distancia} · {t.comparador.stock[i]}
                       </p>
                     </div>
@@ -221,7 +229,7 @@ export function Comparador() {
                       data-monto
                       className={cn(
                         "shrink-0 text-[15px] tabular-nums",
-                        i === 0 ? "text-carbon" : proveedor.sinConfirmar ? "text-oliva" : "text-tierra",
+                        i === 0 ? "text-carbon" : proveedor.sinConfirmar ? "text-oliva-oscuro" : "text-tierra",
                       )}
                     >
                       {formatBs(proveedor.precio, idioma)}
@@ -238,13 +246,14 @@ export function Comparador() {
               ))}
             </div>
 
-            <p className="pt-6 text-[13px] text-tierra/80">
+            <p data-linea-ahorro className="pt-6 text-[13px] text-tierra/80">
               {t.comparador.ahorras[0]}
               <span data-ahorro className="tabular-nums text-oxido">{formatBs(AHORRO, idioma)}</span>
               {t.comparador.ahorras[1]}
               {nProveedores}
               {t.comparador.ahorras[2]}
             </p>
+            <p className="pt-2 text-[11px] text-oliva-oscuro">{t.comparador.nota}</p>
           </div>
         </ScrollReveal>
       </div>

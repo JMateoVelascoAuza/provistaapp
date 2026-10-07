@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { VERSION_POLITICAS } from "@/lib/datos";
 
 /**
  * El comitente todavía no compartió la hoja de Google Sheets (Sección 6
@@ -8,7 +9,7 @@ import { NextResponse } from "next/server";
  * una cuenta de servicio ni credenciales de Google Cloud.
  *
  * Columnas esperadas en la hoja (en este orden):
- *   Fecha y hora | Nombre | Tipo de usuario | WhatsApp
+ *   Fecha | Nombre | Participa como | WhatsApp | Acepta privacidad | ID envío
  *
  * Sin GOOGLE_SHEETS_WEBHOOK_URL configurada, el registro se guarda en
  * los logs del servidor en vez de fallar, para poder probar el formulario
@@ -28,6 +29,11 @@ export async function POST(request: Request) {
   const whatsapp = typeof body?.whatsapp === "string" ? body.whatsapp.trim() : "";
   const tipoUsuario = body?.tipoUsuario;
 
+  // Sin el consentimiento expreso no se guarda nada (DS 1793, art. 56).
+  if (body?.consentimiento !== true) {
+    return NextResponse.json({ error: "Para enviar tus datos tienes que aceptar la Política de privacidad." }, { status: 400 });
+  }
+
   if (!nombre || !whatsapp || !esTipoUsuarioValido(tipoUsuario)) {
     return NextResponse.json(
       { error: "Completa tu nombre, WhatsApp y cómo participas." },
@@ -37,7 +43,15 @@ export async function POST(request: Request) {
 
   // Mismo formato que manda la página cuando no hay servidor
   // (apps-script/Code.gs lo escribe en la pestaña "Acceso anticipado").
-  const fila = { tipo: "acceso", id: crypto.randomUUID(), nombre, whatsapp, tipoUsuario };
+  const fila = {
+    tipo: "acceso",
+    id: crypto.randomUUID(),
+    nombre,
+    whatsapp,
+    tipoUsuario,
+    consentimiento: true,
+    versionPoliticas: VERSION_POLITICAS,
+  };
 
   const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || process.env.NEXT_PUBLIC_APPS_SCRIPT_URL;
 

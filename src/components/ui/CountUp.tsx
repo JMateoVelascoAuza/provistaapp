@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 /**
- * Cuenta de 0 al valor final al montar (tras `retraso` ms). El servidor
+ * Cuenta de `desde` (0 por defecto) al valor final al montar (tras
+ * `retraso` ms). Los montos en Bs arrancan de un valor parcial para que
+ * nunca se vea "Bs 0". El servidor
  * manda el valor final directo (sin JS no hay animación, pero el número
  * correcto igual se ve) — el conteo es un efecto visual encima, no un
  * gate de visibilidad del contenido.
@@ -18,11 +20,13 @@ export function CountUp({
   value,
   duration = 1400,
   retraso = 0,
+  desde = 0,
   formatter = (n: number) => String(n),
 }: {
   value: number;
   duration?: number;
   retraso?: number;
+  desde?: number;
   formatter?: (n: number) => string;
 }) {
   const [display, setDisplay] = useState(value);
@@ -42,14 +46,14 @@ export function CountUp({
       inicio ??= ahora + retraso;
       const progreso = Math.min(Math.max((ahora - inicio) / duration, 0), 1);
       const facilitado = 1 - Math.pow(1 - progreso, 4);
-      setDisplay(Math.round(facilitado * value));
+      setDisplay(Math.round(desde + facilitado * (value - desde)));
       if (progreso < 1) frame = requestAnimationFrame(tick);
     }
 
-    setDisplay(0);
+    setDisplay(desde);
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [value, duration, retraso, reducido]);
+  }, [value, duration, retraso, desde, reducido]);
 
   return <>{formatter(display)}</>;
 }

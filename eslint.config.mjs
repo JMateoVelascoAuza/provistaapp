@@ -19,6 +19,11 @@ const eslintConfig = defineConfig([
     "public/worker-*.js",
     "public/fallback-*.js",
   ]),
+  // Herramientas de prueba en Node (CommonJS): usan require a propósito.
+  {
+    files: ["pruebas/**/*.cjs"],
+    rules: { "@typescript-eslint/no-require-imports": "off" },
+  },
 ]);
 
 export default eslintConfig;

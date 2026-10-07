@@ -7,7 +7,7 @@ export type Textura =
   | "aridos"
   | "ladrillo"
   | "tubos"
-  | "electrico"
+  | "ceramico"
   | "malla"
   | "deposito";
 

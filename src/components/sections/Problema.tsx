@@ -25,10 +25,10 @@ const INTERCAMBIOS: { horaPregunta: string; horaRespuesta: string; esVisto?: boo
 const DOLORES = [{ momento: 0 }, { momento: 1 }, { momento: 3 }, { momento: 5 }];
 
 const CHATS = [
-  { nombre: "San Antonio", sinLeer: 0 },
-  { nombre: "Mat. Cochabamba", sinLeer: 2 },
-  { nombre: "Distribuidora", sinLeer: 1 },
-  { nombre: "Fletes Quillacollo", sinLeer: 3 },
+  { nombre: "Ferretería A", sinLeer: 0 },
+  { nombre: "Ferretería B", sinLeer: 2 },
+  { nombre: "Distribuidora C", sinLeer: 1 },
+  { nombre: "Fletes D", sinLeer: 3 },
 ];
 
 // 08:02 → 10:49: lo que lleva la obra esperando al final del chat.
@@ -217,7 +217,7 @@ export function Problema() {
                         className="absolute right-0 top-0 whitespace-nowrap rounded-2xl rounded-br-sm bg-oxido-claro px-4 py-2.5 text-[14px] text-oxido-oscuro"
                       >
                         {t.problema.intercambios[i].respuesta}
-                        <span className="ml-2.5 text-[10px] tabular-nums text-oxido-oscuro/60">{item.horaRespuesta}</span>
+                        <span className="ml-2.5 text-[10px] tabular-nums text-oxido-oscuro">{item.horaRespuesta}</span>
                       </p>
                     )}
                   </div>

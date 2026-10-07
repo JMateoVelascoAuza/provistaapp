@@ -68,7 +68,7 @@ function PiezaCentral() {
           <br />
           {t.materiales.centroTitulo[1]}
         </p>
-        <a data-centro-cta href="#comparar" className="boton boton-oxido mt-[4cqw]">
+        <a data-centro-cta href="#acceso" className="boton boton-oxido mt-[4cqw]">
           {t.materiales.centroCta}
         </a>
       </div>

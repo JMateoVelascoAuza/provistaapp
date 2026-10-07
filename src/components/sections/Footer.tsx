@@ -1,18 +1,22 @@
 "use client";
 
 import { Logo } from "@/components/ui/Logo";
-import { PrivacyModal } from "@/components/ui/PrivacyModal";
+import { Enlace } from "@/components/ui/Enlace";
 import { ScrollStagger } from "@/components/ui/ScrollReveal";
-import { WHATSAPP_ENTREOBRA } from "@/lib/datos";
+import { NEGOCIO, WHATSAPP_ENTREOBRA } from "@/lib/datos";
+import { LEGAL, RUTAS_LEGALES, type DocumentoLegal } from "@/lib/legal";
 import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
-// Usuario de redes según el manual de marca: @entreobra.
+// Redes del cliente: completar `href` solo con cuentas confirmadas como
+// suyas. @entreobra en Instagram es de otra empresa (limpieza post-obra,
+// Brasil), así que no se enlaza. Sin ningún `href`, la columna no se muestra.
 const REDES: { label: string; href?: string }[] = [
-  { label: "Instagram", href: "https://www.instagram.com/entreobra" },
-  { label: "Facebook", href: "https://www.facebook.com/entreobra" },
-  { label: "TikTok", href: "https://www.tiktok.com/@entreobra" },
+  { label: "Instagram" },
+  { label: "Facebook" },
+  { label: "TikTok" },
 ];
+const REDES_CONFIRMADAS = REDES.filter((red) => red.href);
 
 // Los dos tratamientos del logo principal del manual: sobre yeso
 // (landing) y sobre carbón (demo).
@@ -41,7 +45,8 @@ const TONOS = {
 
 export function Footer({ tono = "oscuro" }: { tono?: keyof typeof TONOS }) {
   const t = TONOS[tono];
-  const { t: tx } = useIdioma();
+  const { idioma, t: tx } = useIdioma();
+  const legal = LEGAL[idioma];
   const enlace = cn("transition-colors duration-300", t.enlace);
 
   return (
@@ -52,31 +57,35 @@ export function Footer({ tono = "oscuro" }: { tono?: keyof typeof TONOS }) {
           <p className={cn("mt-6 text-[13px]", t.etiqueta)}>{tx.footer.ubicacion}</p>
         </div>
 
-        <div className="sm:justify-self-center">
+        <div className={REDES_CONFIRMADAS.length > 0 ? "sm:justify-self-center" : "sm:justify-self-end sm:text-right"}>
           <p className={cn("etiqueta text-[10px]", t.etiqueta)}>{tx.footer.contacto}</p>
           <div className={cn("mt-5 flex flex-col gap-2 text-[13px]", t.texto)}>
             <a href={`https://wa.me/${WHATSAPP_ENTREOBRA}`} target="_blank" rel="noopener noreferrer" className={enlace}>
               WhatsApp +591 76971774
             </a>
-            <a href="mailto:hola@entreobra.com" className={enlace}>
-              hola@entreobra.com
-            </a>
+            {NEGOCIO.correo && (
+              <a href={`mailto:${NEGOCIO.correo}`} className={enlace}>
+                {NEGOCIO.correo}
+              </a>
+            )}
           </div>
         </div>
 
-        <div className="sm:justify-self-end sm:text-right">
-          <p className={cn("etiqueta text-[10px]", t.etiqueta)}>{tx.footer.siguenos}</p>
-          <p className={cn("mt-5 text-[13px]", t.texto)}>
-            {REDES.map((red, i) => (
-              <span key={red.label}>
-                {i > 0 && <span className={cn("mx-2", t.separador)}>·</span>}
-                <a href={red.href} target="_blank" rel="noopener noreferrer" className={enlace}>
-                  {red.label}
-                </a>
-              </span>
-            ))}
-          </p>
-        </div>
+        {REDES_CONFIRMADAS.length > 0 && (
+          <div className="sm:justify-self-end sm:text-right">
+            <p className={cn("etiqueta text-[10px]", t.etiqueta)}>{tx.footer.siguenos}</p>
+            <p className={cn("mt-5 text-[13px]", t.texto)}>
+              {REDES_CONFIRMADAS.map((red, i) => (
+                <span key={red.label}>
+                  {i > 0 && <span className={cn("mx-2", t.separador)}>·</span>}
+                  <a href={red.href} target="_blank" rel="noopener noreferrer" className={enlace}>
+                    {red.label}
+                  </a>
+                </span>
+              ))}
+            </p>
+          </div>
+        )}
       </ScrollStagger>
 
       {/* Sin animación de entrada: al final de la página nunca llega al
@@ -90,8 +99,17 @@ export function Footer({ tono = "oscuro" }: { tono?: keyof typeof TONOS }) {
             t.pie,
           )}
         >
-          <p>© {new Date().getFullYear()} Entreobra</p>
-          <PrivacyModal className={t.enlace} />
+          <p>
+            © {new Date().getFullYear()} {NEGOCIO.razonSocial || NEGOCIO.nombreComercial}
+            {NEGOCIO.nit && ` · NIT ${NEGOCIO.nit}`}
+          </p>
+          <nav aria-label={legal.etiqueta} className="flex flex-wrap gap-x-5 gap-y-2">
+            {(Object.keys(RUTAS_LEGALES) as DocumentoLegal[]).map((doc) => (
+              <Enlace key={doc} href={RUTAS_LEGALES[doc]} className={cn("py-1", enlace)}>
+                {legal.enlaces[doc]}
+              </Enlace>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

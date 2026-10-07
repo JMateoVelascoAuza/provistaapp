@@ -14,11 +14,13 @@ import { cn } from "@/lib/utils";
 gsap.registerPlugin(ScrollTrigger);
 
 // Las etiquetas salen del diccionario (t.hero.metricas), en el mismo orden.
+// Solo datos verificables: 4 pasos (Cómo funciona), el ahorro del ejemplo del
+// comparador, 6 categorías y el acceso anticipado gratis (texto, no "Bs 0").
 const METRICAS = [
-  { valor: 3, prefijo: "", sufijo: " h", bs: false },
+  { valor: 4, prefijo: "", sufijo: "", bs: false },
   { valor: AHORRO, prefijo: "", sufijo: "", bs: true },
   { valor: 6, prefijo: "", sufijo: "", bs: false },
-  { valor: 0, prefijo: "", sufijo: "", bs: true, acento: true },
+  { valor: 0, prefijo: "", sufijo: "", bs: false, acento: true, gratis: true },
 ];
 const LETRAS = "Entreobra".split("");
 
@@ -130,7 +132,11 @@ export function Hero() {
         <div ref={textoRef} className="flex flex-1 flex-col justify-center pb-14 pt-32 md:pb-20 md:pt-40">
           <p className="etiqueta animate-aparecer flex items-center gap-4 text-arena/70" style={{ animationDelay: "250ms" }}>
             <span className="animate-trazo block h-px w-8 bg-oxido" style={{ animationDelay: "350ms" }} />
-            {t.hero.ubicacion}
+            <span>
+              {t.hero.ubicacion}
+              <span className="hidden sm:inline"> · </span>
+              <span className="block sm:inline">{t.hero.proximamente}</span>
+            </span>
           </p>
 
           <h1 className="titulo mt-6 text-[2.75rem] text-yeso sm:text-6xl lg:text-[4.5rem]">
@@ -151,7 +157,7 @@ export function Hero() {
           </p>
 
           <div className="animate-aparecer mt-10 flex flex-col gap-3 sm:flex-row" style={{ animationDelay: "780ms" }}>
-            <a href="#comparar" className="boton boton-oxido">
+            <a href="#acceso" className="boton boton-oxido">
               {t.hero.cta}
             </a>
             <a href="#proveedores" className="boton boton-linea">
@@ -180,13 +186,20 @@ export function Hero() {
                   m.acento ? "text-oxido" : "text-yeso",
                 )}
               >
-                {m.prefijo}
-                <CountUp
-                  value={m.valor}
-                  retraso={950 + i * 90}
-                  formatter={m.bs ? (n) => formatBs(n, idioma) : undefined}
-                />
-                {m.sufijo}
+                {m.gratis ? (
+                  t.hero.gratis
+                ) : (
+                  <>
+                    {m.prefijo}
+                    <CountUp
+                      value={m.valor}
+                      retraso={950 + i * 90}
+                      desde={m.bs ? Math.round((m.valor * 0.6) / 10) * 10 : 0}
+                      formatter={m.bs ? (n) => formatBs(n, idioma) : undefined}
+                    />
+                    {m.sufijo}
+                  </>
+                )}
               </dd>
             </div>
           ))}

@@ -3,6 +3,7 @@ import { Header } from "@/components/sections/Header";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { BackToTop } from "@/components/ui/BackToTop";
 import { InstalarPwa } from "@/components/ui/InstalarPwa";
+import { SaltarContenido } from "@/components/ui/SaltarContenido";
 import { LimpiarServiceWorkerDev } from "@/components/ui/LimpiarServiceWorkerDev";
 import { PreferenciasProvider, SCRIPT_PREFERENCIAS } from "@/lib/preferencias";
 import "./globals.css";
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       </head>
       <body className="flex min-h-screen flex-col bg-background text-foreground">
         <PreferenciasProvider>
+          <SaltarContenido />
           <LimpiarServiceWorkerDev />
           <ScrollProgressBar />
           <Header />

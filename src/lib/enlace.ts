@@ -27,5 +27,7 @@ export function enlace(ruta: string): string {
   if (ruta === "/demo") return "demo.html";
   if (ruta.startsWith("/#")) return `index.html${ruta.slice(1)}`;
   if (ruta === "/") return "index.html";
+  // Páginas legales y cualquier otra ruta de un nivel: "/privacidad" → "privacidad.html".
+  if (/^\/[\w-]+$/.test(ruta)) return `${ruta.slice(1)}.html`;
   return ruta;
 }

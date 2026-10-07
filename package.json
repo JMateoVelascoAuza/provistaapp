@@ -13,7 +13,14 @@
     "build:hosting": "cross-env STATIC_EXPORT=hosting next build --webpack",
     "postbuild:hosting": "node scripts/ajustar-export.mjs",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "prueba:script": "node pruebas/apps-script.test.cjs",
+    "banco": "node pruebas/banco/servidor.cjs",
+    "dev:banco": "cross-env NEXT_PUBLIC_APPS_SCRIPT_URL=http://localhost:5050/exec next dev --webpack"
+  },
+  "engines": {
+    "node": ">=20.9"
   },
   "dependencies": {
     "@ducanh2912/next-pwa": "^10.2.9",

@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { Enlace } from "@/components/ui/Enlace";
 import { Monograma } from "@/components/ui/Logo";
 import { ScrollReveal } from "@/components/ui/ScrollReveal";
-import { WHATSAPP_ENTREOBRA } from "@/lib/datos";
+import { VERSION_POLITICAS, WHATSAPP_ENTREOBRA } from "@/lib/datos";
 import { APPS_SCRIPT_URL, ES_EXPORT_ESTATICO, SIN_SERVIDOR } from "@/lib/enlace";
+import { RUTAS_LEGALES } from "@/lib/legal";
 import { useIdioma } from "@/lib/preferencias";
 import type { Textos } from "@/lib/textos";
 import { escucharTipoUsuario, type TipoUsuario } from "@/lib/tipoUsuario";
@@ -36,9 +38,20 @@ export function Formulario() {
   const [error, setError] = useState<string | null>(null);
   const [enlaceWa, setEnlaceWa] = useState<string | null>(null);
   const { idioma, t } = useIdioma();
+  const opcionesRef = useRef<(HTMLButtonElement | null)[]>([]);
 
   // Los CTA de "Dos lados" llegan con el tipo ya elegido.
   useEffect(() => escucharTipoUsuario(setTipoUsuario), []);
+
+  // Grupo de radio accesible: las flechas cambian la opción y el foco.
+  function alTeclaOpcion(e: KeyboardEvent<HTMLButtonElement>, i: number) {
+    const paso = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+    if (!paso) return;
+    e.preventDefault();
+    const siguiente = (i + paso + OPCIONES.length) % OPCIONES.length;
+    setTipoUsuario(OPCIONES[siguiente]);
+    opcionesRef.current[siguiente]?.focus();
+  }
 
   async function enviar(formData: FormData) {
     const nombre = String(formData.get("nombre") ?? "").trim();
@@ -64,13 +77,21 @@ export function Formulario() {
         ? await fetch(APPS_SCRIPT_URL, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" }, // evita el preflight CORS
-            body: JSON.stringify({ tipo: "acceso", id: nuevoIdEnvio(), nombre, whatsapp, tipoUsuario }),
+            body: JSON.stringify({
+              tipo: "acceso",
+              id: nuevoIdEnvio(),
+              nombre,
+              whatsapp,
+              tipoUsuario,
+              consentimiento: true,
+              versionPoliticas: VERSION_POLITICAS,
+            }),
             redirect: "follow",
           })
         : await fetch("/api/registro", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ nombre, whatsapp, tipoUsuario }),
+            body: JSON.stringify({ nombre, whatsapp, tipoUsuario, consentimiento: true }),
           });
 
       const data = await respuesta.json().catch(() => null);
@@ -138,7 +159,16 @@ export function Formulario() {
                 )}
               </div>
             ) : (
-              <form action={enviar} className="flex flex-col">
+              // onSubmit y no `action`: con `action`, React 19 vacía el
+              // formulario al terminar, y si el envío falla la persona
+              // pierde lo que escribió.
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void enviar(new FormData(e.currentTarget));
+                }}
+                className="flex flex-col"
+              >
                 <label htmlFor="nombre" className="etiqueta text-[10px] text-oliva-oscuro">
                   {t.formulario.nombre}
                 </label>
@@ -153,16 +183,21 @@ export function Formulario() {
 
                 <fieldset className="mt-9">
                   <legend className="etiqueta text-[10px] text-oliva-oscuro">{t.formulario.participas}</legend>
-                  <div role="radiogroup" className="mt-4 grid grid-cols-2 gap-2.5">
-                    {OPCIONES.map((opcion) => {
+                  <div role="radiogroup" aria-label={t.formulario.participas} className="mt-4 grid grid-cols-2 gap-2.5">
+                    {OPCIONES.map((opcion, i) => {
                       const elegido = tipoUsuario === opcion;
                       return (
                         <button
                           key={opcion}
+                          ref={(el) => {
+                            opcionesRef.current[i] = el;
+                          }}
                           type="button"
                           role="radio"
                           aria-checked={elegido}
+                          tabIndex={elegido ? 0 : -1}
                           onClick={() => setTipoUsuario(opcion)}
+                          onKeyDown={(e) => alTeclaOpcion(e, i)}
                           className={cn(
                             "min-h-12 border px-3 text-[13px] transition-colors duration-300",
                             elegido
@@ -204,6 +239,26 @@ export function Formulario() {
                     )}
                   </p>
                 )}
+
+                <label className="mt-9 flex cursor-pointer items-start gap-3 text-[13px] leading-relaxed text-tierra">
+                  <input
+                    type="checkbox"
+                    name="consentimiento"
+                    required
+                    className="mt-0.5 h-4.5 w-4.5 shrink-0 cursor-pointer accent-oxido [color-scheme:light]"
+                  />
+                  <span>
+                    {t.formulario.consentimiento[0]}
+                    <Enlace
+                      href={RUTAS_LEGALES.privacidad}
+                      target="_blank"
+                      className="text-carbon underline decoration-arena underline-offset-4 hover:decoration-oxido"
+                    >
+                      {t.formulario.consentimiento[1]}
+                    </Enlace>
+                    {t.formulario.consentimiento[2]}
+                  </span>
+                </label>
 
                 <button
                   type="submit"

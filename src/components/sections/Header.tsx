@@ -9,16 +9,13 @@ import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
 // Las anclas van con "/#..." (no solo "#...") porque el Header también
-// vive en /demo — así funcionan desde cualquier página. "Demo" es la
-// excepción: no es un ancla de "/", es otra página — por eso tiene su
-// propio `href` explícito en vez del patrón `/#${id}` del resto, y
-// `destacado` para distinguirla visualmente (está fuera del alcance
-// contratado, pensada para pulsear interés del cliente).
-const NAV: { id: "comparar" | "como-funciona" | "proveedores" | "demo"; href?: string; destacado?: boolean }[] = [
+// vive en otras páginas (legales, /demo): así funcionan desde cualquiera.
+// "Demo" no va en el menú (Anexo de la Adenda N.º 1: la demo no es
+// funcional); la página /demo sigue existiendo sin enlace.
+const NAV: { id: "comparar" | "como-funciona" | "proveedores" }[] = [
   { id: "comparar" },
   { id: "como-funciona" },
   { id: "proveedores" },
-  { id: "demo", href: "/demo", destacado: true },
 ];
 
 // Todas las secciones de "/" en orden, para que al pasar por una que no
@@ -79,34 +76,24 @@ export function Header() {
           </Enlace>
 
           <nav aria-label="Principal" className="hidden items-center gap-10 lg:flex">
-            {NAV.map((item) =>
-              item.destacado ? (
-                <Enlace
-                  key={item.id}
-                  href={item.href ?? `/#${item.id}`}
-                  className="py-2 text-[11px] uppercase tracking-[0.24em] text-oxido transition-colors duration-300 hover:text-oxido-oscuro"
-                >
-                  {t.header.nav[item.id]}
-                </Enlace>
-              ) : (
-                <Enlace
-                  key={item.id}
-                  href={item.href ?? `/#${item.id}`}
+            {NAV.map((item) => (
+              <Enlace
+                key={item.id}
+                href={`/#${item.id}`}
+                className={cn(
+                  "group relative py-2 text-[11px] uppercase tracking-[0.24em] transition-colors duration-300",
+                  activo === item.id ? "text-yeso" : "text-arena/80 hover:text-yeso",
+                )}
+              >
+                {t.header.nav[item.id]}
+                <span
                   className={cn(
-                    "group relative py-2 text-[11px] uppercase tracking-[0.24em] transition-colors duration-300",
-                    activo === item.id ? "text-yeso" : "text-arena/80 hover:text-yeso",
+                    "absolute inset-x-0 -bottom-px h-px origin-left bg-oxido transition-transform duration-500 ease-obra",
+                    activo === item.id ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
                   )}
-                >
-                  {t.header.nav[item.id]}
-                  <span
-                    className={cn(
-                      "absolute inset-x-0 -bottom-px h-px origin-left bg-oxido transition-transform duration-500 ease-obra",
-                      activo === item.id ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
-                    )}
-                  />
-                </Enlace>
-              ),
-            )}
+                />
+              </Enlace>
+            ))}
             <Enlace href="/#acceso" className="boton boton-linea min-h-10 px-5">
               {t.header.nav.acceso}
             </Enlace>
@@ -154,10 +141,10 @@ export function Header() {
         )}
       >
         <nav aria-label="Principal" className="contenedor flex h-full flex-col pb-10 pt-6">
-          {[...NAV, { id: "acceso" as const, href: undefined, destacado: false }].map((item, i) => (
+          {[...NAV, { id: "acceso" as const }].map((item, i) => (
             <Enlace
               key={item.id}
-              href={item.href ?? `/#${item.id}`}
+              href={`/#${item.id}`}
               onClick={() => setMenuAbierto(false)}
               style={{ transitionDelay: menuAbierto ? `${80 + i * 60}ms` : "0ms" }}
               className={cn(
@@ -166,13 +153,13 @@ export function Header() {
               )}
             >
               <span className="text-[11px] tracking-[0.2em] text-oliva">{String(i + 1).padStart(2, "0")}</span>
-              <span className={cn("text-2xl font-light", item.destacado ? "text-oxido" : "text-yeso")}>
+              <span className="text-2xl font-light text-yeso">
                 {t.header.nav[item.id]}
               </span>
             </Enlace>
           ))}
           <div className="mt-auto">
-            <Enlace href="/#comparar" onClick={() => setMenuAbierto(false)} className="boton boton-oxido w-full">
+            <Enlace href="/#acceso" onClick={() => setMenuAbierto(false)} className="boton boton-oxido w-full">
               {t.header.ctaMovil}
             </Enlace>
             <p className="etiqueta mt-6 text-center text-oliva">{t.header.ubicacion}</p>

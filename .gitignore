@@ -57,3 +57,7 @@ next-env.d.ts
 
 # Copia generada de registro/index.html (scripts/sincronizar-registro.mjs)
 /public/registro/
+
+# Datos de la hoja simulada del banco de pruebas (npm run banco)
+/pruebas/banco/hoja-prueba.json
+

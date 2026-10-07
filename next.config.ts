@@ -12,8 +12,14 @@ const exportEstatico = process.env.STATIC_EXPORT === "1";
 // (/demo/, /registro/), PWA activa y sin /api (los formularios envían
 // directo al Google Apps Script de NEXT_PUBLIC_APPS_SCRIPT_URL).
 const exportHosting = process.env.STATIC_EXPORT === "hosting";
+// Páginas solo de desarrollo: `page.dev.tsx` es ruta con `npm run dev` y
+// queda fuera de cualquier build. Así /demo (src/app/demo/page.dev.tsx)
+// sigue en el código para mostrarla en local, pero no se publica: el
+// Anexo de la Adenda N.º 1 la saca del sitio porque la app no es funcional.
+const desarrollo = process.env.NODE_ENV === "development";
 
 const nextConfig: NextConfig = {
+  pageExtensions: desarrollo ? ["dev.tsx", "tsx", "ts", "jsx", "js"] : ["tsx", "ts", "jsx", "js"],
   // Expone la misma bandera al cliente (`src/lib/enlace.ts` la usa para
   // reescribir los links de "/demo", "/#formulario", etc. a relativos)
   // — así con UNA sola variable (`STATIC_EXPORT=1`) alcanza para todo.

@@ -73,7 +73,9 @@ export function PreferenciasProvider({ children }: { children: React.ReactNode }
     const t = TEXTOS[idioma].meta;
     // La demo también puede abrirse incrustada (sin "/demo" en la URL).
     const esDemo = pathname?.startsWith("/demo") || !!document.querySelector("[data-pagina=\"demo\"]");
-    const titulo = esDemo ? t.tituloDemo : t.tituloLanding;
+    // Las páginas legales traen su propio título en el idioma actual.
+    const propio = document.querySelector("[data-titulo-pagina]")?.getAttribute("data-titulo-pagina");
+    const titulo = propio || (esDemo ? t.tituloDemo : t.tituloLanding);
     document.title = titulo;
     // Next vuelve a escribir el <title> de los metadatos (en español)
     // después de hidratar: se corrige cada vez que cambie.

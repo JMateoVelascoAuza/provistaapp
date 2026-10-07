@@ -65,7 +65,9 @@ function PantallaApp({
     // y de la barra de pestañas se suavizan contra este fondo, y uno
     // claro dejaba un hilo blanco pegado al marco.
     <div className="flex h-full flex-col bg-carbon font-sans text-carbon">
-      <header className="bg-carbon px-5 pb-5 pt-[58px] text-yeso">
+      {/* Pantalla de ejemplo: divs y no header/main/nav, para no duplicar
+          las regiones reales de la página (lectores de pantalla). */}
+      <div className="bg-carbon px-5 pb-5 pt-[58px] text-yeso">
         <div className="flex items-center justify-between">
           <Logo variante="icono" tamano={12} />
           <span className="relative text-arena">
@@ -76,11 +78,11 @@ function PantallaApp({
         <p className="mt-5 text-[11px] uppercase tracking-[0.28em] text-oliva">{etiqueta}</p>
         <h1 className="mt-1.5 text-[28px] font-light leading-none tracking-[-0.01em]">{titulo}</h1>
         {extra}
-      </header>
+      </div>
 
-      <main className="flex-1 overflow-hidden bg-yeso-claro">{children}</main>
+      <div className="flex-1 overflow-hidden bg-yeso-claro">{children}</div>
 
-      <nav className="grid grid-cols-4 bg-carbon pb-[30px] pt-3">
+      <div className="grid grid-cols-4 bg-carbon pb-[30px] pt-3">
         {pestanas.map(({ label, icono: Icono }, i) => (
           <span
             key={label}
@@ -90,7 +92,7 @@ function PantallaApp({
             {label}
           </span>
         ))}
-      </nav>
+      </div>
     </div>
   );
 }
@@ -98,9 +100,9 @@ function PantallaApp({
 // Logos de ejemplo de las empresas: iniciales sobre el color de cada una
 // hasta tener los logos reales.
 const EMPRESAS_DEMO = [
-  { iniciales: "SA", logo: "bg-oxido text-white", rating: 4.6 },
-  { iniciales: "MC", logo: "bg-tierra text-yeso", rating: 4.4 },
-  { iniciales: "DB", logo: "bg-oliva text-carbon", rating: 4.1 },
+  { iniciales: "FA", logo: "bg-oxido text-white", rating: 4.6 },
+  { iniciales: "FB", logo: "bg-tierra text-yeso", rating: 4.4 },
+  { iniciales: "DC", logo: "bg-oliva text-carbon", rating: 4.1 },
 ];
 
 export function MockInicio() {
@@ -254,14 +256,14 @@ export function MockCatalogo() {
 
 const PEDIDO_DEMO = [
   {
-    proveedor: "Ferretería San Antonio",
+    proveedor: "Ferretería A",
     items: [
       { producto: 0, cantidad: 5, precio: "Bs 310" },
       { producto: 1, cantidad: 10, precio: "Bs 480" },
     ],
   },
   {
-    proveedor: "Materiales Cochabamba",
+    proveedor: "Ferretería B",
     items: [{ producto: 2, cantidad: 200, precio: "Bs 360" }],
   },
 ];
@@ -403,7 +405,7 @@ export function MockDashboard() {
   const ventas = [38, 52, 44, 70, 58, 86, 64];
   return (
     <PantallaApp
-      etiqueta="Ferretería San Antonio"
+      etiqueta="Ferretería A"
       titulo={a.panel.titulo}
       pestanas={pestanas(ICONOS_FERRETERIA, a.pestanasFerreteria)}
       activa={0}
@@ -462,8 +464,8 @@ export function MockDashboard() {
 export function MockFletes() {
   const a = useIdioma().t.app;
   const fletes = [
-    { origen: "Ferretería San Antonio", destino: "Torre del Bosque", distancia: "2.1 km", rating: 4.6, carga: a.fletes.cargas[0] },
-    { origen: "Materiales Cochabamba", destino: "Casa Sacaba #12", distancia: "3.8 km", rating: 4.4, carga: a.fletes.cargas[1] },
+    { origen: "Ferretería A", destino: "Torre del Bosque", distancia: "2.1 km", rating: 4.6, carga: a.fletes.cargas[0] },
+    { origen: "Ferretería B", destino: "Casa Sacaba #12", distancia: "3.8 km", rating: 4.4, carga: a.fletes.cargas[1] },
   ];
   return (
     <PantallaApp

@@ -111,6 +111,24 @@ La URL del script va en **un solo lugar**: `NEXT_PUBLIC_APPS_SCRIPT_URL`
 página de registro antes de cada `dev`/`build`. Sin URL, todo funciona
 igual en local: los formularios terminan en WhatsApp / CSV.
 
+Los dos formularios piden una casilla de aceptación de la Política de
+privacidad y mandan `consentimiento: true` + `versionPoliticas`. El script
+rechaza cualquier envío sin ese dato (DS 1793, art. 56).
+
+## Páginas legales
+
+`/privacidad`, `/terminos`, `/cookies` y `/reembolsos` salen de
+`src/lib/legal.ts` (ES/EN) y se pintan con `components/legal/PaginaLegal.tsx`.
+
+- **Datos del negocio:** `NEGOCIO` en `src/lib/datos.ts`. Razón social, NIT,
+  matrícula SEPREC y dirección están vacíos a propósito y no se muestran
+  hasta completarlos. No inventar valores.
+- **Si cambia un texto legal:** actualizar la fecha (`fecha` en `legal.ts`)
+  y `VERSION_POLITICAS` en `datos.ts` y en el `CONFIG` de `registro/index.html`.
+- **Cookies:** el sitio no usa cookies ni analíticas, por eso no hay aviso de
+  cookies. Si se agrega analítica o publicidad, hace falta pedir permiso antes
+  de cargarla y actualizar `/cookies`.
+
 ## Publicar en producción (Namecheap, hosting estático)
 
 **Una vez, en la hoja del cliente:** Extensiones → Apps Script → pegar
@@ -223,6 +241,29 @@ npm run dev
 ```
 
 Abre [http://localhost:3000](http://localhost:3000).
+
+### Computadora nueva (Windows 10/11)
+
+`scripts/instalar-windows.ps1` instala Git, Node.js LTS, GitHub CLI, VS Code
+y las extensiones del proyecto (con `winget`, salta lo que ya
+esté), hace `npm ci` y verifica script, tipos y lint:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\instalar-windows.ps1
+# -SoloProyecto: salta las herramientas (solo dependencias y verificación)
+```
+
+### Pruebas
+
+| Comando | Qué hace |
+|---|---|
+| `npm run prueba:script` | Corre `apps-script/Code.gs` contra una hoja, Gmail y Session simulados (sin Google). |
+| `npm run banco` | Hoja de prueba local en http://localhost:5050/hoja (se actualiza sola) que ejecuta el `Code.gs` real. El registro apuntando a ella: http://localhost:5050/registro/. |
+| `npm run dev:banco` | El sitio en :3000 con el formulario de la landing enviando al banco (correr junto con `npm run banco`). |
+| `npm run typecheck` / `npm run lint` | Tipos y lint. |
+
+No correr `npm run build:*` con `npm run dev` abierto: comparten `.next/` y
+el servidor de desarrollo se cae.
 
 ## Vista previa local para mandar al cliente (sin servidor, sin hosting)
 

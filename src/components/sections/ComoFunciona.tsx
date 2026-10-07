@@ -43,9 +43,9 @@ function MockBuscarMaterial() {
     <div>
       <p className="etiqueta text-[10px] text-oliva">{m.producto}</p>
       <div className="mt-2">
-        <FilaMock nombre="Ferretería San Antonio" valor="Bs 62" activo />
-        <FilaMock nombre="Materiales Cochabamba" valor="Bs 68" />
-        <FilaMock nombre="Distribuidora Bolivia" valor="Bs 71" />
+        <FilaMock nombre="Ferretería A" valor="Bs 62" activo />
+        <FilaMock nombre="Ferretería B" valor="Bs 68" />
+        <FilaMock nombre="Distribuidora C" valor="Bs 71" />
       </div>
     </div>
   );
@@ -200,7 +200,7 @@ export function ComoFunciona() {
                     <span
                       className={cn(
                         "text-[11px] tracking-[0.3em] transition-colors duration-500",
-                        i === activo ? "text-oxido" : "text-oliva group-hover:text-arena",
+                        i === activo ? "oxido-legible text-oxido" : "text-oliva group-hover:text-arena",
                       )}
                     >
                       {String(i + 1).padStart(2, "0")}
@@ -254,7 +254,7 @@ export function ComoFunciona() {
         <ScrollStagger stagger={0.09} className="mt-10 flex flex-col">
           {t.comoFunciona.pasos.map((paso, i) => (
             <div key={i} className="border-t border-yeso/8 py-7 first:border-t-0">
-              <p className="text-[11px] tracking-[0.3em] text-oxido">{String(i + 1).padStart(2, "0")}</p>
+              <p className="oxido-legible text-[11px] tracking-[0.3em] text-oxido">{String(i + 1).padStart(2, "0")}</p>
               <h3 className="mt-3 text-[17px] font-normal text-yeso">{paso.titulo}</h3>
               <p className="mt-2 text-sm leading-relaxed text-oliva">{paso.descripcion}</p>
             </div>
