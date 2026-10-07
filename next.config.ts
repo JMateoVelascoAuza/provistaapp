@@ -6,6 +6,7 @@ const exportHosting = process.env.STATIC_EXPORT === "hosting";
 const desarrollo = process.env.NODE_ENV === "development";
 
 const nextConfig: NextConfig = {
+  agentRules: false,
   pageExtensions: desarrollo ? ["dev.tsx", "tsx", "ts", "jsx", "js"] : ["tsx", "ts", "jsx", "js"],
   env: {
     NEXT_PUBLIC_STATIC_EXPORT: exportEstatico ? "1" : "0",
