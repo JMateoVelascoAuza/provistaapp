@@ -1,15 +1,8 @@
 import { cn } from "@/lib/utils";
 import marco from "./iphone-marco.webp";
 
-// Medidas de la pantalla dentro de `iphone-marco.webp`, en fracción de
-// la imagen (sacadas del archivo original píxel a píxel). La pantalla
-// del marco es transparente: la app se pinta debajo y la isla y la
-// barra de estado del dibujo quedan encima, como en un teléfono real.
 const PANTALLA = { left: 0.040097, top: 0.016106, width: 0.919807, height: 0.967787, radioX: 0.14496, radioY: 0.06657 };
 
-// La capa de la app se mete un poco bajo el bisel negro del marco: así
-// el filo antialiasado del contenido queda tapado y no asoma una línea
-// clara entre la pantalla y el borde del teléfono.
 const SANGRADO = 0.003;
 export const CAPA_APP = {
   left: PANTALLA.left - SANGRADO,
@@ -20,22 +13,13 @@ export const CAPA_APP = {
   radioY: PANTALLA.radioY,
 };
 
-// La app se diseña a tamaño lógico de iPhone (393 pt de ancho) y se
-// escala para calzar en la pantalla, así el texto y los espacios
-// guardan proporciones reales en cualquier tamaño de marco.
 export const ANCHO_APP = 393;
 
 
 const pct = (v: number) => `${v * 100}%`;
 
-// Alto lógico que corresponde a la capa de la app con ese ancho.
 const ALTO_APP = Math.round((ANCHO_APP * CAPA_APP.height * marco.height) / (CAPA_APP.width * marco.width));
 
-/**
- * El ancho sale de la variable `--ancho` (número de píxeles, sin
- * unidad, porque también calcula la escala de la app). Quien lo usa la
- * define con clases, p. ej. `[--ancho:240] lg:[--ancho:280]`.
- */
 export function PhoneFrame({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div
@@ -75,7 +59,6 @@ export function PhoneFrame({ children, className }: { children: React.ReactNode;
           {children}
         </div>
       </div>
-      {/* eslint-disable-next-line @next/next/no-img-element -- la build estática (file://) no admite next/image optimizado */}
       <img
         src={marco.src}
         alt=""

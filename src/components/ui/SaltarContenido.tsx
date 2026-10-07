@@ -2,7 +2,6 @@
 
 import { useIdioma } from "@/lib/preferencias";
 
-/** Primer elemento con Tab: lleva al contenido principal sin recorrer el menú. */
 export function SaltarContenido() {
   const { t } = useIdioma();
   return (

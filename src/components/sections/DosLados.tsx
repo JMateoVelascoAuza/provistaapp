@@ -14,19 +14,11 @@ import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Textos en t.dosLados.lados (mismo orden).
 const LADOS: { tipo: TipoUsuario; textura: Textura }[] = [
   { tipo: "obra", textura: "malla" },
   { tipo: "proveedor", textura: "deposito" },
 ];
 
-/**
- * El punto de decisión de la página. Las dos tarjetas quedan a cada
- * lado del monograma: Entreobra está, literalmente, entre la obra y el
- * proveedor. Al entrar en pantalla las tarjetas llegan desde los
- * costados hacia el centro; al pasar el mouse, el lado elegido crece y
- * el otro se atenúa.
- */
 export function DosLados() {
   const ref = useRef<HTMLDivElement>(null);
   const reducido = usePrefersReducedMotion();

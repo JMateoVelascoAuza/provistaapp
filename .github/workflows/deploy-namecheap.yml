@@ -1,12 +1,3 @@
-# Publica entreobra.com en Namecheap (hosting estático) en cada push a main.
-#
-# Configurar una sola vez en GitHub → Settings → Secrets and variables → Actions:
-#   Secrets:   FTP_SERVER    (ej: ftp.entreobra.com o el servidor que da cPanel)
-#              FTP_USERNAME  (cuenta FTP de cPanel)
-#              FTP_PASSWORD
-#   Variables: NEXT_PUBLIC_APPS_SCRIPT_URL  (la URL /exec del Apps Script del cliente)
-#
-# Sin los secrets, el trabajo se detiene con un aviso y no publica nada.
 name: Publicar en Namecheap
 
 on:

@@ -1,7 +1,3 @@
-// Después de `npm run build:hosting`. Con trailingSlash, Next 16 exporta los
-// datos de cada segmento en carpetas ("demo/__next.demo/__PAGE__.txt") pero
-// el navegador los pide con punto ("demo/__next.demo.__PAGE__.txt") y recibe
-// 404. Se deja una copia con el nombre que se pide.
 import fs from "node:fs";
 import path from "node:path";
 

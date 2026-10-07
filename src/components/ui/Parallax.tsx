@@ -8,13 +8,6 @@ import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/**
- * Desplaza el contenido a otra velocidad que el scroll normal mientras
- * su sección padre pasa por la pantalla. Es puro movimiento decorativo
- * ligado al scroll (vía `scrub`) — no esconde ni revela nada, así que
- * no aplica ninguna de las precauciones de FOUC de `ScrollReveal`.
- * Con `prefers-reduced-motion` no se aplica ningún desplazamiento.
- */
 export function Parallax({
   children,
   speed = 0.3,

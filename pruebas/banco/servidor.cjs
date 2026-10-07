@@ -1,8 +1,3 @@
-// Banco de pruebas local de los formularios de Entreobra (npm run banco).
-// Con `npm run dev:banco` en otra terminal, la landing también le envía.
-// Ejecuta el apps-script/Code.gs REAL (se relee en cada envío) contra una hoja
-// simulada con las mismas columnas que la del cliente, y muestra la hoja y los
-// correos de aviso en http://localhost:5050/hoja (se actualiza sola).
 const http = require("http"), fs = require("fs"), path = require("path"), vm = require("vm");
 
 const PROYECTO = path.resolve(__dirname, "..", "..");
@@ -12,7 +7,6 @@ const PUERTO = 5050;
 const SITIO = "http://localhost:3000";
 const CLIENTE = ["Fecha", "Ferreteria", "Contacto", "WhatsApp", "Zona", "Correo", "Categoria", "Material", "Medida/variante", "Marca", "Unidad", "Precio (Bs)", "Stock (Si/No)", "Entrega a obra (Si/No)"];
 
-// ---------- Hoja simulada (persistida en hoja-prueba.json) ----------
 function estadoInicial() { return { hojas: { "Hoja 1": [CLIENTE.slice()] }, orden: ["Hoja 1"], correos: [], envios: [] }; }
 let estado = fs.existsSync(DATOS) ? JSON.parse(fs.readFileSync(DATOS, "utf8")) : estadoInicial();
 const guardar = () => fs.writeFileSync(DATOS, JSON.stringify(estado, null, 1));
@@ -37,12 +31,11 @@ function hoja(nombre) {
 }
 
 function fechaLaPaz(d) {
-  const x = new Date(d.getTime() - 4 * 3600 * 1000); // America/La_Paz, UTC-4 sin horario de verano
+  const x = new Date(d.getTime() - 4 * 3600 * 1000);
   const p = (n) => String(n).padStart(2, "0");
   return `${x.getUTCFullYear()}-${p(x.getUTCMonth() + 1)}-${p(x.getUTCDate())} ${p(x.getUTCHours())}:${p(x.getUTCMinutes())}:${p(x.getUTCSeconds())}`;
 }
 
-// Caché de Apps Script (límite de envíos por hora), en memoria mientras corre el banco.
 const cache = new Map();
 
 function ejecutar(funcion, evento) {
@@ -61,11 +54,10 @@ function ejecutar(funcion, evento) {
     console: { log: () => {}, warn: (m) => console.warn("[Code.gs]", m) },
   };
   vm.createContext(ctx);
-  vm.runInContext(fs.readFileSync(CODIGO, "utf8"), ctx); // siempre la versión actual del script
+  vm.runInContext(fs.readFileSync(CODIGO, "utf8"), ctx);
   return ctx[funcion](evento);
 }
 
-// ---------- HTTP ----------
 const CORS = { "access-control-allow-origin": "*", "access-control-allow-headers": "content-type" };
 
 http.createServer((req, res) => {
@@ -104,7 +96,6 @@ http.createServer((req, res) => {
     res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
     return res.end(fs.readFileSync(path.join(__dirname, "hoja.html")));
   }
-  // Página de registro real, apuntando a este banco de pruebas.
   if (url.pathname === "/registro/" || url.pathname === "/registro/index.html") {
     const html = fs.readFileSync(path.join(PROYECTO, "registro/index.html"), "utf8")
       .replace('APPS_SCRIPT_URL: "",', `APPS_SCRIPT_URL: "http://localhost:${PUERTO}/exec",`);
@@ -115,6 +106,5 @@ http.createServer((req, res) => {
     const f = path.join(PROYECTO, "public", url.pathname);
     if (fs.existsSync(f)) { res.writeHead(200, { "content-type": "font/woff2" }); return res.end(fs.readFileSync(f)); }
   }
-  // Lo demás (páginas legales enlazadas desde el registro) vive en el sitio.
   res.writeHead(302, { location: SITIO + url.pathname }); res.end();
 }).listen(PUERTO, () => console.log(`Banco de pruebas: hoja en http://localhost:${PUERTO}/hoja · registro en http://localhost:${PUERTO}/registro/`));

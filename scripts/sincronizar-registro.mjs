@@ -1,7 +1,3 @@
-// Copia registro/index.html a public/registro/index.html (lo que se publica)
-// y le escribe la URL del Google Apps Script, la misma que usa la landing:
-// NEXT_PUBLIC_APPS_SCRIPT_URL en .env.production.local / .env.local.
-// Corre solo antes de `npm run dev` y de cada build (ver package.json).
 import fs from "node:fs";
 import path from "node:path";
 

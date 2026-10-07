@@ -6,21 +6,6 @@ import { Download, PlusSquare, Share2, X } from "lucide-react";
 import { useIdioma } from "@/lib/preferencias";
 import { usePwaInstall } from "@/lib/usePwaInstall";
 
-/**
- * Botón flotante + modal para instalar la PWA. Dos caminos reales,
- * bien distintos, por eso el modal se adapta:
- *
- * - Chrome/Edge/Android disparan `beforeinstallprompt` cuando ELLOS
- *   deciden que la app es instalable — ahí hay un botón nativo real
- *   ("Instalar Entreobra" → `instalar()`).
- * - Safari en iOS nunca dispara ese evento, así que ahí no hay
- *   instalación con un clic: se explican los pasos manuales (compartir
- *   → agregar a pantalla de inicio).
- *
- * En cualquier otro navegador (desktop sin soporte, ya instalada, etc.)
- * el botón no se muestra — no se promete algo que ese navegador no puede.
- */
-
 export function InstalarPwa() {
   const { puedeInstalarNativo, instalada, esIOS, instalar } = usePwaInstall();
   const [abierto, setAbierto] = useState(false);

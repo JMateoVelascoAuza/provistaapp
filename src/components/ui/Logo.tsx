@@ -5,12 +5,6 @@ import { cn } from "@/lib/utils";
 
 type Fondo = "carbon" | "yeso";
 
-/**
- * Monograma de corchetes (manual de marca, "Ícono"): los corchetes en
- * óxido encierran una E de trazo fino — clara sobre carbón, oscura sobre
- * yeso. `mono` lo pinta todo de un solo color (currentColor) y `grueso`
- * engrosa el trazo para tamaños chicos, como pide el manual.
- */
 export function Monograma({
   className,
   fondo = "carbon",
@@ -44,22 +38,6 @@ const BAJADA = "Materiales de obra";
 type Variante = "principal" | "sin-bajada" | "icono" | "solo-icono";
 type Animacion = "no" | "carga" | "scroll";
 
-/**
- * Logotipo según el manual de marca: Jost Light en versalitas
- * espaciadas. `tamano` es el cuerpo del nombre en px (o se hereda del
- * font-size de `className`, para tamaños responsive); el interletrado y
- * la bajada salen de las proporciones del manual (interletrado 9 px y
- * bajada a 7 px sobre el logo de referencia), así se ve igual a
- * cualquier tamaño.
- *
- * Variantes del manual: `principal` (con bajada), `sin-bajada`
- * (encabezados), `icono` (barra de navegación) y `solo-icono`.
- *
- * `animado`: "carga" anima al montar; "scroll" espera a que el logo
- * entre en pantalla. Los corchetes se abren desde la E, la E se dibuja
- * y las letras entran una a una. Al pasar el mouse los corchetes se
- * separan — la plataforma está *entre* la obra y el proveedor.
- */
 export function Logo({
   variante = "icono",
   tamano,

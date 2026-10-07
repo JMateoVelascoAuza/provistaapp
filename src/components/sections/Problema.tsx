@@ -12,16 +12,12 @@ import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Textos en t.problema.intercambios (mismo orden).
 const INTERCAMBIOS: { horaPregunta: string; horaRespuesta: string; esVisto?: boolean }[] = [
   { horaPregunta: "08:02", horaRespuesta: "08:47" },
   { horaPregunta: "08:49", horaRespuesta: "09:31" },
   { horaPregunta: "09:35", horaRespuesta: "10:49", esVisto: true },
 ];
 
-// Cada problema se enciende en un momento del chat: `momento` es el
-// índice del mensaje (pregunta 0, respuesta 0, pregunta 1, ...).
-// Textos en t.problema.dolores (mismo orden).
 const DOLORES = [{ momento: 0 }, { momento: 1 }, { momento: 3 }, { momento: 5 }];
 
 const CHATS = [
@@ -31,7 +27,6 @@ const CHATS = [
   { nombre: "Fletes D", sinLeer: 3 },
 ];
 
-// 08:02 → 10:49: lo que lleva la obra esperando al final del chat.
 const ESPERA_TOTAL = 167;
 
 function formatoEspera(minutos: number) {
@@ -54,12 +49,6 @@ function PuntosTipeo() {
   );
 }
 
-/**
- * El chat es el problema en vivo; la lista de la izquierda es su
- * lectura. A medida que el chat avanza, cada problema se enciende en el
- * mensaje que lo provoca, y el contador de espera corre con las horas
- * de los mensajes hasta el "Visto" sin respuesta.
- */
 export function Problema() {
   const ref = useRef<HTMLDivElement>(null);
   const chatRef = useRef<HTMLDivElement>(null);
@@ -80,9 +69,6 @@ export function Problema() {
       const contador = el.querySelector<HTMLElement>("[data-espera]");
       const cierre = el.querySelector<HTMLElement>("[data-cierre]");
 
-      // Siempre se anima, aunque la página cargue con el chat ya en
-      // pantalla (recarga a mitad de página): ScrollTrigger lo dispara al
-      // instante en ese caso.
       if (reducido) return;
 
       gsap.set(preguntas, { opacity: 0, y: 10 });
@@ -90,8 +76,6 @@ export function Problema() {
       gsap.set(respuestas, { opacity: 0, y: 6, scale: 0.95 });
       gsap.set(dolores, { opacity: 0.35 });
       gsap.set(barras, { scaleY: 0 });
-      // El color final sale del CSS del tema activo (en el claro el óxido
-      // de texto es más oscuro, para que se lea).
       const acento = numeros[0] ? getComputedStyle(numeros[0]).color : "#c2410c";
       gsap.set(numeros, { color: "#696c63" });
       if (cierre) gsap.set(cierre, { opacity: 0, y: 8 });

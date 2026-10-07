@@ -48,11 +48,6 @@ function PiezaCategoria({ categoria, numero }: { categoria: (typeof CATEGORIAS)[
   );
 }
 
-/**
- * Pieza del centro: la que Flip lleva a pantalla completa. El texto usa
- * unidades `cqw` (relativas al ancho de la propia pieza), así crece
- * junto con ella durante el zoom en vez de quedar chico en el medio.
- */
 function PiezaCentral() {
   const { t } = useIdioma();
   return (
@@ -76,17 +71,6 @@ function PiezaCentral() {
   );
 }
 
-/**
- * Desktop: adaptación del "Scrubbed Bento Gallery" de GreenSock. La
- * grilla se fija en pantalla y, con el scroll, Flip la lleva de su
- * estado bento al de `.bento--final` (ver globals.css): la pieza
- * central se agranda hasta llenar el viewport y las seis categorías
- * salen por los bordes. `expoScale` hace que el zoom se sienta parejo
- * de punta a punta. Flip guarda medidas en píxeles, así que la
- * animación se rearma cuando cambia el tamaño de la ventana.
- *
- * Mobile: grilla de dos columnas sin pin, con una entrada escalonada.
- */
 export function Materiales() {
   const seccionRef = useRef<HTMLElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -103,8 +87,6 @@ export function Materiales() {
       window.clearTimeout(espera);
       espera = window.setTimeout(() => {
         const cambioAncho = window.innerWidth !== ancho;
-        // En mobile la barra del navegador cambia el alto al scrollear;
-        // ahí solo importa el ancho.
         const cambioAlto = window.innerHeight !== alto && window.innerWidth >= 1024;
         ancho = window.innerWidth;
         alto = window.innerHeight;
@@ -151,10 +133,6 @@ export function Materiales() {
         }
         tl.to({}, { duration: 0.3 });
 
-        // Este pin se arma después que los de las secciones de abajo (se
-        // rehace al medir la ventana): sin reordenar, esas secciones
-        // calculan su posición sin el espacio que agrega este pin y sus
-        // animaciones se disparan antes de tiempo o se superponen.
         ScrollTrigger.sort();
         ScrollTrigger.refresh();
 

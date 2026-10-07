@@ -8,11 +8,6 @@ import { LimpiarServiceWorkerDev } from "@/components/ui/LimpiarServiceWorkerDev
 import { PreferenciasProvider, SCRIPT_PREFERENCIAS } from "@/lib/preferencias";
 import "./globals.css";
 
-// Jost autohospedada vía `@font-face` en `fuentes.css` — no
-// `next/font/local` (no admite el assetPrefix relativo que necesita la
-// build estática sin servidor) ni `next/font/google` (depende de
-// internet en cada build).
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://entreobra.com"),
   title: "Entreobra — Entre tu obra y tu proveedor",
@@ -46,8 +41,6 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // suppressHydrationWarning: el script del <head> cambia `lang` y los
-    // atributos de tema/idioma antes de que React hidrate.
     <html lang="es" className="antialiased" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_PREFERENCIAS }} />

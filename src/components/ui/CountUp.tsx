@@ -3,19 +3,6 @@
 import { useEffect, useState } from "react";
 import { usePrefersReducedMotion } from "@/lib/usePrefersReducedMotion";
 
-/**
- * Cuenta de `desde` (0 por defecto) al valor final al montar (tras
- * `retraso` ms). Los montos en Bs arrancan de un valor parcial para que
- * nunca se vea "Bs 0". El servidor
- * manda el valor final directo (sin JS no hay animación, pero el número
- * correcto igual se ve) — el conteo es un efecto visual encima, no un
- * gate de visibilidad del contenido.
- *
- * Sin guardas de "ya corrí" con useRef: en StrictMode (dev) el efecto
- * se invoca, limpia y vuelve a invocar — una guarda así deja el segundo
- * montaje sin arrancar y el número pegado en 0. La limpieza de abajo ya
- * cancela el frame viejo correctamente.
- */
 export function CountUp({
   value,
   duration = 1400,
@@ -34,8 +21,6 @@ export function CountUp({
 
   useEffect(() => {
     if (reducido || value === 0) {
-      // Si la preferencia llega después del primer render, deja el valor final.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplay(value);
       return;
     }

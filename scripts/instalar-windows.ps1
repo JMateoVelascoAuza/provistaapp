@@ -1,23 +1,4 @@
-﻿#requires -Version 5.1
-<#
-  Entreobra — instala el entorno de trabajo completo en Windows 10/11.
-
-  Qué hace (salta lo que ya esté instalado):
-    1. Git, Node.js LTS, GitHub CLI y Visual Studio Code (con winget).
-    2. Las extensiones de VS Code del proyecto.
-    3. Coloca el proyecto: lo usa si este script ya está dentro de él, lo
-       descomprime desde entreobra-proyecto.zip si está al lado, o lo clona
-       de GitHub.
-    4. Instala las dependencias (npm ci) y verifica que todo funcione.
-
-  Uso: doble clic en INSTALAR.bat, o en PowerShell:
-    powershell -ExecutionPolicy Bypass -File instalar-windows.ps1
-  Opciones:
-    -Destino "D:\Proyectos\provista-landing"   (carpeta del proyecto)
-    -SinVSCode                                  (no instala VS Code)
-    -SoloProyecto                               (salta las herramientas: solo proyecto y dependencias)
-#>
-param(
+﻿param(
   [string]$Destino = (Join-Path $env:USERPROFILE "StudioProjects\provista-landing"),
   [switch]$SinVSCode,
   [switch]$SoloProyecto
@@ -41,7 +22,6 @@ function Instalar-Winget($id, $nombre, $comando) {
   if (Tiene $comando) { Ok "$nombre ya está instalado"; return }
   Write-Host "    Instalando $nombre..."
   winget install --id $id -e --source winget --accept-package-agreements --accept-source-agreements --silent
-  # -1978335189 y -1978335135: winget dice que ya estaba instalado / sin actualización.
   if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne -1978335189 -and $LASTEXITCODE -ne -1978335135) {
     throw "No se pudo instalar $nombre (winget devolvió $LASTEXITCODE)."
   }
@@ -60,7 +40,6 @@ Write-Host "  ENTREOBRA · instalación del entorno de trabajo" -ForegroundColor
 Write-Host "  ---------------------------------------------" -ForegroundColor DarkGray
 
 if (-not $SoloProyecto) {
-# ---------------------------------------------------------------------------
 Paso "1/5 Comprobando winget"
 if (-not (Tiene "winget")) {
   Aviso "Falta winget (Instalador de aplicaciones de Microsoft)."
@@ -70,7 +49,6 @@ if (-not (Tiene "winget")) {
 }
 Ok "winget disponible"
 
-# ---------------------------------------------------------------------------
 Paso "2/5 Herramientas"
 Instalar-Winget "Git.Git" "Git" "git"
 Instalar-Winget "OpenJS.NodeJS.LTS" "Node.js LTS" "node"
@@ -81,7 +59,6 @@ $nodeMayor = [int]((& node -v).TrimStart("v").Split(".")[0])
 if ($nodeMayor -lt 20) { throw "Node $(& node -v) es muy viejo: el proyecto necesita 20.9 o más. Actualízalo con: winget upgrade OpenJS.NodeJS.LTS" }
 Ok "Node $(& node -v) · npm $(& npm.cmd -v) · $(& git --version)"
 
-# Identidad de git (para que los commits salgan a tu nombre)
 $nombreGit = (& git config --global user.name) 2>$null
 if (-not $nombreGit) {
   $nombreGit = Read-Host "    Tu nombre para git (ej. Mateo Velasco)"
@@ -92,11 +69,9 @@ if (-not $correoGit) {
   $correoGit = Read-Host "    Tu correo de GitHub"
   if ($correoGit) { & git config --global user.email "$correoGit" }
 }
-# Rutas de más de 260 caracteres (node_modules profundos) en Windows.
 & git config --global core.longpaths true
 Ok "git configurado como: $(& git config --global user.name) <$(& git config --global user.email)>"
 
-# ---------------------------------------------------------------------------
 if (Tiene "code") {
   foreach ($ext in @("dbaeumer.vscode-eslint", "bradlc.vscode-tailwindcss")) {
     & code --install-extension $ext --force | Out-Null
@@ -106,7 +81,6 @@ if (Tiene "code") {
 
 }
 
-# ---------------------------------------------------------------------------
 Paso "3/5 Proyecto"
 $padre = Split-Path $PSScriptRoot -Parent
 if (Test-Path (Join-Path $padre "package.json")) {
@@ -134,7 +108,6 @@ else {
 Set-Location $Proyecto
 Ok "Rama actual: $(& git branch --show-current)"
 
-# ---------------------------------------------------------------------------
 Paso "4/5 Dependencias del proyecto (npm ci)"
 Ejecutar "npm ci" { & npm.cmd ci --no-audit --no-fund }
 Ok "Dependencias instaladas"
@@ -151,10 +124,7 @@ if (-not (Test-Path $envProd)) {
 }
 else { Ok ".env.production.local presente" }
 
-# ---------------------------------------------------------------------------
 Paso "5/5 Verificación"
-# En PowerShell 5.1, redirigir la salida de error de npm con "Stop" corta el
-# script aunque la prueba pase: aquí solo importa el código de salida.
 $ErrorActionPreference = "Continue"
 $fallos = 0
 foreach ($p in @(@("Prueba del Apps Script", "prueba:script"), @("Tipos (TypeScript)", "typecheck"), @("Lint", "lint"))) {

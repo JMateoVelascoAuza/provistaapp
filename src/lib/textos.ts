@@ -1,10 +1,3 @@
-/*
- * Todos los textos visibles del sitio, en español e inglés. Los
- * componentes leen el diccionario del idioma elegido con `useIdioma()`.
- * Los arreglos van alineados por posición con los datos de cada sección.
- * El logo ("ENTREOBRA · MATERIALES DE OBRA") no se traduce: es la marca.
- */
-
 const es = {
   meta: {
     tituloLanding: "Entreobra — Entre tu obra y tu proveedor",

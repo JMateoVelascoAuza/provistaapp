@@ -1,34 +1,8 @@
-/**
- * Entreobra — Recibe los dos formularios del sitio (solo si traen
- * consentimiento: true) y avisa por correo a la cuenta dueña del script:
- *  - Registro de productos (registro/index.html) → pestaña "Hoja 1".
- *  - Acceso anticipado de la landing (tipo: "acceso") → pestaña "Acceso anticipado".
- *
- * Cada dato se escribe en la columna que lleva su nombre (no por posición):
- * si alguien mueve o agrega columnas en la hoja, nada se corre. Si falta una
- * columna, se agrega al final. Además se guardan "ID envío" (para no duplicar
- * una lista reenviada) y "Acepta privacidad" (prueba del consentimiento).
- *
- * Instalación (una vez, desde el editor de Apps Script):
- *  1. Ejecutar `configurar`: pide los permisos, da formato a la hoja, crea el
- *     borrado automático de datos viejos y manda un correo de prueba.
- *  2. Implementar → Nueva implementación → Aplicación web, "Ejecutar como: Yo",
- *     "Quién tiene acceso: Cualquier persona".
- *
- * Si cambias los campos en el CONFIG del HTML, cambia también CAMPOS_FERRETERIA,
- * CAMPOS_PRODUCTO, CATEGORIAS y UNIDADES aquí abajo (mismas `key` y valores).
- * Después: Implementar → Administrar implementaciones → Editar → Nueva versión
- * (así la URL no cambia).
- */
-
-// ---------------------------------------------------------------------------
-// Configuración (debe coincidir con el CONFIG de registro/index.html)
-// ---------------------------------------------------------------------------
-var NOMBRE_HOJA = "Hoja 1";       // pestaña del cliente; si no existe, se usa/crea "Productos"
+var NOMBRE_HOJA = "Hoja 1";
 var HOJA_RESPALDO = "Productos";
 var ZONA_HORARIA = "America/La_Paz";
 var MAX_PRODUCTOS = 500;
-var MAX_CARACTERES_ENVIO = 400000; // ~500 productos con holgura; más grande se rechaza
+var MAX_CARACTERES_ENVIO = 400000;
 var HOJA_ACCESO = "Acceso anticipado";
 var TIPOS_ACCESO = { obra: "Estoy en obra", proveedor: "Vendo materiales" };
 var COLUMNA_FECHA = "Fecha";
@@ -36,20 +10,14 @@ var COLUMNA_ID = "ID envío";
 var COLUMNA_PRIVACIDAD = "Acepta privacidad";
 var ENCABEZADOS_ACCESO = [COLUMNA_FECHA, "Nombre", "Participa como", "WhatsApp", COLUMNA_PRIVACIDAD, COLUMNA_ID];
 
-// Aviso por correo de cada registro nuevo (acceso anticipado y listas de
-// productos). CORREO_AVISO vacío = la cuenta de Google dueña de este script.
 var AVISAR_POR_CORREO = true;
 var CORREO_AVISO = "";
 
-// Política de privacidad: los datos se conservan 24 meses. `borrarAntiguos`
-// corre cada día (lo programa `configurar`) y borra las filas más viejas.
 var MESES_RETENCION = 24;
 
-// Contra spam: la URL es pública. Máximo de envíos aceptados por hora.
 var ENVIOS_POR_HORA_POR_NUMERO = 10;
 var ENVIOS_POR_HORA_TOTAL = 300;
 
-// Listas cerradas (las mismas del registro).
 var CATEGORIAS = ["Cemento", "Fierro y acero", "Áridos", "Ladrillos y bloques", "Cerámicos", "Tuberías y sanitarios", "Otros"];
 var UNIDADES = ["bolsa", "varilla", "pieza", "m³", "m²", "metro", "rollo", "kg", "litro", "otra"];
 
@@ -72,16 +40,10 @@ var CAMPOS_PRODUCTO = [
   { key: "entrega",   columna: "Entrega a obra (Si/No)", tipo: "sino",   requerido: false },
 ];
 
-// ---------------------------------------------------------------------------
-// Entradas de la aplicación web
-// ---------------------------------------------------------------------------
-
-/** Para probar la URL en el navegador: debe mostrar ok: true. */
 function doGet() {
   return responder({ ok: true, servicio: "entreobra-registro" });
 }
 
-/** Recibe un envío (JSON en texto plano) y escribe una fila por producto. */
 function doPost(e) {
   var contenido = e && e.postData && e.postData.contents;
   if (contenido && contenido.length > MAX_CARACTERES_ENVIO) {
@@ -90,7 +52,7 @@ function doPost(e) {
 
   var candado = LockService.getScriptLock();
   try {
-    candado.waitLock(20000); // evita que dos envíos simultáneos se pisen
+    candado.waitLock(20000);
   } catch (err) {
     return responder({ ok: false, error: "Servidor ocupado. Intenta de nuevo en unos segundos." });
   }
@@ -103,17 +65,14 @@ function doPost(e) {
       return responder({ ok: false, error: "No pudimos leer el envío." });
     }
 
-    // Trampa para bots: si viene lleno, se responde ok sin escribir nada.
     if (datos && datos.honeypot) {
       return responder({ ok: true, id: String(datos.id || ""), filas: 0 });
     }
 
-    // Sin consentimiento expreso no se guarda nada (DS 1793, art. 56).
     if (!datos || datos.consentimiento !== true) {
       return responder({ ok: false, error: "Para enviar tus datos tienes que aceptar la Política de privacidad." });
     }
 
-    // Formulario de acceso anticipado de la landing.
     if (datos.tipo === "acceso") return guardarAcceso(datos);
 
     var limpio = validar(datos);
@@ -123,7 +82,6 @@ function doPost(e) {
     var columnas = prepararHoja(hoja, encabezados());
     var id = String(datos.id);
 
-    // Idempotencia: si este ID ya está en la hoja, no se duplica.
     if (idYaExiste(hoja, columnas, id)) {
       return responder({ ok: true, id: id, filas: limpio.productos.length, duplicado: true });
     }
@@ -144,7 +102,6 @@ function doPost(e) {
       return filaSegun(columnas, valores);
     });
 
-    // Todas las filas de una vez (más rápido y atómico que appendRow en bucle).
     hoja.getRange(hoja.getLastRow() + 1, 1, filas.length, columnas.length).setValues(filas);
     contarEnvio(f.whatsapp);
 
@@ -170,9 +127,6 @@ function doPost(e) {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Acceso anticipado (formulario de la landing)
-// ---------------------------------------------------------------------------
 function guardarAcceso(datos) {
   var nombre = texto(datos.nombre);
   var whatsappCrudo = texto(datos.whatsapp);
@@ -180,7 +134,6 @@ function guardarAcceso(datos) {
   var id = texto(datos.id);
   if (!nombre || !whatsappCrudo || !tipo) return responder({ ok: false, error: "Completa tu nombre, WhatsApp y cómo participas." });
   if (nombre.length > 120 || whatsappCrudo.length > 30 || !id || id.length > 64) return responder({ ok: false, error: "Datos inválidos." });
-  // La landing no valida el formato: si se reconoce, se guarda ordenado.
   var whatsapp = normalizarTelefono(whatsappCrudo) || whatsappCrudo;
 
   var hoja = obtenerHojaAcceso();
@@ -212,14 +165,6 @@ function guardarAcceso(datos) {
   return responder({ ok: true, id: id, filas: 1 });
 }
 
-// ---------------------------------------------------------------------------
-// Validación del lado del servidor (no se confía en la página)
-// ---------------------------------------------------------------------------
-
-/**
- * Revisa el envío de productos y devuelve los datos ya normalizados
- * ({ ferreteria, productos }) o { error } con el primer problema.
- */
 function validar(datos) {
   if (!datos || typeof datos !== "object") return { error: "Envío vacío." };
   if (!datos.id || String(datos.id).length > 64) return { error: "Falta el código de envío." };
@@ -289,7 +234,6 @@ function validar(datos) {
   return { ferreteria: ferreteria, productos: productos };
 }
 
-/** "76971774", "+591 7697-1774" → "+591 76971774". Internacional con + se deja. */
 function normalizarTelefono(v) {
   var limpio = texto(v).replace(/[\s\-().]/g, "");
   if (/^(\+?591)?[67]\d{7}$/.test(limpio)) return "+591 " + limpio.slice(-8);
@@ -297,7 +241,6 @@ function normalizarTelefono(v) {
   return "";
 }
 
-/** "si", "Si", "SÍ" → "Sí"; "no" → "No"; otra cosa → "". */
 function normalizarSiNo(v) {
   var t = sinTildes(v);
   if (t === "si") return "Sí";
@@ -305,7 +248,6 @@ function normalizarSiNo(v) {
   return "";
 }
 
-/** Devuelve la opción de la lista tal como está escrita ahí, sin importar mayúsculas ni tildes. */
 function buscarEnLista(lista, v) {
   var buscado = sinTildes(v);
   for (var i = 0; i < lista.length; i++) {
@@ -318,11 +260,6 @@ function sinTildes(v) {
   return texto(v).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ");
 }
 
-// ---------------------------------------------------------------------------
-// Límite de envíos (contra spam)
-// ---------------------------------------------------------------------------
-
-/** Devuelve un mensaje de error si se pasó del límite por hora, o "". */
 function revisarLimite(whatsapp) {
   try {
     var cache = CacheService.getScriptCache();
@@ -353,9 +290,6 @@ function claveNumero(whatsapp) {
   return "envios:" + texto(whatsapp).replace(/\D/g, "");
 }
 
-// ---------------------------------------------------------------------------
-// Hoja
-// ---------------------------------------------------------------------------
 function encabezados() {
   var cols = [COLUMNA_FECHA];
   CAMPOS_FERRETERIA.forEach(function (c) { cols.push(c.columna); });
@@ -364,7 +298,6 @@ function encabezados() {
   return cols;
 }
 
-/** "Hoja 1" (la del cliente) o, si no existe, "Productos" (se crea). */
 function obtenerHoja() {
   var libro = SpreadsheetApp.getActiveSpreadsheet();
   return libro.getSheetByName(NOMBRE_HOJA) || libro.getSheetByName(HOJA_RESPALDO) || libro.insertSheet(HOJA_RESPALDO);
@@ -375,11 +308,6 @@ function obtenerHojaAcceso() {
   return libro.getSheetByName(HOJA_ACCESO) || libro.insertSheet(HOJA_ACCESO);
 }
 
-/**
- * Deja en la fila 1 todos los encabezados esperados y devuelve los nombres de
- * las columnas en su orden actual. Si la hoja está vacía los escribe; si ya
- * tiene encabezados, solo agrega al final los que faltan (no mueve nada).
- */
 function prepararHoja(hoja, esperados) {
   if (hoja.getLastRow() === 0) {
     hoja.getRange(1, 1, 1, esperados.length).setValues([esperados]).setFontWeight("bold");
@@ -388,7 +316,6 @@ function prepararHoja(hoja, esperados) {
   }
   var ancho = Math.max(hoja.getLastColumn(), 1);
   var columnas = hoja.getRange(1, 1, 1, ancho).getValues()[0].map(function (c) { return String(c).trim(); });
-  // Celdas vacías al final de la fila 1 no cuentan como columnas.
   while (columnas.length && !columnas[columnas.length - 1]) columnas.pop();
   esperados.forEach(function (nombre) {
     if (columnas.indexOf(nombre) < 0) {
@@ -399,7 +326,6 @@ function prepararHoja(hoja, esperados) {
   return columnas;
 }
 
-/** Arma una fila en el orden de `columnas` con los valores por nombre de columna. */
 function filaSegun(columnas, valores) {
   return columnas.map(function (c) { return valores.hasOwnProperty(c) ? valores[c] : ""; });
 }
@@ -414,16 +340,6 @@ function idYaExiste(hoja, columnas, id) {
   return false;
 }
 
-// ---------------------------------------------------------------------------
-// Instalación y mantenimiento (se ejecutan desde el editor o por activador)
-// ---------------------------------------------------------------------------
-
-/**
- * Ejecutar UNA vez desde el editor (botón Ejecutar) con la cuenta dueña de la
- * hoja. Pide los permisos, ordena y da formato a las dos pestañas, programa el
- * borrado diario de datos viejos y manda un correo de prueba. Se puede volver
- * a ejecutar sin problema: no duplica nada.
- */
 function configurar() {
   var productos = obtenerHoja();
   var columnasProductos = prepararHoja(productos, encabezados());
@@ -441,7 +357,6 @@ function configurar() {
   console.log("Listo: hoja con formato, borrado diario programado y correo de prueba enviado.");
 }
 
-/** Encabezados en negrita, fijos y protegidos; fechas, precios y Sí/No con formato. */
 function darFormato(hoja, columnas) {
   var filas = Math.max(hoja.getMaxRows() - 1, 1);
   hoja.getRange(1, 1, 1, columnas.length).setFontWeight("bold");
@@ -455,8 +370,6 @@ function darFormato(hoja, columnas) {
     if (col(nombre)) hoja.getRange(2, col(nombre), filas, 1).setDataValidation(siNo);
   });
 
-  // Protección "solo advertencia": quien edite un encabezado ve un aviso,
-  // porque cambiarlo haría que el script cree otra columna.
   var descripcion = "Encabezados de Entreobra (los usa el script)";
   hoja.getProtections(SpreadsheetApp.ProtectionType.RANGE).forEach(function (p) {
     if (p.getDescription() === descripcion) p.remove();
@@ -464,10 +377,6 @@ function darFormato(hoja, columnas) {
   hoja.getRange(1, 1, 1, columnas.length).protect().setDescription(descripcion).setWarningOnly(true);
 }
 
-/**
- * Borra las filas con más de MESES_RETENCION meses (lo promete la Política de
- * privacidad). La programa `configurar` para que corra cada día.
- */
 function borrarAntiguos() {
   var limite = new Date();
   limite.setMonth(limite.getMonth() - MESES_RETENCION);
@@ -479,7 +388,6 @@ function borrarAntiguos() {
     var colFecha = columnas.indexOf(COLUMNA_FECHA) + 1;
     if (!colFecha) return;
     var fechas = hoja.getRange(2, colFecha, ultima - 1, 1).getValues();
-    // De abajo hacia arriba, agrupando filas seguidas para borrar en bloque.
     for (var i = fechas.length - 1; i >= 0; i--) {
       if (!esAnterior(fechas[i][0], limite)) continue;
       var fin = i;
@@ -492,7 +400,6 @@ function borrarAntiguos() {
   return borradas;
 }
 
-/** La celda de fecha es anterior al límite. Si no se entiende la fecha, no se borra. */
 function esAnterior(valor, limite) {
   var fecha = null;
   if (Object.prototype.toString.call(valor) === "[object Date]") {
@@ -504,14 +411,10 @@ function esAnterior(valor, limite) {
   return !!fecha && !isNaN(fecha.getTime()) && fecha < limite;
 }
 
-// ---------------------------------------------------------------------------
-// Utilidades
-// ---------------------------------------------------------------------------
 function texto(v) {
   return v === null || v === undefined ? "" : String(v).trim();
 }
 
-/** Evita que la hoja interprete una celda como fórmula (=, +, -, @). */
 function sanear(v) {
   var s = texto(v);
   return /^[=+\-@]/.test(s) ? "'" + s : s;
@@ -522,10 +425,6 @@ function textoPrivacidad(version) {
   return "Sí" + (v ? " (versión " + sanear(v) + ")" : "");
 }
 
-/**
- * Manda el aviso por correo. Si falla (por ejemplo, se acabó la cuota diaria
- * de Gmail), el registro ya quedó guardado: solo se anota el error.
- */
 function avisar(asunto, lineas) {
   if (!AVISAR_POR_CORREO) return;
   try {
@@ -538,7 +437,6 @@ function avisar(asunto, lineas) {
   }
 }
 
-/** Manda un correo de prueba a la cuenta dueña del script (también lo hace `configurar`). */
 function probarAviso() {
   avisar("Entreobra: prueba de aviso", ["Si te llegó este correo, los avisos de registros nuevos funcionan."]);
 }

@@ -11,13 +11,11 @@ import { cn } from "@/lib/utils";
 const ENLACE = "text-carbon underline decoration-arena underline-offset-4 transition-colors hover:decoration-oxido";
 const DOCUMENTOS = Object.keys(RUTAS_LEGALES) as DocumentoLegal[];
 
-/** Convierte los marcadores {contacto}, {privacidad}, etc. de los textos legales en enlaces. */
 function conEnlaces(texto: string, idioma: "es" | "en"): ReactNode[] {
   const l = LEGAL[idioma];
   return texto.split(/(\{[a-z]+\})/).map((parte, i) => {
     const clave = parte.slice(1, -1);
     if (clave === "correo") return <a key={i} href={`mailto:${NEGOCIO.correo}`} className={ENLACE}>{NEGOCIO.correo}</a>;
-    // "a correo o por WhatsApp al número", o solo WhatsApp mientras no haya correo.
     if (clave === "contacto") {
       const conectores = idioma === "es" ? ["a ", " o por WhatsApp al ", "por WhatsApp al "] : ["at ", " or on WhatsApp at ", "on WhatsApp at "];
       return NEGOCIO.correo ? (
@@ -41,7 +39,6 @@ export function PaginaLegal({ documento }: { documento: DocumentoLegal }) {
   const l = LEGAL[idioma];
   const doc = l.documentos[documento];
 
-  // Solo se muestran los datos del negocio que ya están completos (ver NEGOCIO en datos.ts).
   const datosNegocio = [
     [l.responsable, NEGOCIO.razonSocial || NEGOCIO.nombreComercial],
     [l.nit, NEGOCIO.nit],
@@ -108,10 +105,6 @@ export function PaginaLegal({ documento }: { documento: DocumentoLegal }) {
   );
 }
 
-/**
- * Cuerpo de una sección. Cuando trae lista y párrafos, el primer párrafo
- * presenta la lista si termina en ":"; si no, los párrafos van después.
- */
 function Cuerpo({ seccion, idioma }: { seccion: { parrafos?: string[]; lista?: string[] }; idioma: "es" | "en" }) {
   const parrafos = seccion.parrafos ?? [];
   const introduce = parrafos[0]?.trim().endsWith(":");

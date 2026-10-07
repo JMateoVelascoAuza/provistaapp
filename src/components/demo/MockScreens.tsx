@@ -27,14 +27,6 @@ import { AHORRO, formatBs, PROVEEDORES } from "@/lib/datos";
 import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
-/*
- * Pantallas de la app a tamaño lógico de iPhone (393×856 pt — ver
- * PhoneFrame). Arriba queda libre la franja de la barra de estado del
- * marco (hora, isla, batería en blanco), por eso el encabezado es
- * carbón; abajo, la barra de pestañas también es oscura para que el
- * indicador de inicio claro del dibujo se lea.
- */
-
 type Pestana = { label: string; icono: LucideIcon };
 
 const ICONOS_COMPRADOR: LucideIcon[] = [House, Search, ShoppingCart, Building2];
@@ -61,12 +53,7 @@ function PantallaApp({
   children: React.ReactNode;
 }) {
   return (
-    // Fondo base carbón (no claro): al escalar, los bordes del encabezado
-    // y de la barra de pestañas se suavizan contra este fondo, y uno
-    // claro dejaba un hilo blanco pegado al marco.
     <div className="flex h-full flex-col bg-carbon font-sans text-carbon">
-      {/* Pantalla de ejemplo: divs y no header/main/nav, para no duplicar
-          las regiones reales de la página (lectores de pantalla). */}
       <div className="bg-carbon px-5 pb-5 pt-[58px] text-yeso">
         <div className="flex items-center justify-between">
           <Logo variante="icono" tamano={12} />
@@ -97,8 +84,6 @@ function PantallaApp({
   );
 }
 
-// Logos de ejemplo de las empresas: iniciales sobre el color de cada una
-// hasta tener los logos reales.
 const EMPRESAS_DEMO = [
   { iniciales: "FA", logo: "bg-oxido text-white", rating: 4.6 },
   { iniciales: "FB", logo: "bg-tierra text-yeso", rating: 4.4 },
@@ -190,7 +175,6 @@ export function MockInicio() {
   );
 }
 
-// Nombres en t.app.catalogo.productos (mismo orden).
 const PRODUCTOS_DEMO = [
   { precio: "Bs 62", textura: "tex-concreto", proveedores: 3 },
   { precio: "Bs 48", textura: "tex-fierro", proveedores: 4 },

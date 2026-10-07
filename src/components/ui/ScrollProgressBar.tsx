@@ -2,11 +2,6 @@
 
 import { useEffect, useRef } from "react";
 
-/**
- * Hilo de óxido sobre el header que se llena con el scroll. Escala con
- * `transform` (no `width`) directo sobre el nodo: no re-renderiza React
- * en cada evento de scroll.
- */
 export function ScrollProgressBar() {
   const barraRef = useRef<HTMLDivElement>(null);
 

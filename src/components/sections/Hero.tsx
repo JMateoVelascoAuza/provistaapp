@@ -13,9 +13,6 @@ import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Las etiquetas salen del diccionario (t.hero.metricas), en el mismo orden.
-// Solo datos verificables: 4 pasos (Cómo funciona), el ahorro del ejemplo del
-// comparador, 6 categorías y el acceso anticipado gratis (texto, no "Bs 0").
 const METRICAS = [
   { valor: 4, prefijo: "", sufijo: "", bs: false },
   { valor: AHORRO, prefijo: "", sufijo: "", bs: true },
@@ -32,10 +29,6 @@ export function Hero() {
   const reducido = usePrefersReducedMotion();
   const { idioma, t } = useIdioma();
 
-  // Al salir del hero, la fotografía se desplaza más lento que el
-  // contenido y el wordmark se aleja — profundidad sin cortes secos.
-  // Todo parte del estado renderizado (`gsap.to`): en scroll 0 se ve
-  // exactamente igual que el HTML del servidor.
   useGSAP(
     () => {
       const seccion = seccionRef.current;
@@ -49,8 +42,6 @@ export function Hero() {
         return;
       }
 
-      // Entrada: las letras suben desde el centro hacia afuera, saliendo
-      // de un desenfoque; después se enciende la capa de brillo.
       gsap.fromTo(
         letras,
         { opacity: 0, yPercent: 70, filter: "blur(14px)" },
@@ -67,8 +58,6 @@ export function Hero() {
       );
       if (brillo) gsap.to(brillo, { opacity: 1, duration: 1.2, delay: 1.6 });
 
-      // Al salir del hero: la foto va más lenta que el contenido, y las
-      // letras se separan desde el centro mientras se desvanecen.
       const scrollTrigger = {
         trigger: seccion,
         start: "top top",
@@ -97,14 +86,10 @@ export function Hero() {
     <section id="top" ref={seccionRef} data-zona="oscura" className="relative isolate overflow-hidden">
       <div ref={fondoRef} data-velo-claro className="absolute inset-x-0 top-[-6%] -z-10 h-[112%]">
         <Foto textura="encofrado" velo={0.28} />
-        {/* Viñeta: el texto siempre cae sobre la zona más oscura. */}
         <div className="absolute inset-0 bg-linear-to-r from-carbon/70 via-carbon/20 to-transparent" />
         <div className="absolute inset-0 bg-linear-to-b from-carbon/40 via-transparent to-carbon/50" />
       </div>
 
-      {/* Wordmark translúcido, grabado sobre el hormigón. Dos capas con
-          las mismas letras: la base y una de brillo que solo se ve donde
-          pasa la máscara (la luz que recorre la palabra). */}
       <div
         ref={wordmarkRef}
         aria-hidden
@@ -166,7 +151,6 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Barra de métricas flotante, apoyada en el borde del hero. */}
         <dl className="relative grid grid-cols-2 border-t border-yeso/8 bg-carbon/95 backdrop-blur-sm md:grid-cols-4">
           {METRICAS.map((m, i) => (
             <div

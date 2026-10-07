@@ -5,10 +5,6 @@ import { ArrowUp } from "lucide-react";
 import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
-/**
- * No existe hasta que el usuario scrollea lo suficiente — arranca oculto
- * tanto en servidor como en cliente, así que no hay parpadeo posible.
- */
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
   const { t } = useIdioma();

@@ -14,8 +14,6 @@ gsap.registerPlugin(ScrollTrigger);
 
 type Foco = { id: string; titulo: string; texto: string };
 
-// Cada id apunta a un `data-foco` dentro de la pantalla (MockScreens).
-// Los textos de cada paso y cada foco están en t.demo.pasos (mismo orden).
 const BASE: { Pantalla: () => React.ReactNode; focos: string[] }[] = [
   { Pantalla: MockInicio, focos: ["ahorro", "pedido-activo", "empresas", "obras"] },
   { Pantalla: MockCatalogo, focos: ["busqueda", "filtros", "producto"] },
@@ -39,9 +37,7 @@ const ASPECTO_TELEFONO = 2.069;
 const DESKTOP = 1024;
 const ZOOM_MIN = 1.6;
 const ZOOM_MAX = 4.2;
-// El detalle ocupa como máximo el 90% de la zona objetivo.
 const AIRE = 0.9;
-// Cuánto scroll (en altos de pantalla) dura cada unidad del timeline.
 const SCROLL_POR_UNIDAD = 0.3;
 
 function anchoTelefono() {
@@ -50,7 +46,6 @@ function anchoTelefono() {
   return Math.round(Math.min(250, window.innerWidth * 0.6, Math.max(160, ((alto - 64) * 0.52) / ASPECTO_TELEFONO)));
 }
 
-/** Posición de `el` respecto de `ancestro`, por layout (ignora transforms). */
 function offsetHasta(el: HTMLElement, ancestro: HTMLElement) {
   let x = 0;
   let y = 0;
@@ -63,12 +58,9 @@ function offsetHasta(el: HTMLElement, ancestro: HTMLElement) {
   return { x, y };
 }
 
-/** Caja del foco en coordenadas de la app (393 pt de ancho). */
 function rectEnApp(el: HTMLElement, app: HTMLElement) {
   const { x, y } = offsetHasta(el, app);
   let rect = { x, y, w: el.offsetWidth, h: el.offsetHeight };
-  // Contenedores cuyo padding es solo margen de la pantalla: el foco
-  // abraza el contenido, no el aire alrededor.
   if (el.hasAttribute("data-foco-interior")) {
     const cs = getComputedStyle(el);
     const [pl, pr, pt, pb] = [cs.paddingLeft, cs.paddingRight, cs.paddingTop, cs.paddingBottom].map(parseFloat);
@@ -78,17 +70,6 @@ function rectEnApp(el: HTMLElement, app: HTMLElement) {
   return { x: rect.x - margen, y: rect.y - margen, w: rect.w + margen * 2, h: rect.h + margen * 2 };
 }
 
-/**
- * Recorrido estilo página de producto de Apple: la escena se fija en
- * pantalla y, con el scroll, el teléfono hace un zoom grande sobre una
- * parte de la app, explica qué hace, pasa a la siguiente parte, vuelve
- * a su tamaño, cambia de pantalla y repite. Todo es un único timeline
- * con `scrub`, así que va y vuelve con el scroll.
- *
- * El zoom se calcula midiendo cada `data-foco` y la zona `objetivo`
- * (dónde debe quedar centrado el detalle, definida por CSS según el
- * tamaño de pantalla), y se rearma cuando cambia la ventana.
- */
 function RecorridoAnimado() {
   const escenaRef = useRef<HTMLDivElement>(null);
   const objetivoRef = useRef<HTMLDivElement>(null);
@@ -118,8 +99,6 @@ function RecorridoAnimado() {
       window.clearTimeout(espera);
       espera = window.setTimeout(() => {
         const cambioAncho = window.innerWidth !== ancho;
-        // En mobile la barra del navegador cambia el alto al scrollear;
-        // ahí solo cuenta el ancho.
         const cambioAlto = window.innerHeight !== alto && window.innerWidth >= DESKTOP;
         ancho = window.innerWidth;
         alto = window.innerHeight;
@@ -146,8 +125,6 @@ function RecorridoAnimado() {
       const notas = notasRef.current as HTMLDivElement[];
       const textoNormal = [listaRef.current, pasoMovilRef.current, avisoRef.current].filter(Boolean) as HTMLElement[];
 
-      // Geometría: dónde está el teléfono, la pantalla dentro del marco
-      // y la zona donde tiene que quedar centrado cada detalle.
       const tel = offsetHasta(telefono, escena);
       const anchoTel = telefono.offsetWidth;
       const altoTel = telefono.offsetHeight;
@@ -194,7 +171,6 @@ function RecorridoAnimado() {
 
       let nota = 0;
       PASOS.forEach((paso, i) => {
-        // Cambio de pantalla, a tamaño normal.
         if (i === 0) {
           inicios.push(0);
         } else {
@@ -228,7 +204,6 @@ function RecorridoAnimado() {
           tl.to({}, { duration: 0.7 });
         });
 
-        // Vuelta al tamaño normal.
         const t = tl.duration();
         tl.to(telefono, { x: 0, y: 0, scale: 1, duration: 1, ease: "power3.inOut", force3D: false }, t);
         tl.to(notas[nota - 1], { opacity: 0, y: -16, duration: 0.3 }, t);
@@ -256,8 +231,6 @@ function RecorridoAnimado() {
         navRef.current = null;
       };
     },
-    // Con otro idioma cambian los tamaños dentro del teléfono: se vuelve a
-    // medir cada detalle.
     { scope: escenaRef, dependencies: [vista, idioma], revertOnUpdate: true },
   );
 
@@ -271,9 +244,6 @@ function RecorridoAnimado() {
 
   let indiceNota = 0;
 
-  // El envoltorio no es decorativo: si el padre de la escena fuera un
-  // flex (el body lo es), GSAP apaga el pinSpacing y el recorrido no
-  // ocupa scroll.
   return (
     <div>
       <div
@@ -281,7 +251,6 @@ function RecorridoAnimado() {
         className="relative h-svh overflow-hidden bg-yeso"
         style={{ "--ancho": String(vista.ancho) } as React.CSSProperties}
       >
-        {/* Zona donde queda centrado cada detalle al hacer zoom. */}
         <div
           ref={objetivoRef}
           aria-hidden
@@ -318,7 +287,6 @@ function RecorridoAnimado() {
           </div>
 
           <div className="relative z-20 h-[40%] shrink-0 lg:order-1 lg:h-auto">
-            {/* Desktop: la lista de pasos */}
             <div ref={listaRef} className="hidden h-full flex-col justify-center lg:flex">
               <p className="etiqueta text-oliva-oscuro">{t.demo.appPorDentro}</p>
               <div className="mt-8 flex flex-col">
@@ -357,7 +325,6 @@ function RecorridoAnimado() {
               </div>
             </div>
 
-            {/* Mobile: solo el paso actual */}
             <div ref={pasoMovilRef} className="relative h-full lg:hidden">
               {PASOS.map((paso, i) => (
                 <div
@@ -376,7 +343,6 @@ function RecorridoAnimado() {
               ))}
             </div>
 
-            {/* Notas de cada detalle, visibles durante el zoom */}
             {PASOS.map((paso, i) =>
               paso.focos.map((foco, j) => {
                 const indice = indiceNota++;
@@ -407,7 +373,6 @@ function RecorridoAnimado() {
           </div>
         </div>
 
-        {/* Velo: al hacer zoom, funde el teléfono bajo el texto */}
         <div
           ref={veloRef}
           aria-hidden
@@ -422,7 +387,6 @@ function RecorridoAnimado() {
   );
 }
 
-/** Sin animaciones (`prefers-reduced-motion`): cada pantalla con sus detalles, en lista. */
 function RecorridoEstatico() {
   const PASOS = usePasos();
   const { t } = useIdioma();

@@ -40,10 +40,8 @@ export function Formulario() {
   const { idioma, t } = useIdioma();
   const opcionesRef = useRef<(HTMLButtonElement | null)[]>([]);
 
-  // Los CTA de "Dos lados" llegan con el tipo ya elegido.
   useEffect(() => escucharTipoUsuario(setTipoUsuario), []);
 
-  // Grupo de radio accesible: las flechas cambian la opción y el foco.
   function alTeclaOpcion(e: KeyboardEvent<HTMLButtonElement>, i: number) {
     const paso = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
     if (!paso) return;
@@ -60,8 +58,6 @@ export function Formulario() {
     setError(null);
     setEnlaceWa(null);
 
-    // Sin servidor y sin la URL del script (vista previa local): el
-    // registro se completa mandando el mensaje por WhatsApp.
     if ((ES_EXPORT_ESTATICO || SIN_SERVIDOR) && !APPS_SCRIPT_URL) {
       window.open(linkWhatsapp, "_blank", "noopener,noreferrer");
       setEnlaceWa(linkWhatsapp);
@@ -71,12 +67,10 @@ export function Formulario() {
 
     setEstado("enviando");
     try {
-      // Con la URL del script (producción en hosting estático) se envía
-      // directo a la hoja de Google; si no, pasa por /api/registro.
       const respuesta = APPS_SCRIPT_URL
         ? await fetch(APPS_SCRIPT_URL, {
             method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" }, // evita el preflight CORS
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
               tipo: "acceso",
               id: nuevoIdEnvio(),
@@ -96,13 +90,11 @@ export function Formulario() {
 
       const data = await respuesta.json().catch(() => null);
       if (!respuesta.ok || (APPS_SCRIPT_URL && data?.ok !== true)) {
-        // El servidor responde en español; en inglés se muestra el genérico.
         throw new Error((idioma === "es" && data?.error) || t.formulario.errorGenerico);
       }
 
       setEstado("enviado");
     } catch (err) {
-      // `fetch` tira TypeError cuando no hay conexión con el servidor.
       const sinConexion = err instanceof TypeError;
       setError(
         sinConexion
@@ -159,9 +151,6 @@ export function Formulario() {
                 )}
               </div>
             ) : (
-              // onSubmit y no `action`: con `action`, React 19 vacía el
-              // formulario al terminar, y si el envío falla la persona
-              // pierde lo que escribió.
               <form
                 onSubmit={(e) => {
                   e.preventDefault();

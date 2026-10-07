@@ -10,30 +10,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 type Direccion = "up" | "left" | "right";
 
-/**
- * Revela contenido con GSAP + ScrollTrigger cuando entra en el viewport.
- *
- * A diferencia de un `IntersectionObserver` manual que esconde el
- * elemento vía una clase CSS presente desde el primer render (server Y
- * cliente), acá el estado "oculto" lo aplica `gsap.fromTo` recién cuando
- * el efecto corre — es decir, **solo si JS se ejecutó**. Sin JS el
- * elemento nunca se esconde (queda con su opacidad normal del HTML que
- * mandó el servidor).
- *
- * Si el elemento YA está a la vista en el momento en que este efecto
- * corre (páginas cortas, o esta sección cae dentro del primer viewport),
- * NO lo animamos con ScrollTrigger — lo mostramos directo. Esto evita un
- * bug real que encontramos: ScrollTrigger a veces calcula mal su propio
- * "ya lo pasamos, dispará ya" en ese caso puntual (confirmado hasta en
- * build de producción) y la sección se quedaba invisible para siempre,
- * porque nunca ocurre un scroll real que la saque de ese estado.
- */
 function yaVisible(el: HTMLElement) {
   const rect = el.getBoundingClientRect();
   return rect.top < window.innerHeight * 0.9;
 }
 
-/** Con `prefers-reduced-motion` el contenido se muestra directo, sin entrada. */
 function sinAnimar(el: HTMLElement) {
   return yaVisible(el) || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
@@ -94,7 +75,6 @@ export function ScrollReveal({
   );
 }
 
-/** Igual que ScrollReveal, pero anima directamente a los hijos con stagger. */
 export function ScrollStagger({
   children,
   className,

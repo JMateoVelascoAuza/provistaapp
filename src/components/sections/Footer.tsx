@@ -8,9 +8,6 @@ import { LEGAL, RUTAS_LEGALES, type DocumentoLegal } from "@/lib/legal";
 import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
-// Redes del cliente: completar `href` solo con cuentas confirmadas como
-// suyas. @entreobra en Instagram es de otra empresa (limpieza post-obra,
-// Brasil), así que no se enlaza. Sin ningún `href`, la columna no se muestra.
 const REDES: { label: string; href?: string }[] = [
   { label: "Instagram" },
   { label: "Facebook" },
@@ -18,8 +15,6 @@ const REDES: { label: string; href?: string }[] = [
 ];
 const REDES_CONFIRMADAS = REDES.filter((red) => red.href);
 
-// Los dos tratamientos del logo principal del manual: sobre yeso
-// (landing) y sobre carbón (demo).
 const TONOS = {
   claro: {
     footer: "border-arena bg-yeso",
@@ -88,9 +83,6 @@ export function Footer({ tono = "oscuro" }: { tono?: keyof typeof TONOS }) {
         )}
       </ScrollStagger>
 
-      {/* Sin animación de entrada: al final de la página nunca llega al
-          punto que la dispara, y quedaba invisible y corrida hacia abajo
-          (dejaba ver el fondo del body bajo el footer). */}
       <div className="contenedor">
         <div
           className={cn(

@@ -8,7 +8,6 @@
 <meta name="theme-color" content="#F2EFEA">
 <meta name="robots" content="noindex">
 <style>
-  /* Jost autohospedada (misma fuente que el sitio, sin pedirla a Google). */
   @font-face { font-family: "Jost"; font-style: normal; font-weight: 300; font-display: swap; src: url("../fuentes/jost-300.woff2") format("woff2"); }
   @font-face { font-family: "Jost"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fuentes/jost-400.woff2") format("woff2"); }
   :root {
@@ -19,7 +18,6 @@
     --arena: #C4BDB2;
     --yeso: #F2EFEA;
     --oxido: #C2410C;
-    /* Óxido para texto chico de error: el #C2410C no llega a AA sobre yeso. */
     --oxido-texto: #A3360A;
     --superficie: #FBFAF8;
     --fuente: "Jost", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -47,7 +45,6 @@
   .contenedor { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 20px; }
   @media (min-width: 768px) { .contenedor { padding: 0 32px; } }
 
-  /* Tipografía */
   .etiqueta {
     font-size: 11px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase;
     color: var(--oliva-texto); line-height: 1.6; margin: 0;
@@ -58,7 +55,6 @@
   @media (min-width: 768px) { h1 { font-size: 46px; } h2 { font-size: 30px; } }
   p { margin: 0; }
 
-  /* Encabezado */
   .cabecera { border-bottom: 1px solid var(--arena); }
   .cabecera-int { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 64px; }
   .logo { display: inline-flex; align-items: center; gap: 12px; color: var(--carbon); text-decoration: none; }
@@ -67,7 +63,6 @@
   .cabecera .etiqueta { display: none; }
   @media (min-width: 600px) { .cabecera .etiqueta { display: block; } }
 
-  /* Bloques */
   .intro { padding: 48px 0 32px; }
   .intro .etiqueta { margin-bottom: 16px; }
   .intro .bajada { margin-top: 16px; max-width: 560px; color: var(--tierra); font-size: 16px; }
@@ -76,7 +71,6 @@
   .bloque-cabeza .etiqueta { margin-bottom: 8px; }
   .ayuda { color: var(--tierra); font-size: 15px; margin-top: 8px; max-width: 560px; }
 
-  /* Avisos */
   .aviso {
     display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
     border-left: 2px solid var(--oxido); background: var(--superficie); padding: 14px 16px; margin-top: 24px;
@@ -84,7 +78,6 @@
   }
   .aviso[hidden] { display: none; }
 
-  /* Botones */
   .boton {
     display: inline-flex; align-items: center; justify-content: center; gap: 10px;
     min-height: 48px; padding: 0 24px; border: 1px solid transparent; border-radius: 0; cursor: pointer;
@@ -106,7 +99,6 @@
   .boton-texto:hover { color: var(--oxido-texto); }
   .acciones { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
 
-  /* Campos */
   .grupo { display: grid; gap: 20px; }
   @media (min-width: 700px) { .grupo-ferreteria { grid-template-columns: 1fr 1fr; } }
   .campo { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
@@ -133,10 +125,8 @@
   .error .mini { display: inline-block; margin: 4px 12px 0 0; background: none; border: 0; padding: 4px 0; min-height: 32px;
     font: inherit; color: var(--carbon); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 
-  /* Trampa para bots */
   .trampa { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
 
-  /* Lista de productos */
   .barra-productos { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .contador { font-size: 14px; color: var(--tierra); }
   .lista { display: grid; gap: 12px; }
@@ -149,8 +139,6 @@
   .fila-num { grid-column: 1 / 2; align-self: center; font-size: 11px; letter-spacing: 0.3em; color: var(--oliva-texto); }
   .fila-acciones { grid-column: 2 / 3; display: flex; justify-content: flex-end; gap: 4px; }
   .fila .campo.completo { grid-column: 1 / -1; }
-  /* Misma altura de etiqueta en las dos columnas de la tarjeta: así los
-     campos quedan alineados aunque una etiqueta ocupe dos líneas. */
   .fila .campo:not(.completo) > label { min-height: 34px; display: flex; align-items: flex-end; }
   .icono {
     display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px;
@@ -184,7 +172,6 @@
     .fila .campo select { padding-right: 28px; background-position: right 10px center; }
   }
 
-  /* Resumen y envío */
   .resumen { background: #fff; border: 1px solid var(--arena); padding: 20px; display: grid; gap: 12px; }
   .resumen-cifras { font-size: 18px; font-weight: 300; }
   .resumen-cifras strong { font-weight: 400; }
@@ -195,7 +182,6 @@
   .fallo { border-left: 2px solid var(--oxido); background: #fff; padding: 16px; display: grid; gap: 12px; color: var(--tierra); }
   .modo-csv { font-size: 14px; color: var(--tierra); margin-top: 12px; }
 
-  /* Confirmación */
   .confirmacion { padding: 56px 0 72px; }
   .confirmacion[hidden] { display: none; }
   .confirmacion svg { width: 40px; height: 40px; }
@@ -205,11 +191,9 @@
   .codigo strong { font-weight: 400; letter-spacing: 0.12em; color: var(--carbon); }
   .confirmacion .acciones { margin-top: 32px; }
 
-  /* Pie */
   .pie { border-top: 1px solid var(--arena); padding: 28px 0 32px; margin-top: 24px; font-size: 13px; color: var(--oliva-texto); }
   .pie a { color: inherit; }
 
-  /* Barra fija inferior (celular) */
   .barra-inferior {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
     background: var(--carbon); color: var(--yeso);
@@ -221,7 +205,6 @@
   .barra-inferior[hidden] { display: none; }
   @media (min-width: 900px) { .barra-inferior { display: none; } }
 
-  /* Aviso flotante con deshacer */
   .toast {
     position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 40;
     background: var(--carbon); color: var(--yeso); padding: 10px 12px 10px 16px; display: flex; align-items: center; gap: 16px;
@@ -231,7 +214,6 @@
   .toast button { background: none; border: 0; color: #fff; text-decoration: underline; text-underline-offset: 3px; min-height: 44px; padding: 0 8px; cursor: pointer; font-size: 14px; }
   @media (min-width: 900px) { .toast { bottom: 32px; } }
 
-  /* Diálogo de pegado */
   .fondo-dialogo { position: fixed; inset: 0; z-index: 50; background: rgba(36, 34, 32, .55); display: flex; align-items: flex-end; justify-content: center; }
   .fondo-dialogo[hidden] { display: none; }
   .dialogo {
@@ -419,26 +401,17 @@
 <script>
 "use strict";
 
-/* ==========================================================================
-   CONFIG — lo único que hay que tocar cuando llegue el formulario definitivo.
-   Campos, categorías, unidades y textos de error salen de aquí: la tabla, la
-   validación, el pegado de Excel, el CSV y el envío se arman solos.
-   Si cambias campos, actualiza también CAMPOS en apps-script/Code.gs.
-   ========================================================================== */
 const CONFIG = {
-  APPS_SCRIPT_URL: "",              // vacío = modo CSV (descarga + WhatsApp)
+  APPS_SCRIPT_URL: "",
   WHATSAPP: "59176971774",
   WHATSAPP_VISIBLE: "+591 76971774",
-  EMAIL: "", // vacío hasta que exista el correo (entreobra.com no está registrado)
-  VERSION_POLITICAS: "2026-10-04", // misma que VERSION_POLITICAS en src/lib/datos.ts
+  EMAIL: "",
+  VERSION_POLITICAS: "2026-10-04",
   DRAFT_KEY: "entreobra_registro_v2",
   MAX_PRODUCTOS: 500,
-  // Categorías confirmadas por EL COMITENTE (Anexo de la Adenda N.º 1) + "Otros".
   CATEGORIAS: ["Cemento", "Fierro y acero", "Áridos", "Ladrillos y bloques", "Cerámicos", "Tuberías y sanitarios", "Otros"],
   UNIDADES: ["bolsa", "varilla", "pieza", "m³", "m²", "metro", "rollo", "kg", "litro", "otra"],
   SINO: ["Sí", "No"],
-  // Sinónimos para mapear lo que viene de Excel. Se comparan sin tildes, en
-  // minúsculas y sin espacios extra.
   SINONIMOS_CATEGORIA: {
     "cemento": "Cemento", "cementos": "Cemento",
     "fierro": "Fierro y acero", "fierros": "Fierro y acero", "acero": "Fierro y acero", "hierro": "Fierro y acero",
@@ -469,18 +442,13 @@ const CONFIG = {
     "litro": "litro", "litros": "litro", "lt": "litro", "lts": "litro", "l": "litro",
     "otra": "otra",
   },
-  // Respuestas Sí/No como llegan de Excel. Un número también vale:
-  // mayor a 0 = Sí (por ejemplo, la cantidad en stock), 0 = No.
   SINONIMOS_SINO: {
     "si": "Sí", "s": "Sí", "x": "Sí", "yes": "Sí", "y": "Sí", "ok": "Sí", "true": "Sí", "verdadero": "Sí",
     "hay": "Sí", "disponible": "Sí", "con stock": "Sí", "en stock": "Sí", "entrega": "Sí", "entregamos": "Sí",
     "no": "No", "n": "No", "false": "No", "falso": "No", "agotado": "No", "sin stock": "No", "no hay": "No",
     "-": "No", "no entrega": "No", "no entregamos": "No",
   },
-  // El campo que identifica al producto (el que se exige al pegar desde Excel).
   CAMPO_PRINCIPAL: "material",
-  // Datos de la ferretería (una vez por envío). `columna` es el encabezado
-  // exacto de la hoja del cliente; `label`, lo que ve el vendedor.
   CAMPOS_FERRETERIA: [
     { key: "negocio",  label: "Ferretería",         columna: "Ferreteria", tipo: "texto",    requerido: true,  max: 120, autocomplete: "organization", vacio: "Falta el nombre de la ferretería." },
     { key: "contacto", label: "Nombre de contacto", columna: "Contacto",   tipo: "texto",    requerido: true,  max: 80,  autocomplete: "name",         vacio: "Falta el nombre de contacto." },
@@ -488,9 +456,6 @@ const CONFIG = {
     { key: "zona",     label: "Zona o barrio",      columna: "Zona",       tipo: "texto",    requerido: true,  max: 80,                                vacio: "Falta la zona o barrio." },
     { key: "correo",   label: "Correo",             columna: "Correo",     tipo: "correo",   requerido: false, max: 120, autocomplete: "email" },
   ],
-  // Campos del producto, en el mismo orden que las columnas de la hoja del
-  // cliente. La tabla, la validación, el pegado de Excel, el CSV y el envío
-  // salen de aquí. `vacio` e `invalido` son los mensajes de error.
   CAMPOS_PRODUCTO: [
     { key: "categoria", label: "Categoría",         columna: "Categoria",              tipo: "lista",  requerido: true,  opciones: "CATEGORIAS", vacio: "Elige una categoría." },
     { key: "material",  label: "Material",          columna: "Material",               tipo: "texto",  requerido: true,  max: 120, vacio: "Escribe qué material es.", placeholder: "Ej: Cemento IP-30" },
@@ -501,8 +466,6 @@ const CONFIG = {
     { key: "stock",     label: "¿Hay stock?",       columna: "Stock (Si/No)",          tipo: "lista",  requerido: false, opciones: "SINO" },
     { key: "entrega",   label: "¿Entrega a obra?",  columna: "Entrega a obra (Si/No)", tipo: "lista",  requerido: false, opciones: "SINO" },
   ],
-  // Encabezados que se reconocen al pegar desde Excel (lo que va entre
-  // paréntesis se ignora: "Precio (Bs)" → "precio").
   ENCABEZADOS: {
     categoria: ["categoria", "categoría", "rubro", "tipo", "linea", "línea", "familia"],
     material: ["material", "producto", "descripcion", "descripción", "articulo", "artículo", "item", "detalle", "nombre"],
@@ -515,13 +478,9 @@ const CONFIG = {
   },
 };
 
-/* ==========================================================================
-   Utilidades
-   ========================================================================== */
 const $ = (sel, raiz = document) => raiz.querySelector(sel);
 const $$ = (sel, raiz = document) => Array.from(raiz.querySelectorAll(sel));
 
-/** Minúsculas, sin tildes, "³" → "3", espacios colapsados. */
 function normalizar(texto) {
   return String(texto ?? "")
     .normalize("NFKD")
@@ -541,7 +500,7 @@ function opcionesDe(campo) {
 
 function nuevoId() {
   if (window.crypto && typeof window.crypto.randomUUID === "function") {
-    try { return window.crypto.randomUUID(); } catch (e) { /* file:// en algunos navegadores */ }
+    try { return window.crypto.randomUUID(); } catch (e) { }
   }
   const h = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).slice(1);
   return `${h()}${h()}-${h()}-4${h().slice(1)}-${h()}-${h()}${h()}${h()}`;
@@ -554,7 +513,6 @@ function codigoCorto(id) {
 let contadorUid = 0;
 const uid = () => `p${Date.now().toString(36)}${(contadorUid++).toString(36)}`;
 
-/* Mapas normalizados para categorías y unidades */
 const MAPA_CATEGORIA = {};
 CONFIG.CATEGORIAS.forEach((c) => { MAPA_CATEGORIA[normalizar(c)] = c; });
 Object.entries(CONFIG.SINONIMOS_CATEGORIA).forEach(([k, v]) => { MAPA_CATEGORIA[normalizar(k)] = v; });
@@ -565,7 +523,6 @@ Object.entries(CONFIG.SINONIMOS_UNIDAD).forEach(([k, v]) => { MAPA_UNIDAD[normal
 const MAPA_SINO = {};
 CONFIG.SINO.forEach((v) => { MAPA_SINO[normalizar(v)] = v; });
 Object.entries(CONFIG.SINONIMOS_SINO || {}).forEach(([k, v]) => { MAPA_SINO[normalizar(k)] = v; });
-/** Sí/No desde un valor de Excel. Un número mayor a 0 es Sí (por ejemplo, la cantidad en stock); 0 es No. */
 function mapearSiNo(valor) {
   const n = normalizar(valor).replace(/[.!]/g, "").trim();
   if (!n) return "";
@@ -575,7 +532,6 @@ function mapearSiNo(valor) {
   return "";
 }
 
-/** Categoría desde un valor de Excel. `buscarPalabras` permite inferirla del nombre del producto. */
 function mapearCategoria(valor, buscarPalabras) {
   const n = normalizar(valor);
   if (!n) return "";
@@ -588,20 +544,11 @@ function mapearCategoria(valor, buscarPalabras) {
   return "";
 }
 
-/** Unidad desde un valor de Excel: solo coincidencias exactas (no adivinar). */
 function mapearUnidad(valor) {
   const n = normalizar(valor).replace(/\./g, "").trim();
   return n ? MAPA_UNIDAD[n] || "" : "";
 }
 
-/**
- * Interpreta números como los escriben en Bolivia:
- * "Bs 45", "Bs. 45,50", "45.50", "45,5", "1.250,00", "1,250.00".
- * - Coma y punto: el último separador es el decimal.
- * - Solo coma: decimal (salvo grupos de miles tipo "1,250,000").
- * - Un punto seguido de exactamente 3 dígitos ("1.250"): ambiguo, se
- *   interpreta como miles y se marca para revisión.
- */
 function interpretarNumero(texto, decimales) {
   let t = String(texto ?? "").replace(/ /g, " ").trim();
   if (!t) return { vacio: true };
@@ -630,7 +577,6 @@ function interpretarNumero(texto, decimales) {
   return { valor, ambiguo };
 }
 
-/** Número en formato local, sin separador de miles para no crear ambigüedad: 2600 · 45,50. */
 function formatoLocal(valor, decimales) {
   if (decimales === 0 || Number.isInteger(valor)) return String(Math.round(valor));
   return valor.toFixed(decimales).replace(".", ",");
@@ -639,9 +585,6 @@ function formatoMiles(valor) {
   return String(Math.round(valor)).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 }
 
-/* ==========================================================================
-   Estado
-   ========================================================================== */
 const CAMPOS = CONFIG.CAMPOS_PRODUCTO;
 const CLAVE_PRINCIPAL = CONFIG.CAMPO_PRINCIPAL && CAMPOS.some((c) => c.key === CONFIG.CAMPO_PRINCIPAL)
   ? CONFIG.CAMPO_PRINCIPAL : (CAMPOS.find((c) => c.tipo === "texto") || CAMPOS[0]).key;
@@ -649,7 +592,7 @@ const NOMBRE_PRINCIPAL = (CAMPOS.find((c) => c.key === CLAVE_PRINCIPAL) || {}).l
 const estado = {
   ferreteria: Object.fromEntries(CONFIG.CAMPOS_FERRETERIA.map((c) => [c.key, ""])),
   productos: [],
-  tocados: new Set(),        // "uid:key" o "f:key" de campos ya visitados
+  tocados: new Set(),
   intentoEnvio: false,
   envioId: null,
   envioHuella: null,
@@ -668,9 +611,6 @@ function productosConDatos() {
   return estado.productos.filter((p) => !filaVacia(p));
 }
 
-/* ==========================================================================
-   Validación
-   ========================================================================== */
 function errorCampoProducto(p, campo) {
   const v = String(p[campo.key] ?? "").trim();
   if (campo.tipo === "texto") {
@@ -729,9 +669,6 @@ function errorFerreteria(campo) {
   return "";
 }
 
-/* ==========================================================================
-   Borrador (localStorage, todo con try/catch)
-   ========================================================================== */
 let esperaGuardado = null;
 function guardarBorrador() {
   clearTimeout(esperaGuardado);
@@ -748,7 +685,7 @@ function guardarBorrador() {
         guardadoEn: new Date().toISOString(),
       };
       localStorage.setItem(CONFIG.DRAFT_KEY, JSON.stringify(datos));
-    } catch (e) { /* modo privado o file://: la página sigue funcionando sin borrador */ }
+    } catch (e) { }
   }, 400);
 }
 
@@ -761,9 +698,6 @@ function leerBorrador() {
   } catch (e) { return null; }
 }
 
-/* ==========================================================================
-   Render: datos de la ferretería
-   ========================================================================== */
 function renderFerreteria() {
   const cont = $("#campos-ferreteria");
   cont.innerHTML = CONFIG.CAMPOS_FERRETERIA.map((c) => {
@@ -796,9 +730,6 @@ function pintarErrorFerreteria(key) {
   input.setAttribute("aria-invalid", e ? "true" : "false");
 }
 
-/* ==========================================================================
-   Render: productos
-   ========================================================================== */
 function anchoColumna(c) {
   if (c.tipo === "numero") return "minmax(72px, .75fr)";
   if (c.tipo === "lista") return opcionesDe(c).every((o) => o.length <= 3) ? "minmax(80px, .75fr)" : "minmax(112px, 1.35fr)";
@@ -806,7 +737,6 @@ function anchoColumna(c) {
   if ((c.max || 0) >= 100) return "minmax(150px, 2fr)";
   return "minmax(80px, .85fr)";
 }
-/** En celular, ocupa todo el ancho de la tarjeta: textos largos y listas con opciones largas. */
 function esCompleto(c) {
   if (c.tipo === "texto") return (c.max || 0) >= 100;
   if (c.tipo === "lista") return opcionesDe(c).some((o) => o.length > 10);
@@ -877,8 +807,6 @@ function pintarErrorProducto(p, key) {
   } else {
     html = escapar(e || "");
   }
-  // Solo se redibuja si cambió: si no, al salir del campo se borrarían los
-  // botones del mensaje justo cuando la persona los está tocando.
   if (out.dataset.html !== html) {
     out.innerHTML = html;
     out.dataset.html = html;
@@ -892,9 +820,6 @@ function pintarErrorProducto(p, key) {
   }
 }
 
-/* ==========================================================================
-   Contadores, límite y resumen
-   ========================================================================== */
 function textoCantidad(n) {
   return `${n} ${n === 1 ? "producto" : "productos"}`;
 }
@@ -951,9 +876,6 @@ function actualizarResumen() {
   resumen.innerHTML = html;
 }
 
-/* ==========================================================================
-   Acciones sobre la lista
-   ========================================================================== */
 function agregarProducto(foco = true) {
   if (estado.productos.length >= CONFIG.MAX_PRODUCTOS) return;
   const p = productoVacio();
@@ -1005,9 +927,6 @@ function enfocar(id, seleccionar) {
   });
 }
 
-/* ==========================================================================
-   Aviso flotante con deshacer
-   ========================================================================== */
 let esperaToast = null;
 let deshacerToast = null;
 function mostrarToast(texto, alDeshacer) {
@@ -1019,10 +938,6 @@ function mostrarToast(texto, alDeshacer) {
   esperaToast = setTimeout(() => { $("#toast").hidden = true; deshacerToast = null; }, alDeshacer ? 7000 : 4000);
 }
 
-/* ==========================================================================
-   Pegar desde Excel
-   ========================================================================== */
-/** TSV como lo genera Excel: tabulaciones, \r\n o \n, celdas entre comillas con saltos de línea y comillas dobladas. */
 function parsearTSV(texto) {
   const filas = [];
   let fila = [], celda = "", enComillas = false, inicio = true;
@@ -1057,7 +972,6 @@ const ENCABEZADOS_NORM = Object.fromEntries(
 function campoDeEncabezado(celda) {
   const n = normalizar(celda).replace(/[.:]+$/, "").replace(/\s*\(.*\)$/, "");
   if (!n) return "";
-  // También prueba sin el "Bs" final: "P/U Bs.", "Precio (Bs)".
   const variantes = [n, n.replace(/\s*(bs|bob)$/, "").replace(/[.:]+$/, "").trim()];
   for (const [key, lista] of Object.entries(ENCABEZADOS_NORM)) {
     if (CAMPOS.some((c) => c.key === key) && variantes.some((v) => v && lista.includes(v))) return key;
@@ -1073,7 +987,6 @@ function esFilaTotal(fila) {
   return fila.some((v) => /^(sub ?total|total|totales|suma|total general)\b/.test(normalizar(v)));
 }
 
-/** Propone qué es cada columna cuando no hay encabezados. */
 function asignacionAutomatica(datos, columnas) {
   const stats = [];
   for (let j = 0; j < columnas; j++) {
@@ -1100,14 +1013,11 @@ function asignacionAutomatica(datos, columnas) {
   const numericas = stats.filter((s) => !asignacion[s.j] && s.numerico >= 0.7);
   const precio = numericas.find((s) => s.conDecimales > 0) || numericas[0];
   if (precio) usar("precio", precio.j);
-  // Columnas Sí/No, en orden: la primera a stock, la segunda a entrega.
   const camposSiNo = CAMPOS.filter((c) => c.opciones === "SINO").map((c) => c.key);
   stats.filter((s) => !asignacion[s.j] && s.sino >= 0.6).forEach((s, k) => { if (camposSiNo[k]) usar(camposSiNo[k], s.j); });
-  // Una columna de enteros después del precio suele ser la cantidad en stock.
   const cantidad = stats.find((s) => !asignacion[s.j] && s.numerico >= 0.7 && s.enteros >= 0.8);
   if (cantidad && camposSiNo[0] && !asignacion.includes(camposSiNo[0])) usar(camposSiNo[0], cantidad.j);
   usar(CLAVE_PRINCIPAL, mejor((s) => s.numerico < 0.5, (a, b) => b.largo - a.largo)?.j);
-  // Texto corto con números (3/8", 50 kg, 6 huecos): medida o variante.
   if (CAMPOS.some((c) => c.key === "medida")) usar("medida", mejor((s) => s.numerico < 0.5 && s.conDigitos >= 0.5 && s.largo <= 20, (a, b) => b.conDigitos - a.conDigitos)?.j);
   return asignacion;
 }
@@ -1142,7 +1052,6 @@ function leerPegado() {
   }
   pegado.filas = filas;
   pegado.columnas = Math.max(...filas.map((f) => f.length));
-  // Busca la fila de encabezados en las primeras 5 (puede haber un título arriba).
   let idx = -1;
   for (let i = 0; i < Math.min(5, filas.length); i++) {
     if (puntajeEncabezado(filas[i]) >= 2) { idx = i; break; }
@@ -1195,11 +1104,10 @@ function convertirPegado() {
   const colPrecio = colDe("precio");
   for (const fila of pegado.datos) {
     if (esFilaTotal(fila)) continue;
-    if (puntajeEncabezado(fila) >= 2) continue; // encabezado repetido
+    if (puntajeEncabezado(fila) >= 2) continue;
     const llenas = fila.filter(Boolean);
     const precioCrudo = colPrecio >= 0 ? fila[colPrecio] || "" : "";
     const tienePrecio = precioCrudo && !interpretarNumero(precioCrudo, 2).invalido;
-    // Fila de título o de sección ("CEMENTOS", "LISTA DE PRECIOS 2026")
     if (llenas.length === 1 && !tienePrecio) {
       const cat = mapearCategoria(llenas[0], true);
       if (cat) categoriaSeccion = cat;
@@ -1223,7 +1131,6 @@ function convertirPegado() {
         p[c.key] = crudo;
       }
     });
-    // Sin categoría en la fila: la de la sección, o una palabra clara del nombre.
     if (CAMPOS.some((c) => c.key === "categoria") && !p.categoria && !p._origen.categoria) {
       p.categoria = categoriaSeccion || (colNombre >= 0 ? mapearCategoria(p[CLAVE_PRINCIPAL], true) : "");
     }
@@ -1292,9 +1199,6 @@ function aplicarPegado(reemplazar) {
   }
 }
 
-/* ==========================================================================
-   Envío, CSV y confirmación
-   ========================================================================== */
 function datosParaEnvio() {
   const ferreteria = {};
   CONFIG.CAMPOS_FERRETERIA.forEach((c) => {
@@ -1317,7 +1221,6 @@ function datosParaEnvio() {
   return { ferreteria, productos };
 }
 
-/** Mismo orden que la hoja del cliente; el ID del envío va al final (evita duplicados). */
 function encabezadosHoja() {
   return ["Fecha"]
     .concat(CONFIG.CAMPOS_FERRETERIA.map((c) => c.columna || c.label))
@@ -1325,7 +1228,6 @@ function encabezadosHoja() {
     .concat(["ID envío"]);
 }
 
-/** Evita que Excel/Sheets interprete una celda como fórmula. */
 function sanearCelda(v) {
   const s = String(v ?? "");
   return /^[=+\-@]/.test(s) ? "'" + s : s;
@@ -1401,7 +1303,6 @@ async function enviar() {
     enfocar(errores[0].id);
     return;
   }
-  // Consentimiento expreso antes de enviar o descargar (DS 1793, art. 56).
   const consentimiento = $("#consentimiento");
   if (!consentimiento.checked) {
     consentimiento.setAttribute("aria-invalid", "true");
@@ -1411,7 +1312,6 @@ async function enviar() {
   }
   const datos = datosParaEnvio();
   const huella = JSON.stringify(datos);
-  // Reintento con los mismos datos: mismo ID (el servidor no duplica).
   if (!estado.envioId || estado.envioHuella !== huella) {
     estado.envioId = nuevoId();
     estado.envioHuella = huella;
@@ -1419,7 +1319,6 @@ async function enviar() {
   const id = estado.envioId;
   const n = datos.productos.length;
 
-  // Trampa para bots: se muestra la confirmación sin enviar nada.
   if ($("#sitio_web").value.trim()) {
     mostrarConfirmacion({ modo: "enviado", n, id, negocio: datos.ferreteria.negocio });
     return;
@@ -1444,14 +1343,13 @@ async function enviar() {
   try {
     const respuesta = await fetch(CONFIG.APPS_SCRIPT_URL, {
       method: "POST",
-      headers: { "Content-Type": "text/plain;charset=utf-8" }, // evita el preflight CORS
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
       body: JSON.stringify(payload),
       redirect: "follow",
       signal: control ? control.signal : undefined,
     });
     const json = await respuesta.json();
     if (!json || json.ok !== true) throw new Error((json && json.error) || "Respuesta inválida");
-    // Éxito: se borran los productos del borrador (se conservan los datos de la ferretería).
     const enviados = typeof json.filas === "number" ? json.filas : n;
     estado.productos = [];
     estado.envioId = null;
@@ -1536,11 +1434,7 @@ function registrarOtra() {
   enfocar(`${estado.productos[0]._uid}-${CAMPOS[0].key}`);
 }
 
-/* ==========================================================================
-   Eventos
-   ========================================================================== */
 function conectarEventos() {
-  // Ferretería
   const contF = $("#campos-ferreteria");
   contF.addEventListener("input", (e) => {
     const key = e.target.dataset.f;
@@ -1558,7 +1452,6 @@ function conectarEventos() {
     actualizarResumen();
   });
 
-  // Productos (delegación)
   const lista = $("#lista");
   const alCambiar = (e) => {
     const { uid: u, key } = e.target.dataset;
@@ -1601,7 +1494,6 @@ function conectarEventos() {
       const p = estado.productos.find((x) => x._uid === u);
       if (!p) return;
       const r = interpretarNumero(p[key], 2);
-      // "Son 1.250" deja 1250; "Son 1,25" deja 1,25.
       p[key] = formatoLocal(confirmar ? r.valor : r.valor / 1000, 2);
       p._ok[key] = p[key];
       const input = document.getElementById(`${u}-${key}`);
@@ -1623,7 +1515,6 @@ function conectarEventos() {
     enfocar(a.dataset.ir);
   });
 
-  // Toast
   $("#toast-deshacer").addEventListener("click", () => {
     const fn = deshacerToast;
     $("#toast").hidden = true;
@@ -1631,7 +1522,6 @@ function conectarEventos() {
     if (fn) fn();
   });
 
-  // Borrador
   $("#borrar-todo").addEventListener("click", () => {
     const antes = { ferreteria: { ...estado.ferreteria }, productos: estado.productos.slice() };
     CONFIG.CAMPOS_FERRETERIA.forEach((c) => { estado.ferreteria[c.key] = ""; });
@@ -1651,7 +1541,6 @@ function conectarEventos() {
     });
   });
 
-  // Diálogo de pegado
   $("#abrir-pegar").addEventListener("click", abrirDialogo);
   $("#cerrar-dialogo").addEventListener("click", cerrarDialogo);
   $$("[data-cerrar]").forEach((b) => b.addEventListener("click", cerrarDialogo));
@@ -1684,9 +1573,6 @@ function conectarEventos() {
   });
 }
 
-/* ==========================================================================
-   Inicio
-   ========================================================================== */
 function iniciar() {
   $("#consentimiento").addEventListener("change", (e) => {
     if (!e.target.checked) return;

@@ -8,18 +8,12 @@ import { SelectorPreferencias } from "@/components/ui/Preferencias";
 import { useIdioma } from "@/lib/preferencias";
 import { cn } from "@/lib/utils";
 
-// Las anclas van con "/#..." (no solo "#...") porque el Header también
-// vive en otras páginas (legales, /demo): así funcionan desde cualquiera.
-// "Demo" no va en el menú (Anexo de la Adenda N.º 1: la demo no es
-// funcional); la página /demo sigue existiendo sin enlace.
 const NAV: { id: "comparar" | "como-funciona" | "proveedores" }[] = [
   { id: "comparar" },
   { id: "como-funciona" },
   { id: "proveedores" },
 ];
 
-// Todas las secciones de "/" en orden, para que al pasar por una que no
-// está en el menú (hero, materiales, acceso) se apague el subrayado.
 const SECCIONES_OBSERVADAS = ["top", "materiales", "problema", "como-funciona", "comparar", "proveedores", "acceso"];
 
 export function Header() {
@@ -36,8 +30,6 @@ export function Header() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Resalta en el menú la sección que está a mitad de pantalla. Solo
-  // decide qué item subrayar, nunca si algo se ve.
   useEffect(() => {
     if (pathname !== "/") return;
     const observer = new IntersectionObserver(
@@ -128,10 +120,6 @@ export function Header() {
         </div>
       </header>
 
-      {/* Menú móvil: pantalla completa, mismo lenguaje que el resto. Va
-          fuera del <header> a propósito: el backdrop-blur del header
-          convierte al header en el contenedor de cualquier hijo
-          `fixed`, y el overlay quedaba recortado y transparente. */}
       <div
         id="menu-movil"
         data-zona="oscura"

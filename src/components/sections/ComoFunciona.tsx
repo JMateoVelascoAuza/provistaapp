@@ -11,7 +11,6 @@ import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Los textos de cada paso están en t.comoFunciona.pasos.
 const CANTIDAD_PASOS = 4;
 
 function FilaMock({ nombre, valor, activo = false }: { nombre: string; valor: string; activo?: boolean }) {
@@ -89,18 +88,6 @@ function MockRecibirObra() {
 const PANELES = [MockRegistrarObra, MockBuscarMaterial, MockArmarPedido, MockRecibirObra];
 const DESKTOP_MQ = "(min-width: 1024px)";
 
-/**
- * Desktop: el mismo mecanismo de `/demo` (`AppleScrollFeatures`) —
- * `ScrollTrigger` con `pin` + `scrub` real, la sección se "traba" en
- * pantalla mientras los cuatro pasos avanzan con el scroll, en vez de
- * solo pasar de largo con una línea de progreso pasiva. Mismo
- * contenido de siempre (títulos, descripciones, los cuatro mockups);
- * lo que cambia es la mecánica de scroll, no la información.
- *
- * Mobile: la lista simple apilada, sin pin — igual que en `/demo`, el
- * pin+scrub es una pieza de escritorio (mobile no es el mismo efecto
- * reducido, es una variante propia).
- */
 export function ComoFunciona() {
   const seccionRef = useRef<HTMLElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -113,9 +100,6 @@ export function ComoFunciona() {
   const reducido = usePrefersReducedMotion();
   const { t } = useIdioma();
 
-  // La pantalla de ejemplo se centra en la parte visible de la lista: en
-  // pantallas bajas (o con escala de Windows al 125–150 %) la lista pasa
-  // el borde inferior y, centrada en toda la lista, quedaba cortada abajo.
   useEffect(() => {
     const panel = panelRef.current;
     const lista = listaRef.current;
@@ -143,8 +127,6 @@ export function ComoFunciona() {
       mm.add(DESKTOP_MQ, () => {
         if (!panelRef.current) return;
 
-        // Se fija el panel entero (título incluido): mientras avanzan los
-        // pasos, el lector nunca pierde de vista qué está leyendo.
         const trigger = ScrollTrigger.create({
           trigger: panelRef.current,
           start: "top top",
@@ -199,7 +181,6 @@ export function ComoFunciona() {
 
   return (
     <section id="como-funciona" ref={seccionRef} data-zona="oscura" className="bg-carbon">
-      {/* Desktop — panel fijo con título, pasos y pantalla */}
       <div ref={panelRef} className="hidden h-screen flex-col bg-carbon pt-[72px] lg:flex">
         <div className="contenedor flex w-full flex-1 flex-col justify-center py-10">
           <p className="etiqueta text-oliva">{t.comoFunciona.etiqueta}</p>
@@ -269,7 +250,6 @@ export function ComoFunciona() {
         </div>
       </div>
 
-      {/* Mobile — título y lista simple, sin pin */}
       <div className="contenedor pb-24 pt-24 lg:hidden">
         <ScrollReveal>
           <p className="etiqueta text-oliva">{t.comoFunciona.etiqueta}</p>

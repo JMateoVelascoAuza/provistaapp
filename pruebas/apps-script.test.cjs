@@ -1,5 +1,3 @@
-// Prueba del Apps Script (apps-script/Code.gs) sin Google: lo ejecuta contra
-// una hoja, Gmail, caché y activadores simulados. Uso: npm run prueba:script
 const fs = require("fs"); const path = require("path"); const vm = require("vm");
 const codigo = fs.readFileSync(path.join(__dirname, "..", "apps-script", "Code.gs"), "utf8");
 const CLIENTE = ["Fecha","Ferreteria","Contacto","WhatsApp","Zona","Correo","Categoria","Material","Medida/variante","Marca","Unidad","Precio (Bs)","Stock (Si/No)","Entrega a obra (Si/No)"];
@@ -70,14 +68,12 @@ const base = () => ({ id: "abc-123", enviadoEn: "x", honeypot: "", version: 1, .
 const h = libro.hojas["Hoja 1"];
 const COLS = [...CLIENTE, "ID envío", "Acepta privacidad"];
 
-// --- Consentimiento ---
 const sinC = base(); delete sinC.consentimiento;
 let res = post(sinC);
 ok(res.ok === false && h.datos.length === 1 && /Política de privacidad/.test(res.error), `productos sin consentimiento: rechaza y no escribe (${res.error})`);
 const cFalso = base(); cFalso.consentimiento = "true";
 res = post(cFalso); ok(res.ok === false && h.datos.length === 1, "consentimiento 'true' (texto) no vale: tiene que ser true");
 
-// --- Envío normal ---
 res = post(base());
 ok(res.ok && res.filas === 2, `envío: ${JSON.stringify(res)}`);
 ok(correos.length === 1 && correos[0].para === "duenio@gmail.com" && correos[0].asunto === "Entreobra: Ferretería A envió 2 productos" && /Ver la hoja: https:/.test(correos[0].cuerpo) && correos[0].cuerpo.includes("\nZona: Cercado\n"), `aviso de productos por correo: "${correos[0] && correos[0].asunto}"`);
@@ -89,7 +85,6 @@ res = post(base()); ok(res.duplicado === true && h.datos.length === 3 && correos
 const bot = base(); bot.id = "bot"; bot.honeypot = "x"; delete bot.consentimiento;
 res = post(bot); ok(res.ok === true && h.datos.length === 3, "honeypot: responde ok sin escribir");
 
-// --- (5) Validación y normalización ---
 const norm = base(); norm.id = "norm-1"; norm.ferreteria.whatsapp = "7697-1774";
 norm.productos = [{ categoria: "cemento", material: "Cemento", medida: "", marca: "", unidad: "BOLSA", precio: 10.456, stock: "si", entrega: "NO" }];
 res = post(norm); const filaN = h.datos[h.datos.length - 1];
@@ -104,7 +99,6 @@ malo((e) => { e.ferreteria.correo = "sin-arroba"; }, "correo inválido");
 malo((e) => { e.productos[0].precio = "62"; }, "precio como texto");
 malo((e) => { e.productos[0].precio = 0; }, "precio 0");
 
-// --- (1) Columnas por nombre ---
 libro.hojas["Hoja 1"] = crearHoja("Hoja 1", [["Fecha", "Notas del cliente", "Material", "Ferreteria", "Precio (Bs)", "ID envío"], ["F0", "nota", "Viejo", "X", 1, "old"]]);
 const hM = libro.hojas["Hoja 1"];
 const mov = base(); mov.id = "mov-1"; mov.ferreteria.whatsapp = "+59170000001";
@@ -117,7 +111,6 @@ ok(cab.slice(0, 6).join("|") === "Fecha|Notas del cliente|Material|Ferreteria|Pr
 res = post(mov); ok(res.duplicado === true, "columnas movidas: encuentra el ID por nombre (no duplica)");
 libro.hojas["Hoja 1"] = h;
 
-// --- Acceso anticipado (pestaña nueva) ---
 let a = post({ tipo: "acceso", id: "acc-0", nombre: "Sin Permiso", whatsapp: "+591 70000000", tipoUsuario: "obra" });
 ok(a.ok === false && !libro.hojas["Acceso anticipado"], "acceso sin consentimiento: rechaza y no crea la pestaña");
 a = post({ tipo: "acceso", id: "acc-1", nombre: "Juan Pérez", whatsapp: "70000000", tipoUsuario: "obra", ...C });
@@ -138,7 +131,6 @@ ctx.probarAviso(); ok(correos[correos.length - 1].asunto === "Entreobra: prueba 
 a = post({ tipo: "acceso", id: "acc-2", nombre: "", whatsapp: "1", tipoUsuario: "obra", ...C });
 ok(a.ok === false, `acceso: rechaza incompleto (${a.error})`);
 
-// --- Acceso anticipado creado con la versión anterior (5 columnas) ---
 libro.hojas["Acceso anticipado"] = crearHoja("Acceso anticipado", [
   ["Fecha", "Nombre", "Participa como", "WhatsApp", "ID envío"],
   ["F0", "Viejo", "Estoy en obra", "'+591 1", "old-1"],
@@ -151,7 +143,6 @@ a = post({ tipo: "acceso", id: "new-2", nombre: "Nueva", whatsapp: "+591 2", tip
 ok(a.ok && hV.datos[2].join("|") === "FECHA(America/La_Paz)|Nueva|Vendo materiales|'+591 2|new-2|Sí (versión 2026-10-04)", `hoja vieja: fila nueva en su lugar ${hV.datos[2].join("|")}`);
 ok(hV.datos[1].join("|") === "F0|Viejo|Estoy en obra|'+591 1|old-1", "hoja vieja: filas anteriores intactas");
 
-// --- (4) Límite contra spam ---
 cache.clear();
 const spam = (i) => { const e = base(); e.id = "spam-" + i; e.ferreteria.whatsapp = "+59177777777"; e.productos = [e.productos[0]]; return post(e); };
 let aceptados = 0; for (let i = 0; i < 10; i++) if (spam(i).ok) aceptados++;
@@ -171,7 +162,6 @@ ctx.CacheService = { getScriptCache: () => ({ get: (k) => (cache.has(k) ? cache.
 res = postTexto(JSON.stringify({ ...base(), id: "grande", relleno: "x".repeat(400001) }));
 ok(res.ok === false && /demasiado grande/.test(res.error), "rechaza un envío de más de 400.000 caracteres");
 
-// --- (6) configurar ---
 const antesCorreos = correos.length;
 ctx.configurar(); ctx.configurar();
 ok(activadores.length === 1 && activadores[0].funcion === "borrarAntiguos" && activadores[0].dias === 1 && activadores[0].zona === "America/La_Paz", "configurar: programa el borrado diario una sola vez aunque se ejecute dos veces");
@@ -183,7 +173,6 @@ ok(vSiNo.length >= 2 && vSiNo.some((v) => v.col === colDe("Hoja 1", "Stock (Si/N
 const pH = protecciones.filter((p) => p.hoja === "Hoja 1"); const pA = protecciones.filter((p) => p.hoja === "Acceso anticipado");
 ok(pH.length === 1 && pH[0].soloAviso === true && pH[0].ancho === 16 && pA.length === 1, "configurar: encabezados protegidos (solo aviso), sin duplicar la protección");
 
-// --- (3) Borrado de datos viejos ---
 const viejo = new Date(); viejo.setMonth(viejo.getMonth() - 25);
 const reciente = new Date(); reciente.setMonth(reciente.getMonth() - 23);
 const iso = (d) => d.toISOString().slice(0, 10) + " 10:00:00";

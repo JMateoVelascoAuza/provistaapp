@@ -13,8 +13,6 @@ import { cn } from "@/lib/utils";
 
 gsap.registerPlugin(ScrollTrigger, Flip);
 
-// Orden en que aparecen las filas antes de que el comparador las ordene
-// por precio (PROVEEDORES ya viene ordenado de menor a mayor).
 const ORDEN_INICIAL = [1, 2, 0];
 
 const precios = PROVEEDORES.map((p) => p.precio);
@@ -22,19 +20,10 @@ const MIN = Math.min(...precios);
 const MAX = Math.max(...precios);
 const anchoBarra = (precio: number) => 0.35 + (0.65 * (precio - MIN)) / (MAX - MIN || 1);
 
-/**
- * La tarjeta "compara" al entrar en pantalla: las filas llegan
- * desordenadas, los precios cuentan hasta su valor, el comparador las
- * ordena (Flip: cada fila se desliza a su lugar), marca la mejor opción
- * y el ahorro cuenta hasta su total. El HTML del servidor ya es el
- * estado final, así que sin JS o con movimiento reducido se ve completo.
- */
 export function Comparador() {
   const tarjetaRef = useRef<HTMLDivElement>(null);
   const reducido = usePrefersReducedMotion();
   const { idioma, t } = useIdioma();
-  // La animación escribe textos y precios cuando corre: lee el idioma
-  // vigente en ese momento, no el del primer render.
   const actual = useRef({ idioma, t });
   useEffect(() => {
     actual.current = { idioma, t };
@@ -56,8 +45,6 @@ export function Comparador() {
       const lineaAhorro = tarjeta.querySelector<HTMLElement>("[data-linea-ahorro]");
 
       if (!marca || !chip || !escaneo) return;
-      // Textos que la animación reescribe: se restauran al deshacerla
-      // (por ejemplo, si el usuario pide reducir movimiento).
       const originales = [estado, ahorro, ...montos].map((el) => [el, el?.textContent ?? ""] as const);
       filas.forEach((fila, i) => (fila.style.order = String(ORDEN_INICIAL[i])));
       gsap.set(filas, { opacity: 0, y: 14 });
@@ -66,8 +53,6 @@ export function Comparador() {
       gsap.set([marca, chip], { opacity: 0 });
       gsap.set(marca, { scaleY: 0 });
       gsap.set(escaneo, { scaleX: 0 });
-      // La línea del ahorro espera oculta: nunca se ve "Bs 0" antes de
-      // que la animación arranque (en celular puede tardar en dispararse).
       if (lineaAhorro) gsap.set(lineaAhorro, { opacity: 0 });
       const tc = actual.current.t.comparador;
       if (estado) estado.textContent = tc.comparando(tc.numeros[PROVEEDORES.length - 1]);
@@ -77,7 +62,6 @@ export function Comparador() {
         scrollTrigger: { trigger: tarjeta, start: "top 85%", once: true },
       });
 
-      // Los montos cuentan desde el 60 % de su valor (nunca se ve "Bs 0").
       const desde = (n: number) => Math.round((n * 0.6) / 10) * 10;
       tl.call(
         () => {

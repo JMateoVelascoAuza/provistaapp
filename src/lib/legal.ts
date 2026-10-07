@@ -1,15 +1,3 @@
-/*
- * Textos de las páginas legales, en español e inglés. Dentro de los
- * párrafos, {contacto}, {correo}, {whatsapp}, {privacidad}, {terminos}, {cookies}
- * y {reembolsos} se convierten en enlaces (ver PaginaLegal).
- *
- * Marco que se tomó en cuenta (Bolivia): Constitución Política del Estado
- * (arts. 21 y 130), DS 1793 (art. 56, datos personales), Ley 453 de
- * derechos de usuarios y consumidores, Ley 1322 de Derecho de Autor y
- * Decisión 486 de la CAN (marcas). Conviene que lo revise un abogado
- * boliviano antes del lanzamiento.
- */
-
 export type DocumentoLegal = "privacidad" | "terminos" | "cookies" | "reembolsos";
 
 export type Seccion = { titulo: string; parrafos?: string[]; lista?: string[] };
@@ -536,7 +524,6 @@ const en: TextosLegales = {
 
 export const LEGAL = { es, en };
 
-/** Rutas de las páginas legales (también las usa el pie y los formularios). */
 export const RUTAS_LEGALES: Record<DocumentoLegal, string> = {
   privacidad: "/privacidad",
   terminos: "/terminos",
