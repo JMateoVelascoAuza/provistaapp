@@ -30,7 +30,9 @@ export function SelectorPreferencias({ className }: { className?: string }) {
               onClick={() => setIdioma(opcion)}
               className={cn(
                 "py-2 uppercase transition-colors duration-300",
-                idioma === opcion ? "text-yeso" : "text-oliva hover:text-arena",
+                // Arena al 80 % y no oliva: el menú es translúcido y sobre el
+                // pie claro el oliva bajaba a 4:1 de contraste (mínimo 4,5:1).
+                idioma === opcion ? "text-yeso" : "text-arena/80 hover:text-yeso",
               )}
             >
               {opcion}

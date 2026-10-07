@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -16,7 +16,7 @@ const CANTIDAD_PASOS = 4;
 
 function FilaMock({ nombre, valor, activo = false }: { nombre: string; valor: string; activo?: boolean }) {
   return (
-    <div className="flex items-center justify-between border-t border-yeso/8 py-3 text-sm first:border-t-0">
+    <div className="flex items-center justify-between border-t border-yeso/8 py-3 text-[15px] first:border-t-0">
       <span className={activo ? "text-yeso" : "text-arena/80"}>{nombre}</span>
       <span className={cn("tabular-nums", activo ? "font-normal text-oxido" : "text-oliva")}>{valor}</span>
     </div>
@@ -27,10 +27,10 @@ function MockRegistrarObra() {
   const m = useIdioma().t.comoFunciona.mocks;
   return (
     <div>
-      <p className="etiqueta text-[10px] text-oliva">{m.nuevaObra}</p>
+      <p className="etiqueta text-[11px] text-oliva">{m.nuevaObra}</p>
       <div className="mt-4 space-y-2.5">
-        <div className="border border-yeso/10 px-4 py-3 text-sm text-yeso">{m.nombreObra}</div>
-        <div className="border border-yeso/10 px-4 py-3 text-sm text-oliva">{m.zona}</div>
+        <div className="border border-yeso/10 px-4 py-3 text-[15px] text-yeso">{m.nombreObra}</div>
+        <div className="border border-yeso/10 px-4 py-3 text-[15px] text-oliva">{m.zona}</div>
       </div>
       <div className="boton boton-oxido mt-5 w-full">{m.crearObra}</div>
     </div>
@@ -41,7 +41,7 @@ function MockBuscarMaterial() {
   const m = useIdioma().t.comoFunciona.mocks;
   return (
     <div>
-      <p className="etiqueta text-[10px] text-oliva">{m.producto}</p>
+      <p className="etiqueta text-[11px] text-oliva">{m.producto}</p>
       <div className="mt-2">
         <FilaMock nombre="Ferretería A" valor="Bs 62" activo />
         <FilaMock nombre="Ferretería B" valor="Bs 68" />
@@ -55,12 +55,12 @@ function MockArmarPedido() {
   const m = useIdioma().t.comoFunciona.mocks;
   return (
     <div>
-      <p className="etiqueta text-[10px] text-oliva">{m.tuPedido}</p>
+      <p className="etiqueta text-[11px] text-oliva">{m.tuPedido}</p>
       <div className="mt-2">
         <FilaMock nombre={m.lineas[0]} valor="Bs 310" />
         <FilaMock nombre={m.lineas[1]} valor="Bs 480" />
       </div>
-      <div className="mt-2 flex items-center justify-between border-t border-yeso/10 pt-4 text-sm">
+      <div className="mt-2 flex items-center justify-between border-t border-yeso/10 pt-4 text-[15px]">
         <span className="text-yeso">{m.total}</span>
         <span className="font-normal text-oxido tabular-nums">Bs 790</span>
       </div>
@@ -73,12 +73,12 @@ function MockRecibirObra() {
   const pasos = m.estados;
   return (
     <div>
-      <p className="etiqueta text-[10px] text-oliva">{m.pedido}</p>
+      <p className="etiqueta text-[11px] text-oliva">{m.pedido}</p>
       <div className="mt-4 space-y-3">
         {pasos.map((p, i) => (
           <div key={p} className="flex items-center gap-3">
             <span className={cn("h-1.5 w-1.5 shrink-0", i <= 1 ? "bg-oxido" : "bg-yeso/15")} />
-            <span className={cn("text-sm", i <= 1 ? "text-yeso" : "text-oliva")}>{p}</span>
+            <span className={cn("text-[15px]", i <= 1 ? "text-yeso" : "text-oliva")}>{p}</span>
           </div>
         ))}
       </div>
@@ -107,9 +107,33 @@ export function ComoFunciona() {
   const lineaRef = useRef<HTMLDivElement>(null);
   const mockRefs = useRef<Array<HTMLDivElement | null>>([]);
   const triggerRef = useRef<ScrollTrigger | null>(null);
+  const listaRef = useRef<HTMLDivElement>(null);
+  const columnaRef = useRef<HTMLDivElement>(null);
   const [activo, setActivo] = useState(0);
   const reducido = usePrefersReducedMotion();
   const { t } = useIdioma();
+
+  // La pantalla de ejemplo se centra en la parte visible de la lista: en
+  // pantallas bajas (o con escala de Windows al 125–150 %) la lista pasa
+  // el borde inferior y, centrada en toda la lista, quedaba cortada abajo.
+  useEffect(() => {
+    const panel = panelRef.current;
+    const lista = listaRef.current;
+    const columna = columnaRef.current;
+    if (!panel || !lista || !columna) return;
+
+    const ajustar = () => {
+      const arriba = lista.getBoundingClientRect().top - panel.getBoundingClientRect().top;
+      const visible = panel.clientHeight - arriba;
+      columna.style.height = `${Math.max(0, Math.min(lista.offsetHeight, visible))}px`;
+    };
+
+    ajustar();
+    const observador = new ResizeObserver(ajustar);
+    observador.observe(panel);
+    observador.observe(lista);
+    return () => observador.disconnect();
+  }, []);
 
   useGSAP(
     () => {
@@ -190,7 +214,7 @@ export function ComoFunciona() {
             />
 
             <div className="grid grid-cols-2 items-center gap-16 pt-8">
-              <div className="flex flex-col">
+              <div ref={listaRef} className="flex flex-col">
                 {t.comoFunciona.pasos.map((paso, i) => (
                   <button
                     key={i}
@@ -225,7 +249,7 @@ export function ComoFunciona() {
                 ))}
               </div>
 
-              <div className="relative h-[22rem]">
+              <div ref={columnaRef} className="relative h-[22rem] self-start">
                 {PANELES.map((Panel, i) => (
                   <div
                     key={i}
@@ -234,7 +258,7 @@ export function ComoFunciona() {
                     }}
                     className={cn("absolute inset-0 flex items-center justify-center", i > 0 && "opacity-0")}
                   >
-                    <div className="w-full max-w-[22rem] border border-yeso/10 bg-carbon-800 px-6 py-7">
+                    <div className="w-full max-w-[26rem] border border-yeso/10 bg-carbon-800 px-8 py-9">
                       <Panel />
                     </div>
                   </div>
